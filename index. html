@@ -1,12 +1,61 @@
 <!DOCTYPE html>
-<html>
+<html lang="bn">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Trading AI</title>
+
+  <style>
+    body {
+      margin: 0;
+      font-family: Arial, sans-serif;
+      background: #0f172a;
+      color: white;
+      text-align: center;
+    }
+
+    .box {
+      padding: 40px 20px;
+    }
+
+    h1 {
+      color: #22c55e;
+      font-size: 32px;
+    }
+
+    p {
+      font-size: 18px;
+      line-height: 1.6;
+    }
+
+    button {
+      background: #22c55e;
+      color: white;
+      border: none;
+      padding: 14px 25px;
+      border-radius: 8px;
+      font-size: 17px;
+      margin-top: 15px;
+    }
+  </style>
 </head>
+
 <body>
-  <h1>Trading AI</h1>
-  <p>আমাদের AI Trading Assistant তৈরি হচ্ছে...</p>
+
+  <div class="box">
+    <h1>🤖 Trading AI</h1>
+
+    <p>
+      আমাদের AI Trading Assistant তৈরি হচ্ছে...
+    </p>
+
+    <p>
+      বাজার বিশ্লেষণ, ট্রেন্ড এবং ট্রেডিং সিগন্যাল বুঝতে
+      আপনাকে সাহায্য করবে।
+    </p>
+
+    <button>Start Trading AI</button>
+  </div>
+
 </body>
 </html>
