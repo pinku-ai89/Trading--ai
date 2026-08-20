@@ -1,9 +1,10 @@
-
+ea">
 <!DOCTYPE html>
 <html lang="bn">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
   <title>Trading AI</title>
 
   <style>
@@ -18,101 +19,85 @@
       color: white;
     }
 
-    .header {
-      padding: 20px;
-      text-align: center;
-      background: #111827;
-      border-bottom: 1px solid #263244;
-    }
-
-    .header h1 {
-      margin: 0;
-      color: #22c55e;
-      font-size: 30px;
-    }
-
-    .header p {
-      margin: 8px 0 0;
-      color: #9ca3af;
-    }
-
     .container {
-      max-width: 600px;
+      max-width: 700px;
       margin: auto;
       padding: 20px;
     }
 
-    .card {
-      background: #111827;
+    h1 {
+      text-align: center;
+      color: #00ff99;
+      margin-top: 20px;
+    }
+
+    .subtitle {
+      text-align: center;
+      color: #b8c2d1;
+      margin-bottom: 25px;
+    }
+
+    .box {
+      background: #111c30;
       border-radius: 15px;
       padding: 20px;
-      margin-top: 20px;
-      border: 1px solid #263244;
+      box-shadow: 0 0 20px rgba(0,255,153,0.15);
     }
 
-    .card h2 {
-      margin-top: 0;
-      color: #38bdf8;
+    label {
+      display: block;
+      margin-bottom: 8px;
+      font-size: 16px;
     }
 
-    .message {
-      background: #1f2937;
+    textarea {
+      width: 100%;
+      min-height: 130px;
       padding: 15px;
       border-radius: 10px;
-      line-height: 1.6;
-      color: #e5e7eb;
-    }
-
-    .input-area {
-      display: flex;
-      gap: 10px;
-      margin-top: 15px;
-    }
-
-    input {
-      flex: 1;
-      padding: 14px;
-      border: none;
-      border-radius: 10px;
-      background: #1f2937;
+      border: 1px solid #30405c;
+      background: #09111f;
       color: white;
       font-size: 16px;
+      resize: vertical;
       outline: none;
     }
 
-    button {
-      padding: 14px 18px;
-      border: none;
-      border-radius: 10px;
-      background: #22c55e;
-      color: white;
-      font-weight: bold;
-      font-size: 16px;
+    textarea:focus {
+      border-color: #00ff99;
     }
 
-    .signal {
-      display: flex;
-      justify-content: space-between;
+    button {
+      width: 100%;
       margin-top: 15px;
       padding: 15px;
-      background: #1f2937;
+      border: none;
       border-radius: 10px;
+      background: #00c878;
+      color: white;
+      font-size: 17px;
+      font-weight: bold;
+      cursor: pointer;
     }
 
-    .buy {
-      color: #22c55e;
-      font-weight: bold;
+    button:hover {
+      background: #00a965;
     }
 
-    .sell {
-      color: #ef4444;
-      font-weight: bold;
+    .answer {
+      margin-top: 20px;
+      padding: 15px;
+      min-height: 80px;
+      background: #09111f;
+      border: 1px solid #30405c;
+      border-radius: 10px;
+      line-height: 1.6;
     }
 
     .warning {
-      margin-top: 20px;
-      color: #9ca3af;
-      font-size: 13px;
+      color: #ffd166;
+      font-size: 14px;
+      margin-top: 15px;
       text-align: center;
     }
   </style>
@@ -120,69 +105,63 @@
 
 <body>
 
-  <div class="header">
-    <h1>🤖 Trading AI</h1>
-    <p>Smart Trading Assistant</p>
-  </div>
-
   <div class="container">
 
-    <div class="card">
-      <h2>AI Assistant</h2>
+    <h1>🤖 Trading AI</h1>
 
-      <div class="message" id="answer">
-        👋 স্বাগতম! Trading সম্পর্কে আপনার প্রশ্ন লিখুন।
+    <p class="subtitle">
+      AI Trading Analysis Assistant
+    </p>
+
+    <div class="box">
+
+      <label for="question">
+        আপনার ট্রেডিং প্রশ্ন লিখুন:
+      </label>
+
+      <textarea
+        id="question"
+        placeholder="যেমন: XAUUSD 5 মিনিট চার্টে এখন Buy নাকি Sell?"
+      ></textarea>
+
+      <button onclick="askAI()">
+        🔍 AI Analysis
+      </button>
+
+      <div class="answer" id="answer">
+        এখানে AI-এর উত্তর দেখা যাবে।
       </div>
 
-      <div class="input-area">
-        <input
-          type="text"
-          id="question"
-          placeholder="আপনার প্রশ্ন লিখুন..."
-        >
-
-        <button onclick="askAI()">Send</button>
-      </div>
-    </div>
-
-    <div class="card">
-      <h2>📊 Market Analysis</h2>
-
-      <div class="signal">
-        <span>XAUUSD</span>
-        <span class="buy">WAIT</span>
+      <div class="warning">
+        ⚠️ এটি শুধুমাত্র শিক্ষামূলক ট্রেডিং বিশ্লেষণের জন্য।
       </div>
 
-      <div class="signal">
-        <span>Trend</span>
-        <span>Analyzing...</span>
-      </div>
-
-      <div class="signal">
-        <span>Risk</span>
-        <span>High</span>
-      </div>
-    </div>
-
-    <div class="warning">
-      ⚠️ Trading involves risk. Always do your own analysis.
     </div>
 
   </div>
 
+
   <script>
+
     function askAI() {
+
       const question = document.getElementById("question").value;
       const answer = document.getElementById("answer");
 
       if (question.trim() === "") {
+
         answer.innerHTML = "❗ আগে আপনার প্রশ্ন লিখুন।";
+
         return;
       }
 
       answer.innerHTML =
-        "🤖 আপনার প্রশ্ন পেয়েছি। আসল AI সংযোগ করার পর এখানে AI-এর উত্তর দেখা যাবে।";
+        "🤖 আপনার প্রশ্ন পেয়েছি।<br><br>" +
+        "বর্তমানে AI সংযোগ করা হয়নি। " +
+        "AI API সংযোগ করার পর এখানে আসল AI Trading Analysis দেখাবে।";
+
     }
+
   </script>
 
 </body>
