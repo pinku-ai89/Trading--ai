@@ -1,0 +1,14 @@
+{
+  "name": "Trader Pink AI",
+  "short_name": "Pink AI",
+  "id": "trader-pink-ai",
+  "description": "Smart Forex and Binary Trading Signal Assistant for Forex and Quotex",
+  "start_url": "/Trading--ai/",
+  "scope": "/Trading--ai/",
+  "display": "standalone",
+  "orientation": "any",
+  "background_color": "#000000",
+  "theme_color": "#000000",
+  "dir": "ltr",
+  "lang": "bn"
+}
