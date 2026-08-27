@@ -1,14 +1,693 @@
-{
-  "name": "Trader Pink AI",
-  "short_name": "Pink AI",
-  "id": "trader-pink-ai",
-  "description": "Smart Forex and Binary Trading Signal Assistant for Forex and Quotex",
-  "start_url": "/Trading--ai/",
-  "scope": "/Trading--ai/",
-  "display": "standalone",
-  "orientation": "any",
-  "background_color": "#000000",
-  "theme_color": "#000000",
-  "dir": "ltr",
-  "lang": "bn"
+<!DOCTYPE html>
+<html lang="bn">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <title>Trader Pink AI</title>
+
+  <meta name="theme-color" content="#000000">
+  <meta name="description" content="Trader Pink AI - Smart Forex Trading Assistant">
+
+  <link rel="manifest" href="manifest.json">
+
+  <style>
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      font-family: Arial, sans-serif;
+      background: #050505;
+      color: #ffffff;
+    }
+
+    .app {
+      max-width: 600px;
+      margin: auto;
+      padding: 16px;
+    }
+
+    .header {
+      text-align: center;
+      padding: 20px 10px;
+    }
+
+    .header h1 {
+      margin: 0;
+      font-size: 28px;
+    }
+
+    .header p {
+      margin-top: 8px;
+      color: #aaa;
+    }
+
+    .status {
+      text-align: center;
+      padding: 10px;
+      margin-bottom: 15px;
+      border-radius: 12px;
+      background: #111;
+      color: #00ff88;
+      font-size: 14px;
+    }
+
+    .button-row {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+      margin-bottom: 15px;
+    }
+
+    button {
+      border: none;
+      border-radius: 12px;
+      padding: 14px;
+      font-size: 16px;
+      font-weight: bold;
+      cursor: pointer;
+    }
+
+    .analyze-btn {
+      background: #ffffff;
+      color: #000000;
+    }
+
+    .history-btn {
+      background: #222;
+      color: #ffffff;
+    }
+
+    .card {
+      background: #111;
+      border: 1px solid #252525;
+      border-radius: 18px;
+      padding: 16px;
+      margin-bottom: 15px;
+    }
+
+    .market-title {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 12px;
+    }
+
+    .market-title h2 {
+      margin: 0;
+      font-size: 22px;
+    }
+
+    .price {
+      color: #aaa;
+      font-size: 14px;
+    }
+
+    .signal {
+      text-align: center;
+      font-size: 30px;
+      font-weight: bold;
+      padding: 18px 10px;
+      border-radius: 14px;
+      background: #181818;
+      margin-bottom: 12px;
+    }
+
+    .buy {
+      color: #00ff88;
+    }
+
+    .sell {
+      color: #ff4d6d;
+    }
+
+    .wait {
+      color: #ffd166;
+    }
+
+    .strength {
+      text-align: center;
+      font-size: 18px;
+      margin-bottom: 15px;
+    }
+
+    .grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+    }
+
+    .box {
+      background: #181818;
+      border-radius: 12px;
+      padding: 12px;
+    }
+
+    .box span {
+      display: block;
+      color: #999;
+      font-size: 12px;
+      margin-bottom: 5px;
+    }
+
+    .box strong {
+      font-size: 15px;
+    }
+
+    .time {
+      color: #aaa;
+      font-size: 13px;
+      margin-top: 12px;
+    }
+
+    .reason {
+      margin-top: 14px;
+      padding: 12px;
+      background: #181818;
+      border-radius: 12px;
+      color: #ccc;
+      font-size: 13px;
+      line-height: 1.6;
+    }
+
+    .section-title {
+      font-size: 20px;
+      margin: 20px 0 12px;
+    }
+
+    .summary {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 8px;
+    }
+
+    .summary-box {
+      background: #111;
+      border-radius: 12px;
+      padding: 12px 5px;
+      text-align: center;
+    }
+
+    .summary-box span {
+      display: block;
+      color: #999;
+      font-size: 11px;
+      margin-bottom: 5px;
+    }
+
+    .summary-box strong {
+      font-size: 18px;
+    }
+
+    .loading {
+      text-align: center;
+      padding: 25px;
+      color: #aaa;
+    }
+
+    .error {
+      color: #ff4d6d;
+      text-align: center;
+      padding: 15px;
+    }
+
+    .footer {
+      text-align: center;
+      color: #666;
+      font-size: 12px;
+      padding: 20px 5px;
+    }
+  </style>
+</head>
+
+<body>
+
+<div class="app">
+
+  <div class="header">
+    <h1>🤖 Trader Pink AI</h1>
+    <p>Smart Trading Analysis Assistant</p>
+  </div>
+
+  <div class="status" id="status">
+    ● Ready
+  </div>
+
+  <div class="button-row">
+    <button class="analyze-btn" onclick="runAnalysis()">
+      🔍 AI Analysis
+    </button>
+
+    <button class="history-btn" onclick="loadResults()">
+      📊 Results
+    </button>
+  </div>
+
+  <div id="bestSignal"></div>
+
+  <h2 class="section-title">📈 Market Analysis</h2>
+
+  <div id="markets">
+    <div class="loading">
+      Analysis চালু করতে AI Analysis চাপুন
+    </div>
+  </div>
+
+  <h2 class="section-title">🎯 Signal Results</h2>
+
+  <div id="results">
+    <div class="summary">
+      <div class="summary-box">
+        <span>Total</span>
+        <strong id="total">0</strong>
+      </div>
+
+      <div class="summary-box">
+        <span>Correct</span>
+        <strong id="correct">0</strong>
+      </div>
+
+      <div class="summary-box">
+        <span>Accuracy</span>
+        <strong id="accuracy">0%</strong>
+      </div>
+    </div>
+  </div>
+
+  <div class="footer">
+    Bangladesh Time (UTC+6)<br>
+    Signal is for analysis only. No guaranteed profit.
+  </div>
+
+</div>
+
+<script>
+
+const API_BASE =
+  "https://crimson-grass-f881.bijondebnath51.workers.dev";
+
+
+// =====================================
+// RUN ANALYSIS
+// =====================================
+
+async function runAnalysis() {
+
+  const status =
+    document.getElementById("status");
+
+  const markets =
+    document.getElementById("markets");
+
+  const bestSignal =
+    document.getElementById("bestSignal");
+
+  status.textContent =
+    "● Analyzing live market...";
+
+  markets.innerHTML =
+    '<div class="loading">⏳ Live data পাওয়া যাচ্ছে...</div>';
+
+  bestSignal.innerHTML = "";
+
+  try {
+
+    const response =
+      await fetch(
+        API_BASE + "/analyze"
+      );
+
+    if (!response.ok) {
+      throw new Error(
+        "Server error: " + response.status
+      );
+    }
+
+    const data =
+      await response.json();
+
+    if (data.status !== "success") {
+      throw new Error(
+        data.message ||
+        "Analysis failed"
+      );
+    }
+
+    status.textContent =
+      data.tracking &&
+      data.tracking.kv_binding === "CONNECTED"
+        ? "● AI Online • KV Connected"
+        : "● AI Online";
+
+    renderBestSignal(
+      data.best_signal
+    );
+
+    renderMarkets(
+      data.market_analysis || []
+    );
+
+    loadResults();
+
+  } catch (error) {
+
+    status.textContent =
+      "● Connection error";
+
+    markets.innerHTML =
+      '<div class="error">❌ ' +
+      escapeHtml(error.message) +
+      '</div>';
+
+  }
+
 }
+
+
+// =====================================
+// BEST SIGNAL
+// =====================================
+
+function renderBestSignal(signal) {
+
+  if (!signal) {
+    return;
+  }
+
+  let cls = "wait";
+
+  if (signal.signal === "BUY") {
+    cls = "buy";
+  }
+
+  if (signal.signal === "SELL") {
+    cls = "sell";
+  }
+
+  const html = `
+
+    <div class="card">
+
+      <div class="market-title">
+        <h2>⭐ Best Signal</h2>
+        <div class="price">
+          ${escapeHtml(signal.market || "-")}
+        </div>
+      </div>
+
+      <div class="signal ${cls}">
+        ${escapeHtml(signal.signal || "WAIT")}
+      </div>
+
+      <div class="strength">
+        Strength:
+        <strong>
+          ${escapeHtml(signal.strength || "0%")}
+        </strong>
+      </div>
+
+      <div class="time">
+        🕐 ${
+          escapeHtml(
+            signal.candle_time || "-"
+          )
+        }
+      </div>
+
+    </div>
+
+  `;
+
+  document.getElementById(
+    "bestSignal"
+  ).innerHTML = html;
+
+}
+
+
+// =====================================
+// MARKET CARDS
+// =====================================
+
+function renderMarkets(markets) {
+
+  const container =
+    document.getElementById("markets");
+
+  if (!markets.length) {
+
+    container.innerHTML =
+      '<div class="loading">কোনো market data পাওয়া যায়নি</div>';
+
+    return;
+  }
+
+  container.innerHTML =
+    markets.map(
+      market => {
+
+        let cls = "wait";
+
+        if (market.signal === "BUY") {
+          cls = "buy";
+        }
+
+        if (market.signal === "SELL") {
+          cls = "sell";
+        }
+
+        const direction =
+          market.direction || {};
+
+        const trend =
+          market.trend || {};
+
+        return `
+
+          <div class="card">
+
+            <div class="market-title">
+
+              <h2>
+                ${escapeHtml(
+                  market.market
+                )}
+              </h2>
+
+              <div class="price">
+                ${
+                  market.price !== null &&
+                  market.price !== undefined
+                    ? escapeHtml(
+                        String(
+                          market.price
+                        )
+                      )
+                    : "-"
+                }
+              </div>
+
+            </div>
+
+            <div class="signal ${cls}">
+              ${escapeHtml(
+                market.signal || "WAIT"
+              )}
+            </div>
+
+            <div class="strength">
+              Strength:
+              <strong>
+                ${escapeHtml(
+                  market.strength || "0%"
+                )}
+              </strong>
+            </div>
+
+            <div class="grid">
+
+              <div class="box">
+                <span>1m Direction</span>
+                <strong>
+                  ${escapeHtml(
+                    direction["1m"] || "-"
+                  )}
+                </strong>
+              </div>
+
+              <div class="box">
+                <span>5m Direction</span>
+                <strong>
+                  ${escapeHtml(
+                    direction["5m"] || "-"
+                  )}
+                </strong>
+              </div>
+
+              <div class="box">
+                <span>15m Direction</span>
+                <strong>
+                  ${escapeHtml(
+                    direction["15m"] || "-"
+                  )}
+                </strong>
+              </div>
+
+              <div class="box">
+                <span>1m Trend</span>
+                <strong>
+                  ${escapeHtml(
+                    trend["1m"] || "-"
+                  )}
+                </strong>
+              </div>
+
+              <div class="box">
+                <span>5m Trend</span>
+                <strong>
+                  ${escapeHtml(
+                    trend["5m"] || "-"
+                  )}
+                </strong>
+              </div>
+
+              <div class="box">
+                <span>15m Trend</span>
+                <strong>
+                  ${escapeHtml(
+                    trend["15m"] || "-"
+                  )}
+                </strong>
+              </div>
+
+            </div>
+
+            <div class="time">
+              🕐 ${
+                escapeHtml(
+                  market.candle_time || "-"
+                )
+              }
+            </div>
+
+            <div class="reason">
+              ${
+                Array.isArray(market.reason)
+                  ? market.reason
+                      .map(
+                        r =>
+                          "• " +
+                          escapeHtml(
+                            String(r)
+                          )
+                      )
+                      .join("<br>")
+                  : "কোনো কারণ পাওয়া যায়নি"
+              }
+            </div>
+
+          </div>
+
+        `;
+
+      }
+    ).join("");
+
+}
+
+
+// =====================================
+// RESULTS
+// =====================================
+
+async function loadResults() {
+
+  try {
+
+    const response =
+      await fetch(
+        API_BASE + "/results"
+      );
+
+    const data =
+      await response.json();
+
+    if (data.status !== "success") {
+      return;
+    }
+
+    document.getElementById(
+      "total"
+    ).textContent =
+      data.total_signals ?? 0;
+
+    document.getElementById(
+      "correct"
+    ).textContent =
+      data.correct ?? 0;
+
+    document.getElementById(
+      "accuracy"
+    ).textContent =
+      data.accuracy || "0%";
+
+  } catch (error) {
+
+    console.log(
+      "Results error:",
+      error
+    );
+
+  }
+
+}
+
+
+// =====================================
+// ESCAPE HTML
+// =====================================
+
+function escapeHtml(value) {
+
+  return String(value)
+    .replace(
+      /&/g,
+      "&amp;"
+    )
+    .replace(
+      /</g,
+      "&lt;"
+    )
+    .replace(
+      />/g,
+      "&gt;"
+    )
+    .replace(
+      /"/g,
+      "&quot;"
+    )
+    .replace(
+      /'/g,
+      "&#039;"
+    );
+
+}
+
+
+// =====================================
+// AUTO LOAD
+// =====================================
+
+window.addEventListener(
+  "load",
+  () => {
+    loadResults();
+  }
+);
+
+</script>
+
+</body>
+</html>
