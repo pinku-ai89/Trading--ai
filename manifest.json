@@ -7,9 +7,13 @@
   <title>Trader Pink AI</title>
 
   <meta name="theme-color" content="#000000">
-  <meta name="description" content="Trader Pink AI - Smart Forex Trading Assistant">
+  <meta name="description" content="Smart Forex and Binary Trading Signal Assistant">
 
-  <link rel="manifest" href="manifest.json">
+  <link rel="manifest" href="./manifest.json">
+  <link rel="icon" href="./icon-192.png">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-title" content="Trader Pink AI">
 
   <style>
     * {
@@ -259,6 +263,7 @@
 
   <div id="results">
     <div class="summary">
+
       <div class="summary-box">
         <span>Total</span>
         <strong id="total">0</strong>
@@ -273,6 +278,7 @@
         <span>Accuracy</span>
         <strong id="accuracy">0%</strong>
       </div>
+
     </div>
   </div>
 
@@ -392,6 +398,7 @@ function renderBestSignal(signal) {
 
       <div class="market-title">
         <h2>⭐ Best Signal</h2>
+
         <div class="price">
           ${escapeHtml(signal.market || "-")}
         </div>
@@ -652,26 +659,41 @@ async function loadResults() {
 function escapeHtml(value) {
 
   return String(value)
-    .replace(
-      /&/g,
-      "&amp;"
-    )
-    .replace(
-      /</g,
-      "&lt;"
-    )
-    .replace(
-      />/g,
-      "&gt;"
-    )
-    .replace(
-      /"/g,
-      "&quot;"
-    )
-    .replace(
-      /'/g,
-      "&#039;"
-    );
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;")
+    .replace(/'/g, "&#039;");
+
+}
+
+
+// =====================================
+// SERVICE WORKER
+// =====================================
+
+if ("serviceWorker" in navigator) {
+
+  window.addEventListener(
+    "load",
+    () => {
+
+      navigator.serviceWorker
+        .register("./sw.js")
+        .then(() => {
+          console.log(
+            "Trader Pink AI Service Worker registered"
+          );
+        })
+        .catch(error => {
+          console.log(
+            "Service Worker error:",
+            error
+          );
+        });
+
+    }
+  );
 
 }
 
