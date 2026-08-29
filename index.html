@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1.0">
 <meta name="theme-color" content="#ff4f9a">
-<meta name="description" content="Trader Pink AI - Smart Forex Trading Analysis Assistant">
+<meta name="description" content="Trader Pink AI - Smart Forex and Binary Trading Analysis Assistant">
 <link rel="manifest" href="manifest.json">
 <title>Trader Pink AI 🤖📈</title>
 
@@ -12,349 +12,1061 @@
 *{box-sizing:border-box}
 body{
  margin:0;
- font-family:Arial,sans-serif;
- background:linear-gradient(180deg,#16051a,#090909);
+ background:linear-gradient(180deg,#170719,#080808);
  color:#fff;
- min-height:100vh;
+ font-family:Arial,sans-serif;
 }
 .app{
- max-width:520px;
+ width:100%;
+ max-width:540px;
  margin:auto;
- padding:16px;
+ padding:14px;
 }
 .header{
  text-align:center;
- padding:18px 5px;
+ padding:14px 0 10px;
 }
-.logo{font-size:34px}
-h1{margin:6px 0;color:#ff4f9a;font-size:27px}
-.sub{color:#bbb;font-size:14px}
+.logo{font-size:38px}
+h1{
+ margin:5px 0;
+ color:#ff4f9a;
+ font-size:28px;
+}
+.sub{color:#aaa;font-size:13px}
+.online{color:#35e0a1;margin-top:7px;font-size:13px}
 
 .card{
  background:#171717;
- border:1px solid #333;
+ border:1px solid #303030;
  border-radius:18px;
- padding:16px;
+ padding:15px;
  margin:12px 0;
- box-shadow:0 8px 25px #0007;
+ box-shadow:0 8px 24px #0008;
 }
-
-.label{color:#aaa;font-size:13px;margin-bottom:8px}
+.title{
+ font-size:17px;
+ font-weight:bold;
+ margin-bottom:12px;
+}
+.label{
+ color:#999;
+ font-size:12px;
+ margin-bottom:7px;
+}
 select,button{
  width:100%;
- border:0;
+ padding:13px;
  border-radius:12px;
- padding:14px;
- font-size:16px;
+ border:1px solid #3b3b3b;
+ font-size:15px;
 }
 select{
- background:#252525;
- color:#fff;
- border:1px solid #444;
+ background:#242424;
+ color:white;
 }
-
 .tf{
  display:grid;
  grid-template-columns:repeat(3,1fr);
  gap:8px;
 }
 .tf button{
- background:#292929;
+ background:#282828;
  color:#fff;
- border:1px solid #444;
 }
 .tf button.active{
  background:#ff4f9a;
  border-color:#ff4f9a;
 }
-
 .analyze{
- margin-top:14px;
- background:linear-gradient(90deg,#ff4f9a,#ff78b3);
- color:#fff;
+ margin-top:12px;
+ background:linear-gradient(90deg,#ff4f9a,#ff75b1);
+ color:white;
+ border:0;
  font-weight:bold;
 }
-
 .status{
  text-align:center;
  color:#aaa;
- font-size:13px;
- margin-top:10px;
+ font-size:12px;
+ margin-top:9px;
 }
 
-.signal{
+.best{
  text-align:center;
- padding:18px;
- border-radius:16px;
  background:#202020;
+ border-radius:16px;
+ padding:17px 10px;
 }
-.signal-title{font-size:14px;color:#aaa}
-.signal-value{
- font-size:38px;
+.best-symbol{
+ color:#bbb;
+ font-size:14px;
+}
+.signal{
+ font-size:40px;
  font-weight:bold;
- margin:8px 0;
+ margin:7px 0;
 }
-.buy{color:#21e6a3}
-.sell{color:#ff5c72}
+.buy{color:#22e0a0}
+.sell{color:#ff6075}
 .wait{color:#ffd166}
+.conf{
+ font-size:14px;
+ color:#ddd;
+}
 
-.grid{
+.row{
  display:grid;
  grid-template-columns:1fr 1fr;
- gap:10px;
+ gap:9px;
 }
-.item{
+.box{
+ background:#222;
+ padding:11px;
+ border-radius:12px;
+}
+.box span{
+ display:block;
+ color:#999;
+ font-size:11px;
+ margin-bottom:5px;
+}
+.box b{
+ font-size:15px;
+ word-break:break-word;
+}
+
+.multi{
+ display:grid;
+ grid-template-columns:repeat(3,1fr);
+ gap:7px;
+}
+.tfbox{
  background:#222;
  border-radius:12px;
- padding:12px;
+ padding:12px 5px;
+ text-align:center;
 }
-.item small{display:block;color:#999;margin-bottom:5px}
-.item b{font-size:16px}
+.tfbox span{
+ display:block;
+ color:#aaa;
+ font-size:11px;
+}
+.tfbox b{
+ display:block;
+ margin-top:5px;
+ font-size:15px;
+}
 
-.reason{
+.pred{
+ background:#222;
+ border-radius:12px;
+ padding:10px;
+ margin:7px 0;
+}
+.pred b{font-size:14px}
+.pred small{
+ display:block;
+ color:#999;
+ margin-top:4px;
+}
+
+.analysis{
  color:#ddd;
- line-height:1.5;
+ line-height:1.6;
  font-size:14px;
+}
+
+.warning{
+ color:#ffcf70;
+ font-size:11px;
+ line-height:1.5;
+ margin-top:12px;
 }
 
 .footer{
  text-align:center;
  color:#777;
  font-size:11px;
- padding:20px 0;
+ padding:18px 0 25px;
 }
 </style>
 </head>
 
 <body>
+
 <div class="app">
 
 <div class="header">
 <div class="logo">🤖📈</div>
 <h1>Trader Pink AI</h1>
-<div class="sub">Smart Trading Analysis Assistant</div>
+<div class="sub">Smart Forex and Binary Trading Signal Assistant</div>
+<div class="online">● AI Online • Live Data</div>
 </div>
 
 <div class="card">
+
 <div class="label">Market</div>
+
 <select id="symbol">
 <option value="EURUSD">EURUSD</option>
+<option value="GBPUSD">GBPUSD</option>
 </select>
 
-<div class="label" style="margin-top:15px">Timeframe</div>
+<div class="label" style="margin-top:13px">
+Timeframe
+</div>
+
 <div class="tf">
-<button class="active" data-tf="1m">1M</button>
-<button data-tf="5m">5M</button>
-<button data-tf="15m">15M</button>
+<button class="active" data-tf="1m">1 Minute</button>
+<button data-tf="5m">5 Minutes</button>
+<button data-tf="15m">15 Minutes</button>
 </div>
 
-<button class="analyze" onclick="analyze()">🔍 AI Analysis</button>
-<div class="status" id="status">Ready</div>
+<button class="analyze" onclick="runAnalysis()">
+🔍 Analyze Market
+</button>
+
+<div id="status" class="status">
+Ready
 </div>
 
-<div class="card">
-<div class="signal">
-<div class="signal-title">CURRENT SIGNAL</div>
-<div class="signal-value wait" id="signal">WAIT</div>
-<div id="confidence">Confidence: --</div>
-</div>
 </div>
 
 <div class="card">
-<div class="grid">
-<div class="item">
-<small>Trend</small>
-<b id="trend">--</b>
+
+<div class="title">🎯 Best Signal</div>
+
+<div class="best">
+
+<div class="best-symbol" id="bestSymbol">
+EURUSD
 </div>
-<div class="item">
-<small>Strength</small>
-<b id="strength">--</b>
+
+<div id="signal" class="signal wait">
+WAIT
 </div>
-<div class="item">
-<small>Support</small>
-<b id="support">--</b>
+
+<div id="confidence" class="conf">
+Confidence: --
 </div>
-<div class="item">
-<small>Resistance</small>
-<b id="resistance">--</b>
+
 </div>
-<div class="item">
-<small>Candle Time</small>
+
+</div>
+
+<div class="card">
+
+<div class="row">
+
+<div class="box">
+<span>Forex Signal</span>
+<b id="forexSignal">WAIT</b>
+</div>
+
+<div class="box">
+<span>Binary Signal</span>
+<b id="binarySignal">WAIT</b>
+</div>
+
+<div class="box">
+<span>Binary Expiry</span>
+<b id="expiry">5 মিনিট</b>
+</div>
+
+<div class="box">
+<span>Current Price</span>
+<b id="price">--</b>
+</div>
+
+<div class="box">
+<span>Candle Time</span>
 <b id="candleTime">--</b>
 </div>
-<div class="item">
-<small>Timeframe</small>
-<b id="currentTf">1M</b>
+
+<div class="box">
+<span>Signal Time</span>
+<b id="signalTime">--</b>
 </div>
+
 </div>
+
 </div>
 
 <div class="card">
-<div class="label">Next 1–3 Candle Prediction</div>
-<div id="predictions" class="reason">
-Analysis চালু করলে prediction এখানে দেখা যাবে।
+
+<div class="title">🔮 Next 1–3 Candles</div>
+
+<div id="predictions">
+<div class="pred">
+Analysis চালু করলে prediction দেখা যাবে।
 </div>
 </div>
 
-<div class="card">
-<div class="label">AI Analysis</div>
-<div id="reason" class="reason">
-🔹 Market analysis-এর জন্য AI Analysis চাপুন।
 </div>
+
+<div class="card">
+
+<div class="title">📊 Market Analysis</div>
+
+<div class="box">
+
+<div style="font-size:20px;font-weight:bold">
+<span id="marketSymbol">EURUSD</span>
+</div>
+
+<div style="margin-top:7px">
+Price:
+<b id="marketPrice">--</b>
+</div>
+
+<div style="margin-top:7px">
+Signal:
+<b id="marketSignal">WAIT</b>
+</div>
+
+<div style="margin-top:7px">
+Strength:
+<b id="strength">--</b>
+</div>
+
+</div>
+
+<div style="margin-top:12px" class="multi">
+
+<div class="tfbox">
+<span>1 Minute</span>
+<b id="tf1">-</b>
+</div>
+
+<div class="tfbox">
+<span>5 Minutes</span>
+<b id="tf5">-</b>
+</div>
+
+<div class="tfbox">
+<span>15 Minutes</span>
+<b id="tf15">-</b>
+</div>
+
+</div>
+
+<div class="row" style="margin-top:10px">
+
+<div class="box">
+<span>1m Trend</span>
+<b id="trend1">-</b>
+</div>
+
+<div class="box">
+<span>5m Trend</span>
+<b id="trend5">-</b>
+</div>
+
+<div class="box">
+<span>15m Trend</span>
+<b id="trend15">-</b>
+</div>
+
+<div class="box">
+<span>Candle</span>
+<b id="candle">-</b>
+</div>
+
+<div class="box">
+<span>Support</span>
+<b id="support">--</b>
+</div>
+
+<div class="box">
+<span>Resistance</span>
+<b id="resistance">--</b>
+</div>
+
+<div class="box">
+<span>EMA 9</span>
+<b id="ema9">--</b>
+</div>
+
+<div class="box">
+<span>EMA 21</span>
+<b id="ema21">--</b>
+</div>
+
+</div>
+
+</div>
+
+<div class="card">
+
+<div class="title">🧠 AI Analysis</div>
+
+<div id="analysis" class="analysis">
+Market analysis শুরু করতে
+<b>Analyze Market</b> চাপুন।
+</div>
+
+<div id="warning" class="warning"></div>
+
+</div>
+
+<div class="card">
+
+<div class="title">🎯 Signal Results</div>
+
+<div class="row">
+
+<div class="box">
+<span>Total Signals</span>
+<b id="totalSignals">0</b>
+</div>
+
+<div class="box">
+<span>Correct</span>
+<b id="correctSignals">0</b>
+</div>
+
+<div class="box">
+<span>Accuracy</span>
+<b id="accuracy">0%</b>
+</div>
+
+<div class="box">
+<span>Timezone</span>
+<b>Bangladesh UTC+6</b>
+</div>
+
+</div>
+
 </div>
 
 <div class="footer">
 Trader Pink AI 🤖📈<br>
-For analysis assistance only. Trading involves risk.
+AI analysis only. No guaranteed profit.
 </div>
 
 </div>
 
 <script>
-const API_BASE="https://crimson-grass-f881.workers.dev";
 
-let timeframe="1m";
+const API_BASE =
+"https://crimson-grass-f881.workers.dev";
 
-document.querySelectorAll(".tf button").forEach(btn=>{
- btn.addEventListener("click",()=>{
-  document.querySelectorAll(".tf button")
-   .forEach(b=>b.classList.remove("active"));
+let selectedTimeframe = "1m";
 
-  btn.classList.add("active");
-  timeframe=btn.dataset.tf;
-  document.getElementById("currentTf").textContent=
-   timeframe.toUpperCase();
+const buttons =
+document.querySelectorAll(".tf button");
+
+buttons.forEach(button => {
+
+ button.addEventListener("click", () => {
+
+  buttons.forEach(b =>
+   b.classList.remove("active")
+  );
+
+  button.classList.add("active");
+
+  selectedTimeframe =
+   button.dataset.tf;
+
+  runAnalysis();
  });
 });
 
-function setSignal(value){
- const el=document.getElementById("signal");
- el.textContent=value || "WAIT";
- el.className="signal-value";
+function setSignal(
+ element,
+ value
+){
 
- if(value==="BUY") el.classList.add("buy");
- else if(value==="SELL") el.classList.add("sell");
- else el.classList.add("wait");
-}
+ value =
+ String(value || "WAIT")
+ .toUpperCase();
 
-async function analyze(){
+ element.textContent =
+ value;
 
- const status=document.getElementById("status");
- status.textContent="⏳ Market data ও AI analysis চলছে...";
+ element.className = "";
 
- try{
-
-  const symbol=document.getElementById("symbol").value;
-
-  const url=
-   API_BASE+
-   "/analyze?symbol="+encodeURIComponent(symbol)+
-   "&timeframe="+encodeURIComponent(timeframe);
-
-  const response=await fetch(url,{cache:"no-store"});
-
-  if(!response.ok){
-   throw new Error("API error "+response.status);
-  }
-
-  const data=await response.json();
-
-  console.log("AI DATA:",data);
-
-  const analysis=data.analysis || {};
-  const signal=data.signal || {};
-
-  const direction=
-   signal.direction ||
-   data.direction ||
-   data.signal_direction ||
-   "WAIT";
-
-  const confidence=
-   signal.confidence ??
-   data.confidence ??
-   "--";
-
-  setSignal(String(direction).toUpperCase());
-
-  document.getElementById("confidence").textContent=
-   "Confidence: "+
-   (confidence==="--" ? "--" : confidence+"%");
-
-  document.getElementById("trend").textContent=
-   analysis.trend ||
-   data.trend ||
-   "--";
-
-  document.getElementById("strength").textContent=
-   analysis.market_strength ||
-   data.market_strength ||
-   "--";
-
-  document.getElementById("support").textContent=
-   analysis.support ??
-   data.support ??
-   "--";
-
-  document.getElementById("resistance").textContent=
-   analysis.resistance ??
-   data.resistance ??
-   "--";
-
-  document.getElementById("candleTime").textContent=
-   data.timestamp ||
-   data.candle_time ||
-   new Date().toLocaleTimeString("en-GB");
-
-  let reason=
-   analysis.reason ||
-   analysis.summary ||
-   data.reason ||
-   data.message ||
-   "AI analysis পাওয়া গেছে।";
-
-  document.getElementById("reason").textContent=reason;
-
-  let predictions=
-   data.predictions ||
-   data.next_candles ||
-   analysis.predictions;
-
-  if(Array.isArray(predictions)){
-   document.getElementById("predictions").innerHTML=
-    predictions.map((p,i)=>
-     "Candle "+(i+1)+" → "+
-     (typeof p==="string" ? p :
-      (p.direction || p.signal || "WAIT"))+
-     (p.time ? " • "+p.time : "")
-    ).join("<br>");
-  }else{
-   document.getElementById("predictions").textContent=
-    predictions ||
-    "Next candle prediction API response-এর ওপর নির্ভর করবে।";
-  }
-
-  status.textContent=
-   "✅ Updated "+new Date().toLocaleTimeString("en-GB");
-
- }catch(error){
-
-  console.error(error);
-
-  status.textContent="❌ Analysis পাওয়া যায়নি";
-
-  document.getElementById("reason").textContent=
-   "Server/API সংযোগে সমস্যা হয়েছে। কিছুক্ষণ পর আবার চেষ্টা করুন।";
-
+ if(value === "BUY"){
+  element.classList.add("buy");
+ }
+ else if(value === "SELL"){
+  element.classList.add("sell");
+ }
+ else{
+  element.classList.add("wait");
  }
 }
 
-if("serviceWorker" in navigator){
- window.addEventListener("load",()=>{
-  navigator.serviceWorker.register("./sw.js")
-   .catch(err=>console.log("SW:",err));
- });
+function cleanConfidence(value){
+
+ if(value === null ||
+    value === undefined ||
+    value === "--"){
+  return "--";
+ }
+
+ return String(value)
+  .replace("%","") + "%";
 }
+
+function getTrend(data){
+
+ return (
+  data?.market?.trend ||
+  data?.trend ||
+  data?.analysis?.trend ||
+  "--"
+ );
+}
+
+function getPrice(data){
+
+ return (
+  data?.price ??
+  data?.market?.price ??
+  data?.market?.latest?.close ??
+  data?.data?.price ??
+  data?.data?.latest?.close ??
+  "--"
+ );
+}
+
+function getCandleTime(data){
+
+ return (
+  data?.candle_time ||
+  data?.market?.candle_time ||
+  data?.market?.latest?.time ||
+  data?.timestamp ||
+  "--"
+ );
+}
+
+function formatPrice(value){
+
+ const number =
+  Number(value);
+
+ if(!Number.isFinite(number)){
+  return "--";
+ }
+
+ return number.toFixed(6);
+}
+
+async function fetchTimeframe(
+ symbol,
+ timeframe
+){
+
+ const url =
+ API_BASE +
+ "/analyze?symbol=" +
+ encodeURIComponent(symbol) +
+ "&timeframe=" +
+ encodeURIComponent(timeframe);
+
+ const response =
+ await fetch(
+  url,
+  {
+   cache:"no-store"
+  }
+ );
+
+ if(!response.ok){
+  throw new Error(
+   "API HTTP " +
+   response.status
+  );
+ }
+
+ return await response.json();
+}
+
+async function runAnalysis(){
+
+ const symbol =
+ document.getElementById(
+  "symbol"
+ ).value;
+
+ const status =
+ document.getElementById(
+  "status"
+ );
+
+ status.textContent =
+ "⏳ Live market data নেওয়া হচ্ছে...";
+
+ document.getElementById(
+  "bestSymbol"
+ ).textContent =
+  symbol;
+
+ document.getElementById(
+  "marketSymbol"
+ ).textContent =
+  symbol;
+
+ try{
+
+  /*
+   Main selected timeframe
+  */
+
+  const mainData =
+   await fetchTimeframe(
+    symbol,
+    selectedTimeframe
+   );
+
+  /*
+   Get all timeframes
+  */
+
+  const results =
+   await Promise.allSettled([
+
+    fetchTimeframe(
+     symbol,
+     "1m"
+    ),
+
+    fetchTimeframe(
+     symbol,
+     "5m"
+    ),
+
+    fetchTimeframe(
+     symbol,
+     "15m"
+    )
+
+  ]);
+
+  const data1 =
+   results[0].status === "fulfilled"
+    ? results[0].value
+    : null;
+
+  const data5 =
+   results[1].status === "fulfilled"
+    ? results[1].value
+    : null;
+
+  const data15 =
+   results[2].status === "fulfilled"
+    ? results[2].value
+    : null;
+
+  /*
+   Main signal
+  */
+
+  const signalData =
+   mainData.signal || {};
+
+  const direction =
+   String(
+    signalData.direction ||
+    mainData.direction ||
+    "WAIT"
+   ).toUpperCase();
+
+  const confidence =
+   cleanConfidence(
+    signalData.confidence ||
+    mainData.confidence
+   );
+
+  setSignal(
+   document.getElementById("signal"),
+   direction
+  );
+
+  setSignal(
+   document.getElementById("forexSignal"),
+   direction
+  );
+
+  setSignal(
+   document.getElementById("marketSignal"),
+   direction
+  );
+
+  document.getElementById(
+   "confidence"
+  ).textContent =
+   "Confidence: " +
+   confidence;
+
+  /*
+   Price
+  */
+
+  const price =
+   getPrice(mainData);
+
+  const priceText =
+   formatPrice(price);
+
+  document.getElementById(
+   "price"
+  ).textContent =
+   priceText;
+
+  document.getElementById(
+   "marketPrice"
+  ).textContent =
+   priceText;
+
+  /*
+   Candle
+  */
+
+  const candleTime =
+   getCandleTime(mainData);
+
+  document.getElementById(
+   "candleTime"
+  ).textContent =
+   candleTime;
+
+  document.getElementById(
+   "signalTime"
+  ).textContent =
+   candleTime;
+
+  /*
+   Strength
+  */
+
+  const strength =
+   mainData?.market?.strength ||
+   mainData?.market?.market_strength ||
+   mainData?.strength ||
+   confidence;
+
+  document.getElementById(
+   "strength"
+  ).textContent =
+   strength;
+
+  /*
+   Candle type
+  */
+
+  document.getElementById(
+   "candle"
+  ).textContent =
+   mainData?.market?.candle ||
+   "--";
+
+  /*
+   Support / Resistance
+  */
+
+  document.getElementById(
+   "support"
+  ).textContent =
+   mainData?.market?.support ??
+   "--";
+
+  document.getElementById(
+   "resistance"
+  ).textContent =
+   mainData?.market?.resistance ??
+   "--";
+
+  /*
+   EMA
+  */
+
+  document.getElementById(
+   "ema9"
+  ).textContent =
+   mainData?.indicators?.EMA_9 ??
+   "--";
+
+  document.getElementById(
+   "ema21"
+  ).textContent =
+   mainData?.indicators?.EMA_21 ??
+   "--";
+
+  /*
+   Binary
+  */
+
+  const binary =
+   mainData.binary || {};
+
+  document.getElementById(
+   "binarySignal"
+  ).textContent =
+   binary.instruction ||
+   (
+    direction === "BUY"
+     ? "CALL / UP"
+     : direction === "SELL"
+       ? "PUT / DOWN"
+       : "WAIT"
+   );
+
+  document.getElementById(
+   "expiry"
+  ).textContent =
+   (
+    binary.expiry_minutes ||
+    5
+   ) +
+   " মিনিট";
+
+  /*
+   Timeframe results
+  */
+
+  function updateTF(
+   elementId,
+   data
+  ){
+
+   if(!data){
+
+    document.getElementById(
+     elementId
+    ).textContent = "-";
+
+    return;
+   }
+
+   const s =
+    data?.signal?.direction ||
+    data?.direction ||
+    "WAIT";
+
+   document.getElementById(
+    elementId
+   ).textContent =
+    String(s).toUpperCase();
+  }
+
+  updateTF(
+   "tf1",
+   data1
+  );
+
+  updateTF(
+   "tf5",
+   data5
+  );
+
+  updateTF(
+   "tf15",
+   data15
+  );
+
+  /*
+   Trends
+  */
+
+  document.getElementById(
+   "trend1"
+  ).textContent =
+   getTrend(data1);
+
+  document.getElementById(
+   "trend5"
+  ).textContent =
+   getTrend(data5);
+
+  document.getElementById(
+   "trend15"
+  ).textContent =
+   getTrend(data15);
+
+  /*
+   AI Analysis
+  */
+
+  document.getElementById(
+   "analysis"
+  ).textContent =
+   "Market trend এবং candle analysis অনুযায়ী " +
+   direction +
+   " signal তৈরি হয়েছে। " +
+   "বর্তমান price: " +
+   priceText +
+   ", trend: " +
+   getTrend(mainData) +
+   ", confidence: " +
+   confidence + ".";
+
+  /*
+   Warning
+  */
+
+  document.getElementById(
+   "warning"
+  ).textContent =
+   mainData.warning ||
+   "AI analysis only. No guaranteed profit.";
+
+  /*
+   Next candles
+  */
+
+  const predictions =
+   mainData.next_candles ||
+   [];
+
+  const predictionBox =
+   document.getElementById(
+    "predictions"
+   );
+
+  if(
+   Array.isArray(predictions) &&
+   predictions.length
+  ){
+
+   predictionBox.innerHTML =
+    predictions
+     .slice(0,3)
+     .map(
+      p => `
+       <div class="pred">
+        <b>
+         Candle ${p.candle || ""}
+         • ${p.timeframe || selectedTimeframe}
+         • ${p.signal || p.expected_direction || "WAIT"}
+        </b>
+        <small>
+         🕐 ${p.time || "--"}
+        </small>
+       </div>
+      `
+     )
+     .join("");
+
+  }
+  else{
+
+   predictionBox.innerHTML =
+    `<div class="pred">
+      Prediction data পাওয়া যায়নি।
+     </div>`;
+  }
+
+  /*
+   Results
+  */
+
+  try{
+
+   const resultResponse =
+    await fetch(
+     API_BASE +
+     "/results",
+     {
+      cache:"no-store"
+     }
+    );
+
+   if(resultResponse.ok){
+
+    const result =
+     await resultResponse.json();
+
+    document.getElementById(
+     "totalSignals"
+    ).textContent =
+     result.total_signals ??
+     0;
+
+    document.getElementById(
+     "correctSignals"
+    ).textContent =
+     result.correct ??
+     0;
+
+    document.getElementById(
+     "accuracy"
+    ).textContent =
+     result.accuracy ??
+     "0%";
+   }
+
+  }catch(e){
+
+   console.log(
+    "Results unavailable",
+    e
+   );
+  }
+
+  status.textContent =
+   "✅ Live analysis updated • " +
+   new Date().toLocaleTimeString(
+    "en-GB"
+   );
+
+ }catch(error){
+
+  console.error(
+   "Analysis error:",
+   error
+  );
+
+  status.textContent =
+   "❌ Live data পাওয়া যায়নি";
+
+  document.getElementById(
+   "analysis"
+  ).textContent =
+   "Server/API সংযোগে সমস্যা হয়েছে। কিছুক্ষণ পর আবার চেষ্টা করুন।";
+ }
+}
+
+/*
+ Auto refresh every 60 seconds
+*/
+
+setInterval(
+ () => {
+  runAnalysis();
+ },
+ 60000
+);
+
+/*
+ Service Worker
+*/
+
+if(
+ "serviceWorker" in navigator
+){
+
+ window.addEventListener(
+  "load",
+  () => {
+
+   navigator.serviceWorker
+    .register("./sw.js")
+    .catch(
+     error =>
+      console.log(
+       "Service Worker:",
+       error
+      )
+    );
+
+  }
+ );
+}
+
 </script>
 
 </body>
