@@ -69,48 +69,38 @@ jobs:
                   applicationId 'com.traderpinkai.app'
                   minSdk 23
                   targetSdk 35
-                  versionCode 3
-                  versionName '3.0'
+                  versionCode 4
+                  versionName '4.0'
               }
           }
           EOF
 
           cat > app/src/main/res/values/styles.xml <<'EOF'
           <resources>
-
               <style name="AppTheme"
                   parent="android:style/Theme.Material.Light.NoActionBar">
-
                   <item name="android:fontFamily">sans</item>
                   <item name="android:colorAccent">#ff4f9a</item>
                   <item name="android:statusBarColor">#ff4f9a</item>
                   <item name="android:navigationBarColor">#000000</item>
-
               </style>
-
           </resources>
           EOF
 
           cat > app/src/main/AndroidManifest.xml <<'EOF'
           <manifest xmlns:android="http://schemas.android.com/apk/res/android">
 
-              <uses-permission android:name="android.permission.INTERNET" />
-
-              <uses-permission
-                  android:name="android.permission.SYSTEM_ALERT_WINDOW" />
-
-              <uses-permission
-                  android:name="android.permission.FOREGROUND_SERVICE" />
-
-              <uses-permission
-                  android:name="android.permission.FOREGROUND_SERVICE_SPECIAL_USE" />
+              <uses-permission android:name="android.permission.INTERNET"/>
+              <uses-permission android:name="android.permission.SYSTEM_ALERT_WINDOW"/>
+              <uses-permission android:name="android.permission.FOREGROUND_SERVICE"/>
+              <uses-permission android:name="android.permission.FOREGROUND_SERVICE_SPECIAL_USE"/>
 
               <application
                   android:theme="@style/AppTheme"
                   android:label="Trader Pink AI"
-                  android:usesCleartextTraffic="true"
                   android:allowBackup="false"
-                  android:supportsRtl="true">
+                  android:supportsRtl="true"
+                  android:usesCleartextTraffic="true">
 
                   <activity
                       android:name=".MainActivity"
@@ -118,13 +108,8 @@ jobs:
                       android:exported="true">
 
                       <intent-filter>
-
-                          <action
-                              android:name="android.intent.action.MAIN" />
-
-                          <category
-                              android:name="android.intent.category.LAUNCHER" />
-
+                          <action android:name="android.intent.action.MAIN"/>
+                          <category android:name="android.intent.category.LAUNCHER"/>
                       </intent-filter>
 
                   </activity>
@@ -136,7 +121,7 @@ jobs:
 
                       <property
                           android:name="android.app.PROPERTY_SPECIAL_USE_FGS_SUBTYPE"
-                          android:value="Trader Pink AI floating trading assistant" />
+                          android:value="Trader Pink AI floating trading assistant"/>
 
                   </service>
 
@@ -150,16 +135,20 @@ jobs:
 
           import android.app.Activity;
           import android.content.Intent;
+          import android.graphics.Color;
           import android.net.Uri;
           import android.os.Build;
           import android.os.Bundle;
           import android.provider.Settings;
+          import android.view.Gravity;
+          import android.view.ViewGroup;
+          import android.widget.Button;
+          import android.widget.LinearLayout;
+          import android.widget.TextView;
+          import android.widget.Toast;
           import android.webkit.WebSettings;
           import android.webkit.WebView;
           import android.webkit.WebViewClient;
-          import android.widget.Button;
-          import android.widget.LinearLayout;
-          import android.widget.Toast;
 
           public class MainActivity extends Activity {
 
@@ -169,96 +158,174 @@ jobs:
               protected void onCreate(Bundle savedInstanceState) {
                   super.onCreate(savedInstanceState);
 
-                  LinearLayout layout = new LinearLayout(this);
-                  layout.setOrientation(LinearLayout.VERTICAL);
+                  LinearLayout main =
+                          new LinearLayout(this);
 
-                  Button floatingButton = new Button(this);
-
-                  floatingButton.setText(
-                          "🟣 Floating Trader Pink AI চালু করুন"
+                  main.setOrientation(
+                          LinearLayout.VERTICAL
                   );
 
-                  webView = new WebView(this);
+                  main.setBackgroundColor(
+                          Color.WHITE
+                  );
 
-                  WebSettings settings = webView.getSettings();
+                  TextView title =
+                          new TextView(this);
+
+                  title.setText(
+                          "🤖 Trader Pink AI"
+                  );
+
+                  title.setTextSize(22);
+
+                  title.setTextColor(
+                          Color.BLACK
+                  );
+
+                  title.setGravity(
+                          Gravity.CENTER
+                  );
+
+                  title.setPadding(
+                          10, 20, 10, 10
+                  );
+
+                  main.addView(
+                          title,
+                          new LinearLayout.LayoutParams(
+                                  ViewGroup.LayoutParams.MATCH_PARENT,
+                                  ViewGroup.LayoutParams.WRAP_CONTENT
+                          )
+                  );
+
+                  Button floatingButton =
+                          new Button(this);
+
+                  floatingButton.setText(
+                          "🟣 FLOATING BOT চালু করুন"
+                  );
+
+                  floatingButton.setTextSize(17);
+
+                  main.addView(
+                          floatingButton,
+                          new LinearLayout.LayoutParams(
+                                  ViewGroup.LayoutParams.MATCH_PARENT,
+                                  ViewGroup.LayoutParams.WRAP_CONTENT
+                          )
+                  );
+
+                  TextView instruction =
+                          new TextView(this);
+
+                  instruction.setText(
+                          "স্ক্রিনের উপর Trader Pink AI ভাসাতে এই বাটনে চাপুন।"
+                  );
+
+                  instruction.setTextSize(14);
+
+                  instruction.setGravity(
+                          Gravity.CENTER
+                  );
+
+                  instruction.setPadding(
+                          10, 5, 10, 10
+                  );
+
+                  main.addView(
+                          instruction,
+                          new LinearLayout.LayoutParams(
+                                  ViewGroup.LayoutParams.MATCH_PARENT,
+                                  ViewGroup.LayoutParams.WRAP_CONTENT
+                          )
+                  );
+
+                  webView =
+                          new WebView(this);
+
+                  WebSettings settings =
+                          webView.getSettings();
 
                   settings.setJavaScriptEnabled(true);
                   settings.setDomStorageEnabled(true);
-                  settings.setDatabaseEnabled(true);
-                  settings.setAllowFileAccess(true);
-                  settings.setAllowContentAccess(true);
 
-                  webView.setWebViewClient(new WebViewClient());
+                  webView.setWebViewClient(
+                          new WebViewClient()
+                  );
 
                   webView.loadUrl(
                           "https://pinku-ai89.github.io/Trading--ai/"
                   );
 
-                  layout.addView(floatingButton);
-
-                  layout.addView(
+                  main.addView(
                           webView,
                           new LinearLayout.LayoutParams(
-                                  LinearLayout.LayoutParams.MATCH_PARENT,
+                                  ViewGroup.LayoutParams.MATCH_PARENT,
                                   0,
                                   1
                           )
                   );
 
-                  setContentView(layout);
+                  setContentView(main);
 
-                  floatingButton.setOnClickListener(v -> {
+                  floatingButton.setOnClickListener(
+                          v -> {
 
-                      if (!Settings.canDrawOverlays(this)) {
+                              if (
+                                      !Settings.canDrawOverlays(this)
+                              ) {
 
-                          Toast.makeText(
-                                  this,
-                                  "অনুমতি দিন, তারপর আবার Floating Bot চাপুন",
-                                  Toast.LENGTH_LONG
-                          ).show();
+                                  Toast.makeText(
+                                          this,
+                                          "অনুগ্রহ করে অনুমতি দিন",
+                                          Toast.LENGTH_LONG
+                                  ).show();
 
-                          Intent intent = new Intent(
-                                  Settings.ACTION_MANAGE_OVERLAY_PERMISSION,
-                                  Uri.parse(
-                                          "package:" + getPackageName()
-                                  )
-                          );
+                                  Intent intent =
+                                          new Intent(
+                                                  Settings.ACTION_MANAGE_OVERLAY_PERMISSION,
+                                                  Uri.parse(
+                                                          "package:" +
+                                                          getPackageName()
+                                                  )
+                                          );
 
-                          startActivity(intent);
+                                  startActivity(intent);
 
-                      } else {
+                              } else {
 
-                          startFloatingService();
+                                  Intent service =
+                                          new Intent(
+                                                  this,
+                                                  FloatingService.class
+                                          );
 
-                      }
+                                  if (
+                                          Build.VERSION.SDK_INT >= 26
+                                  ) {
 
-                  });
+                                      startForegroundService(
+                                              service
+                                      );
 
-              }
+                                  } else {
 
-              private void startFloatingService() {
+                                      startService(
+                                              service
+                                      );
 
-                  Intent serviceIntent =
-                          new Intent(
-                                  this,
-                                  FloatingService.class
-                          );
+                                  }
 
-                  if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                                  Toast.makeText(
+                                          this,
+                                          "Floating Bot চালু হয়েছে",
+                                          Toast.LENGTH_SHORT
+                                  ).show();
 
-                      startForegroundService(serviceIntent);
+                              }
 
-                  } else {
-
-                      startService(serviceIntent);
-
-                  }
-
-                  Toast.makeText(
-                          this,
-                          "Trader Pink AI Floating চালু হয়েছে",
-                          Toast.LENGTH_SHORT
-                  ).show();
+                          }
+                  );
 
               }
 
@@ -270,7 +337,10 @@ jobs:
               @Override
               public void onBackPressed() {
 
-                  if (webView != null && webView.canGoBack()) {
+                  if (
+                          webView != null &&
+                          webView.canGoBack()
+                  ) {
 
                       webView.goBack();
 
@@ -309,7 +379,6 @@ jobs:
 
               private WindowManager windowManager;
               private View floatingView;
-
               private WindowManager.LayoutParams params;
 
               @Override
@@ -347,7 +416,9 @@ jobs:
 
               private void showFloatingWindow() {
 
-                  if (!Settings.canDrawOverlays(this)) {
+                  if (
+                          !Settings.canDrawOverlays(this)
+                  ) {
 
                       stopSelf();
                       return;
@@ -368,10 +439,7 @@ jobs:
                   );
 
                   box.setPadding(
-                          22,
-                          15,
-                          22,
-                          15
+                          20, 12, 20, 12
                   );
 
                   box.setBackgroundColor(
@@ -408,26 +476,13 @@ jobs:
                           new TextView(this);
 
                   signal.setText(
-                          "WAIT  •  70%"
+                          "WAIT  •  50%"
                   );
 
                   signal.setTextSize(20);
 
                   signal.setTextColor(
                           Color.rgb(255, 79, 154)
-                  );
-
-                  TextView info =
-                          new TextView(this);
-
-                  info.setText(
-                          "AI Signal"
-                  );
-
-                  info.setTextSize(13);
-
-                  info.setTextColor(
-                          Color.GRAY
                   );
 
                   TextView close =
@@ -446,12 +501,13 @@ jobs:
                   box.addView(title);
                   box.addView(market);
                   box.addView(signal);
-                  box.addView(info);
                   box.addView(close);
 
                   int type;
 
-                  if (Build.VERSION.SDK_INT >= 26) {
+                  if (
+                          Build.VERSION.SDK_INT >= 26
+                  ) {
 
                       type =
                               WindowManager.LayoutParams
@@ -475,9 +531,10 @@ jobs:
                           );
 
                   params.gravity =
-                          Gravity.TOP | Gravity.LEFT;
+                          Gravity.TOP |
+                          Gravity.LEFT;
 
-                  params.x = 25;
+                  params.x = 20;
                   params.y = 180;
 
                   floatingView = box;
@@ -492,7 +549,6 @@ jobs:
 
                               private int initialX;
                               private int initialY;
-
                               private float initialTouchX;
                               private float initialTouchY;
 
@@ -540,24 +596,16 @@ jobs:
                                                           initialTouchY
                                                   );
 
-                                          if (
-                                                  windowManager != null &&
-                                                  floatingView != null
-                                          ) {
-
-                                              windowManager.updateViewLayout(
-                                                      floatingView,
-                                                      params
-                                              );
-
-                                          }
+                                          windowManager.updateViewLayout(
+                                                  floatingView,
+                                                  params
+                                          );
 
                                           return true;
 
                                   }
 
                                   return false;
-
                               }
 
                           }
@@ -579,8 +627,7 @@ jobs:
                               new NotificationChannel(
                                       "trader_pink_ai",
                                       "Trader Pink AI",
-                                      NotificationManager
-                                              .IMPORTANCE_LOW
+                                      NotificationManager.IMPORTANCE_LOW
                               );
 
                       NotificationManager manager =
@@ -615,7 +662,6 @@ jobs:
                           );
 
                       } catch (Exception ignored) {
-
                       }
 
                   }
@@ -646,5 +692,5 @@ jobs:
       - name: Upload APK
         uses: actions/upload-artifact@v4
         with:
-          name: Trader-Pink-AI-Floating
+          name: Trader-Pink-AI-Floating-v4
           path: app/build/outputs/apk/debug/app-debug.apk
