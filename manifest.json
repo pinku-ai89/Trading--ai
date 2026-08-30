@@ -1,17 +1,16 @@
 {
-  "name": "Trader Pink AI",
+  "name": "Trader Pink AI 🤖📈",
   "short_name": "Trader Pink AI",
   "description": "Smart Forex and Binary Trading Signal Assistant",
   "start_url": "./",
-  "scope": "./",
   "display": "standalone",
-  "orientation": "portrait",
-  "background_color": "#050505",
+  "background_color": "#ffffff",
   "theme_color": "#ff4f9a",
-  "lang": "bn",
+  "orientation": "portrait",
+  "scope": "./",
   "icons": [
     {
-      "src": "./CompressJPEG.Online_img(512x512).jpg",
+      "src": "CompressJPEG.Online_img(512x512).jpg",
       "sizes": "512x512",
       "type": "image/jpeg",
       "purpose": "any maskable"
