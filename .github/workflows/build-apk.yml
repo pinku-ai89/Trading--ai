@@ -26,7 +26,7 @@ jobs:
       - name: Create Android project
         run: |
           mkdir -p app/src/main/java/com/traderpinkai/app
-          mkdir -p app/src/main/res/mipmap-hdpi
+          mkdir -p app/src/main/res/values
 
           cat > settings.gradle <<'EOF'
           pluginManagement {
@@ -68,22 +68,36 @@ jobs:
                   applicationId 'com.traderpinkai.app'
                   minSdk 23
                   targetSdk 35
-                  versionCode 1
-                  versionName '1.0'
+                  versionCode 2
+                  versionName '2.0'
               }
           }
+          EOF
+
+          cat > app/src/main/res/values/styles.xml <<'EOF'
+          <resources>
+              <style name="AppTheme"
+                  parent="android:style/Theme.Material.Light.NoActionBar">
+                  <item name="android:fontFamily">sans</item>
+                  <item name="android:colorAccent">#ff4f9a</item>
+                  <item name="android:statusBarColor">#ff4f9a</item>
+                  <item name="android:navigationBarColor">#000000</item>
+              </style>
+          </resources>
           EOF
 
           cat > app/src/main/AndroidManifest.xml <<'EOF'
           <manifest xmlns:android="http://schemas.android.com/apk/res/android">
 
               <uses-permission android:name="android.permission.INTERNET"/>
+              <uses-permission android:name="android.permission.SYSTEM_ALERT_WINDOW"/>
+              <uses-permission android:name="android.permission.FOREGROUND_SERVICE"/>
+              <uses-permission android:name="android.permission.FOREGROUND_SERVICE_SPECIAL_USE"/>
 
               <application
                   android:theme="@style/AppTheme"
                   android:label="Trader Pink AI"
-                  android:usesCleartextTraffic="true"
-                  android:resizeableActivity="true">
+                  android:usesCleartextTraffic="true">
 
                   <activity
                       android:name=".MainActivity"
@@ -97,31 +111,33 @@ jobs:
 
                   </activity>
 
+                  <service
+                      android:name=".FloatingService"
+                      android:exported="false"
+                      android:foregroundServiceType="specialUse">
+                      <property
+                          android:name="android.app.PROPERTY_SPECIAL_USE_FGS_SUBTYPE"
+                          android:value="Trader Pink AI floating overlay"/>
+                  </service>
+
               </application>
+
           </manifest>
-          EOF
-
-          mkdir -p app/src/main/res/values
-
-          cat > app/src/main/res/values/styles.xml <<'EOF'
-          <resources>
-              <style name="AppTheme" parent="android:style/Theme.Material.Light.NoActionBar">
-                  <item name="android:fontFamily">sans</item>
-                  <item name="android:colorAccent">#ff4f9a</item>
-                  <item name="android:navigationBarColor">#000000</item>
-                  <item name="android:statusBarColor">#ff4f9a</item>
-              </style>
-          </resources>
           EOF
 
           cat > app/src/main/java/com/traderpinkai/app/MainActivity.java <<'EOF'
           package com.traderpinkai.app;
 
           import android.app.Activity;
+          import android.content.Intent;
+          import android.net.Uri;
           import android.os.Bundle;
+          import android.provider.Settings;
           import android.webkit.WebSettings;
           import android.webkit.WebView;
           import android.webkit.WebViewClient;
+          import android.widget.Button;
+          import android.widget.LinearLayout;
 
           public class MainActivity extends Activity {
 
@@ -131,17 +147,52 @@ jobs:
               protected void onCreate(Bundle savedInstanceState) {
                   super.onCreate(savedInstanceState);
 
+                  LinearLayout layout = new LinearLayout(this);
+                  layout.setOrientation(LinearLayout.VERTICAL);
+
+                  Button floatingButton = new Button(this);
+                  floatingButton.setText("🟣 Floating Bot চালু করুন");
+
                   webView = new WebView(this);
-                  setContentView(webView);
 
                   WebSettings settings = webView.getSettings();
                   settings.setJavaScriptEnabled(true);
                   settings.setDomStorageEnabled(true);
-                  settings.setDatabaseEnabled(true);
 
                   webView.setWebViewClient(new WebViewClient());
-
                   webView.loadUrl("https://pinku-ai89.github.io/Trading--ai/");
+
+                  layout.addView(floatingButton);
+                  layout.addView(webView,
+                          new LinearLayout.LayoutParams(
+                                  -1, 0, 1));
+
+                  setContentView(layout);
+
+                  floatingButton.setOnClickListener(v -> {
+
+                      if (!Settings.canDrawOverlays(this)) {
+                          Intent intent = new Intent(
+                                  Settings.ACTION_MANAGE_OVERLAY_PERMISSION,
+                                  Uri.parse("package:" + getPackageName())
+                          );
+                          startActivity(intent);
+                      } else {
+                          startService(new Intent(
+                                  this,
+                                  FloatingService.class
+                          ));
+                      }
+                  });
+              }
+
+              @Override
+              protected void onResume() {
+                  super.onResume();
+
+                  if (Settings.canDrawOverlays(this)) {
+                      // Permission already granted.
+                  }
               }
 
               @Override
@@ -155,6 +206,180 @@ jobs:
           }
           EOF
 
+          cat > app/src/main/java/com/traderpinkai/app/FloatingService.java <<'EOF'
+          package com.traderpinkai.app;
+
+          import android.app.Notification;
+          import android.app.NotificationChannel;
+          import android.app.NotificationManager;
+          import android.app.Service;
+          import android.content.Intent;
+          import android.graphics.Color;
+          import android.graphics.PixelFormat;
+          import android.os.Build;
+          import android.os.IBinder;
+          import android.provider.Settings;
+          import android.view.Gravity;
+          import android.view.MotionEvent;
+          import android.view.View;
+          import android.view.WindowManager;
+          import android.widget.LinearLayout;
+          import android.widget.TextView;
+
+          public class FloatingService extends Service {
+
+              private WindowManager windowManager;
+              private View floatingView;
+
+              @Override
+              public void onCreate() {
+                  super.onCreate();
+
+                  createNotificationChannel();
+
+                  Notification notification =
+                          new Notification.Builder(this, "trader_pink_ai")
+                                  .setContentTitle("Trader Pink AI")
+                                  .setContentText("Floating Bot চালু আছে")
+                                  .setSmallIcon(android.R.drawable.ic_dialog_info)
+                                  .build();
+
+                  if (Build.VERSION.SDK_INT >= 26) {
+                      startForeground(1001, notification);
+                  }
+
+                  showFloatingWindow();
+              }
+
+              private void showFloatingWindow() {
+
+                  if (!Settings.canDrawOverlays(this)) {
+                      stopSelf();
+                      return;
+                  }
+
+                  windowManager =
+                          (WindowManager) getSystemService(WINDOW_SERVICE);
+
+                  LinearLayout box = new LinearLayout(this);
+                  box.setOrientation(LinearLayout.VERTICAL);
+                  box.setPadding(20, 12, 20, 12);
+                  box.setBackgroundColor(Color.WHITE);
+
+                  TextView title = new TextView(this);
+                  title.setText("🤖 Trader Pink AI");
+                  title.setTextSize(16);
+                  title.setTextColor(Color.BLACK);
+
+                  TextView signal = new TextView(this);
+                  signal.setText("EURUSD  |  5M\nWAIT  |  70%");
+                  signal.setTextSize(15);
+                  signal.setTextColor(Color.BLACK);
+
+                  TextView close = new TextView(this);
+                  close.setText("✕ বন্ধ");
+                  close.setTextSize(14);
+                  close.setTextColor(Color.RED);
+
+                  box.addView(title);
+                  box.addView(signal);
+                  box.addView(close);
+
+                  int type =
+                          Build.VERSION.SDK_INT >= 26
+                                  ? WindowManager.LayoutParams.TYPE_APPLICATION_OVERLAY
+                                  : WindowManager.LayoutParams.TYPE_PHONE;
+
+                  WindowManager.LayoutParams params =
+                          new WindowManager.LayoutParams(
+                                  WindowManager.LayoutParams.WRAP_CONTENT,
+                                  WindowManager.LayoutParams.WRAP_CONTENT,
+                                  type,
+                                  WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE,
+                                  PixelFormat.TRANSLUCENT
+                          );
+
+                  params.gravity = Gravity.TOP | Gravity.LEFT;
+                  params.x = 30;
+                  params.y = 150;
+
+                  floatingView = box;
+
+                  windowManager.addView(floatingView, params);
+
+                  box.setOnTouchListener(new View.OnTouchListener() {
+
+                      private int initialX;
+                      private int initialY;
+                      private float initialTouchX;
+                      private float initialTouchY;
+
+                      @Override
+                      public boolean onTouch(View v, MotionEvent event) {
+
+                          switch (event.getAction()) {
+
+                              case MotionEvent.ACTION_DOWN:
+                                  initialX = params.x;
+                                  initialY = params.y;
+                                  initialTouchX = event.getRawX();
+                                  initialTouchY = event.getRawY();
+                                  return true;
+
+                              case MotionEvent.ACTION_MOVE:
+                                  params.x = initialX +
+                                          (int)(event.getRawX() - initialTouchX);
+
+                                  params.y = initialY +
+                                          (int)(event.getRawY() - initialTouchY);
+
+                                  windowManager.updateViewLayout(
+                                          floatingView, params);
+                                  return true;
+                          }
+
+                          return false;
+                      }
+                  });
+
+                  close.setOnClickListener(v -> stopSelf());
+              }
+
+              private void createNotificationChannel() {
+
+                  if (Build.VERSION.SDK_INT >= 26) {
+
+                      NotificationChannel channel =
+                              new NotificationChannel(
+                                      "trader_pink_ai",
+                                      "Trader Pink AI",
+                                      NotificationManager.IMPORTANCE_LOW
+                              );
+
+                      NotificationManager manager =
+                              getSystemService(NotificationManager.class);
+
+                      manager.createNotificationChannel(channel);
+                  }
+              }
+
+              @Override
+              public void onDestroy() {
+
+                  if (floatingView != null && windowManager != null) {
+                      windowManager.removeView(floatingView);
+                  }
+
+                  super.onDestroy();
+              }
+
+              @Override
+              public IBinder onBind(Intent intent) {
+                  return null;
+              }
+          }
+          EOF
+
       - name: Build APK
         run: |
           gradle assembleDebug --no-daemon
@@ -162,5 +387,5 @@ jobs:
       - name: Upload APK
         uses: actions/upload-artifact@v4
         with:
-          name: Trader-Pink-AI-debug
+          name: Trader-Pink-AI-Floating
           path: app/build/outputs/apk/debug/app-debug.apk
