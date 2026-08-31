@@ -360,11 +360,9 @@ select{
 
   </div>
 
-
   <div class="status" id="status">
     ● Ready
   </div>
-
 
   <div class="card">
 
@@ -383,7 +381,6 @@ select{
       </option>
 
     </select>
-
 
     <div class="label" style="margin-top:15px">
       Timeframe
@@ -405,7 +402,6 @@ select{
 
     </div>
 
-
     <button
       class="analyze"
       onclick="analyzeAll()">
@@ -413,7 +409,6 @@ select{
       🔍 FULL AI MARKET ANALYSIS
 
     </button>
-
 
     <button
       class="results-btn"
@@ -461,7 +456,7 @@ select{
   </div>
 
 
-  <!-- THREE TIMEFRAME SIGNALS -->
+  <!-- MULTI TIMEFRAME -->
 
   <div class="card">
 
@@ -469,8 +464,6 @@ select{
       📡 Multi-Timeframe Signals
     </div>
 
-
-    <!-- 1M -->
 
     <div class="signal-box">
 
@@ -521,8 +514,6 @@ select{
     </div>
 
 
-    <!-- 5M -->
-
     <div class="signal-box">
 
       <div class="signal-head">
@@ -571,8 +562,6 @@ select{
 
     </div>
 
-
-    <!-- 15M -->
 
     <div class="signal-box">
 
@@ -720,7 +709,7 @@ select{
   </div>
 
 
-  <!-- ANALYSIS -->
+  <!-- AI ANALYSIS -->
 
   <div class="card">
 
@@ -732,6 +721,14 @@ select{
 
       <span class="analysis-tag">
         EMA
+      </span>
+
+      <span class="analysis-tag">
+        RSI
+      </span>
+
+      <span class="analysis-tag">
+        MACD
       </span>
 
       <span class="analysis-tag">
@@ -812,7 +809,7 @@ select{
 
     Bangladesh Time (UTC+6)<br>
 
-    AI analysis only. No guaranteed profit.
+    AI technical analysis only. No guaranteed profit.
 
   </div>
 
@@ -821,10 +818,9 @@ select{
 
 <script>
 
-
 /* ========================================
    TRADER PINK AI
-   ======================================== */
+======================================== */
 
 const API_BASE =
   "https://crimson-grass-f881.bijondebnath51.workers.dev";
@@ -834,7 +830,7 @@ let timeframe = "1m";
 
 /* ========================================
    TIMEFRAME BUTTON
-   ======================================== */
+======================================== */
 
 document
   .querySelectorAll(".tf button")
@@ -864,8 +860,8 @@ document
 
 
 /* ========================================
-   SET SIGNAL COLOR
-   ======================================== */
+   SIGNAL COLOR
+======================================== */
 
 function signalClass(signal){
 
@@ -885,6 +881,10 @@ function signalClass(signal){
 
 }
 
+
+/* ========================================
+   SET TIMEFRAME SIGNAL
+======================================== */
 
 function setTimeframeSignal(
   tf,
@@ -959,7 +959,7 @@ function setTimeframeSignal(
 
 /* ========================================
    FETCH ONE TIMEFRAME
-   ======================================== */
+======================================== */
 
 async function fetchAnalysis(
   symbol,
@@ -975,9 +975,16 @@ async function fetchAnalysis(
 
 
   const response =
-    await fetch(url,{
-      cache:"no-store"
-    });
+    await fetch(
+      url,
+      {
+        method:"GET",
+        cache:"no-store",
+        headers:{
+          "Accept":"application/json"
+        }
+      }
+    );
 
 
   if(!response.ok){
@@ -1011,7 +1018,7 @@ async function fetchAnalysis(
 
 /* ========================================
    FULL ANALYSIS
-   ======================================== */
+======================================== */
 
 async function analyzeAll(){
 
@@ -1047,12 +1054,17 @@ async function analyzeAll(){
       ]);
 
 
-    const data1 = results[0];
-    const data5 = results[1];
-    const data15 = results[2];
+    const data1 =
+      results[0];
+
+    const data5 =
+      results[1];
+
+    const data15 =
+      results[2];
 
 
-    /* তিনটি সিগন্যাল দেখানো */
+    /* Signals */
 
     setTimeframeSignal(
       "1m",
@@ -1100,7 +1112,9 @@ async function analyzeAll(){
     ).textContent =
       symbol +
       " • " +
-      best.timeframe.toUpperCase();
+      String(
+        best.timeframe || timeframe
+      ).toUpperCase();
 
 
     const bestEl =
@@ -1128,7 +1142,7 @@ async function analyzeAll(){
       "%";
 
 
-    /* Selected timeframe-এর বিস্তারিত */
+    /* Selected timeframe */
 
     const selectedData =
       timeframe === "1m"
@@ -1151,7 +1165,7 @@ async function analyzeAll(){
     );
 
 
-    /* AI reason */
+    /* Reason */
 
     const trend =
       selectedData.market?.trend ||
@@ -1247,7 +1261,7 @@ async function analyzeAll(){
 
 /* ========================================
    BEST SIGNAL
-   ======================================== */
+======================================== */
 
 function chooseBest(
   data1,
@@ -1272,7 +1286,10 @@ function chooseBest(
     );
 
 
-  for(const data of list){
+  for(
+    const data
+    of list
+  ){
 
     const confidence =
       getConfidence(
@@ -1280,8 +1297,57 @@ function chooseBest(
       );
 
 
-    if(confidence >
-       bestConfidence){
+    /*
+      BUY/SELL signal-কে WAIT-এর
+      উপরে priority দেওয়া হচ্ছে।
+    */
+
+    const direction =
+      getDirection(data);
+
+
+    const bestDirection =
+      getDirection(best);
+
+
+    if(
+      direction !== "WAIT" &&
+      bestDirection === "WAIT"
+    ){
+
+      best =
+        data;
+
+      bestConfidence =
+        confidence;
+
+      continue;
+
+    }
+
+
+    if(
+      direction !== "WAIT" &&
+      bestDirection !== "WAIT" &&
+      confidence > bestConfidence
+    ){
+
+      best =
+        data;
+
+      bestConfidence =
+        confidence;
+
+      continue;
+
+    }
+
+
+    if(
+      bestDirection === "WAIT" &&
+      direction === "WAIT" &&
+      confidence > bestConfidence
+    ){
 
       best =
         data;
@@ -1301,7 +1367,7 @@ function chooseBest(
 
 /* ========================================
    CONFIDENCE
-   ======================================== */
+======================================== */
 
 function getConfidence(data){
 
@@ -1326,7 +1392,7 @@ function getConfidence(data){
 
 /* ========================================
    DIRECTION
-   ======================================== */
+======================================== */
 
 function getDirection(data){
 
@@ -1340,7 +1406,7 @@ function getDirection(data){
 
 /* ========================================
    MARKET DETAILS
-   ======================================== */
+======================================== */
 
 function showMarketDetails(
   data,
@@ -1350,13 +1416,14 @@ function showMarketDetails(
   const market =
     data.market || {};
 
+
   document.getElementById(
     "marketName"
   ).textContent =
     symbol;
 
 
-  let price =
+  const price =
     data.price ??
     market.price ??
     "--";
@@ -1449,7 +1516,7 @@ function showMarketDetails(
 
 /* ========================================
    PREDICTIONS
-   ======================================== */
+======================================== */
 
 function showPredictions(data){
 
@@ -1517,7 +1584,7 @@ function showPredictions(data){
 
 /* ========================================
    RESULTS
-   ======================================== */
+======================================== */
 
 async function loadResults(){
 
@@ -1528,6 +1595,7 @@ async function loadResults(){
         API_BASE +
         "/results",
         {
+          method:"GET",
           cache:"no-store"
         }
       );
@@ -1577,7 +1645,7 @@ async function loadResults(){
 
 /* ========================================
    ESCAPE HTML
-   ======================================== */
+======================================== */
 
 function escapeHtml(value){
 
@@ -1608,7 +1676,7 @@ function escapeHtml(value){
 
 /* ========================================
    SERVICE WORKER
-   ======================================== */
+======================================== */
 
 if(
   "serviceWorker" in navigator
@@ -1649,7 +1717,7 @@ if(
 
 /* ========================================
    START
-   ======================================== */
+======================================== */
 
 window.addEventListener(
   "load",
