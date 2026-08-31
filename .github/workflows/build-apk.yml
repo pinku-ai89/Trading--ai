@@ -72,8 +72,8 @@ jobs:
                   applicationId 'com.traderpinkai.app'
                   minSdk 23
                   targetSdk 35
-                  versionCode 5
-                  versionName '5.0'
+                  versionCode 6
+                  versionName '6.0'
               }
           }
           EOF
@@ -167,39 +167,18 @@ jobs:
               protected void onCreate(Bundle savedInstanceState) {
                   super.onCreate(savedInstanceState);
 
-                  LinearLayout main =
-                          new LinearLayout(this);
+                  LinearLayout root = new LinearLayout(this);
+                  root.setOrientation(LinearLayout.VERTICAL);
+                  root.setBackgroundColor(Color.WHITE);
 
-                  main.setOrientation(
-                          LinearLayout.VERTICAL
-                  );
-
-                  main.setBackgroundColor(
-                          Color.WHITE
-                  );
-
-                  TextView title =
-                          new TextView(this);
-
-                  title.setText(
-                          "🤖 Trader Pink AI"
-                  );
-
+                  TextView title = new TextView(this);
+                  title.setText("🤖 Trader Pink AI");
                   title.setTextSize(22);
+                  title.setTextColor(Color.BLACK);
+                  title.setGravity(Gravity.CENTER);
+                  title.setPadding(10, 18, 10, 10);
 
-                  title.setTextColor(
-                          Color.BLACK
-                  );
-
-                  title.setGravity(
-                          Gravity.CENTER
-                  );
-
-                  title.setPadding(
-                          10, 20, 10, 10
-                  );
-
-                  main.addView(
+                  root.addView(
                           title,
                           new LinearLayout.LayoutParams(
                                   ViewGroup.LayoutParams.MATCH_PARENT,
@@ -207,16 +186,11 @@ jobs:
                           )
                   );
 
-                  Button floatingButton =
-                          new Button(this);
-
-                  floatingButton.setText(
-                          "🟣 FLOATING BOT চালু করুন"
-                  );
-
+                  Button floatingButton = new Button(this);
+                  floatingButton.setText("🟣 FLOATING BOT চালু করুন");
                   floatingButton.setTextSize(17);
 
-                  main.addView(
+                  root.addView(
                           floatingButton,
                           new LinearLayout.LayoutParams(
                                   ViewGroup.LayoutParams.MATCH_PARENT,
@@ -224,50 +198,39 @@ jobs:
                           )
                   );
 
-                  TextView instruction =
-                          new TextView(this);
-
-                  instruction.setText(
-                          "স্ক্রিনের উপর Trader Pink AI ভাসাতে এই বাটনে চাপুন।"
+                  TextView status = new TextView(this);
+                  status.setText(
+                          "অন্য অ্যাপের উপর Trader Pink AI ভাসাতে উপরের বাটনে চাপুন।"
                   );
+                  status.setTextSize(14);
+                  status.setTextColor(Color.DKGRAY);
+                  status.setGravity(Gravity.CENTER);
+                  status.setPadding(10, 4, 10, 10);
 
-                  instruction.setTextSize(14);
-
-                  instruction.setGravity(
-                          Gravity.CENTER
-                  );
-
-                  instruction.setPadding(
-                          10, 5, 10, 10
-                  );
-
-                  main.addView(
-                          instruction,
+                  root.addView(
+                          status,
                           new LinearLayout.LayoutParams(
                                   ViewGroup.LayoutParams.MATCH_PARENT,
                                   ViewGroup.LayoutParams.WRAP_CONTENT
                           )
                   );
 
-                  webView =
-                          new WebView(this);
+                  webView = new WebView(this);
 
-                  WebSettings settings =
-                          webView.getSettings();
-
+                  WebSettings settings = webView.getSettings();
                   settings.setJavaScriptEnabled(true);
                   settings.setDomStorageEnabled(true);
                   settings.setDatabaseEnabled(true);
+                  settings.setLoadWithOverviewMode(true);
+                  settings.setUseWideViewPort(true);
 
-                  webView.setWebViewClient(
-                          new WebViewClient()
-                  );
+                  webView.setWebViewClient(new WebViewClient());
 
                   webView.loadUrl(
                           "https://pinku-ai89.github.io/Trading--ai/"
                   );
 
-                  main.addView(
+                  root.addView(
                           webView,
                           new LinearLayout.LayoutParams(
                                   ViewGroup.LayoutParams.MATCH_PARENT,
@@ -276,62 +239,89 @@ jobs:
                           )
                   );
 
-                  setContentView(main);
+                  setContentView(root);
 
-                  floatingButton.setOnClickListener(
-                          v -> {
+                  floatingButton.setOnClickListener(v -> {
 
-                              if (!Settings.canDrawOverlays(this)) {
+                      if (!Settings.canDrawOverlays(this)) {
 
-                                  Toast.makeText(
-                                          this,
-                                          "অনুগ্রহ করে অনুমতি দিন",
-                                          Toast.LENGTH_LONG
-                                  ).show();
+                          Toast.makeText(
+                                  this,
+                                  "Overlay permission দিতে হবে",
+                                  Toast.LENGTH_LONG
+                          ).show();
 
-                                  Intent intent =
-                                          new Intent(
-                                                  Settings.ACTION_MANAGE_OVERLAY_PERMISSION,
-                                                  Uri.parse(
-                                                          "package:" +
-                                                          getPackageName()
-                                                  )
-                                          );
+                          try {
 
-                                  startActivity(intent);
+                              Intent intent = new Intent(
+                                      Settings.ACTION_MANAGE_OVERLAY_PERMISSION,
+                                      Uri.parse(
+                                              "package:" + getPackageName()
+                                      )
+                              );
 
-                              } else {
+                              startActivity(intent);
 
-                                  Intent service =
-                                          new Intent(
-                                                  this,
-                                                  FloatingService.class
-                                          );
+                          } catch (Exception e) {
 
-                                  if (
-                                          Build.VERSION.SDK_INT >= 26
-                                  ) {
+                              Intent intent = new Intent(
+                                      Settings.ACTION_MANAGE_OVERLAY_PERMISSION
+                              );
 
-                                      startForegroundService(
-                                              service
-                                      );
-
-                                  } else {
-
-                                      startService(
-                                              service
-                                      );
-
-                                  }
-
-                                  Toast.makeText(
-                                          this,
-                                          "Floating Bot চালু হয়েছে",
-                                          Toast.LENGTH_SHORT
-                                  ).show();
-                              }
+                              startActivity(intent);
                           }
+
+                      } else {
+
+                          startFloatingService();
+
+                          status.setText(
+                                  "✅ Floating Bot চালু আছে"
+                          );
+                      }
+                  });
+              }
+
+              private void startFloatingService() {
+
+                  Intent service = new Intent(
+                          this,
+                          FloatingService.class
                   );
+
+                  if (Build.VERSION.SDK_INT >= 26) {
+
+                      startForegroundService(service);
+
+                  } else {
+
+                      startService(service);
+                  }
+
+                  Toast.makeText(
+                          this,
+                          "Floating Bot চালু হয়েছে",
+                          Toast.LENGTH_SHORT
+                  ).show();
+              }
+
+              @Override
+              protected void onResume() {
+                  super.onResume();
+
+                  if (webView != null) {
+                      webView.onResume();
+                  }
+              }
+
+              @Override
+              protected void onPause() {
+
+                  if (webView != null) {
+                      webView.onPause();
+                  }
+
+                  super.onPause();
               }
 
               @Override
@@ -347,7 +337,6 @@ jobs:
                   } else {
 
                       super.onBackPressed();
-
                   }
               }
           }
@@ -391,22 +380,15 @@ jobs:
                                   this,
                                   "trader_pink_ai"
                           )
-                          .setContentTitle(
-                                  "Trader Pink AI"
-                          )
-                          .setContentText(
-                                  "Floating Bot চালু আছে"
-                          )
+                          .setContentTitle("Trader Pink AI")
+                          .setContentText("Floating Bot চালু আছে")
                           .setSmallIcon(
                                   android.R.drawable.ic_dialog_info
                           )
                           .setOngoing(true)
                           .build();
 
-                  startForeground(
-                          1001,
-                          notification
-                  );
+                  startForeground(1001, notification);
 
                   showFloatingWindow();
               }
@@ -420,9 +402,7 @@ jobs:
 
                   windowManager =
                           (WindowManager)
-                                  getSystemService(
-                                          WINDOW_SERVICE
-                                  );
+                                  getSystemService(WINDOW_SERVICE);
 
                   LinearLayout box =
                           new LinearLayout(this);
@@ -447,10 +427,7 @@ jobs:
                   );
 
                   title.setTextSize(17);
-
-                  title.setTextColor(
-                          Color.BLACK
-                  );
+                  title.setTextColor(Color.BLACK);
 
                   TextView market =
                           new TextView(this);
@@ -460,23 +437,29 @@ jobs:
                   );
 
                   market.setTextSize(14);
-
-                  market.setTextColor(
-                          Color.DKGRAY
-                  );
+                  market.setTextColor(Color.DKGRAY);
 
                   TextView signal =
                           new TextView(this);
 
                   signal.setText(
-                          "WAIT • 50%"
+                          "🔴 SELL • 70%"
                   );
 
                   signal.setTextSize(20);
-
                   signal.setTextColor(
-                          Color.rgb(255, 79, 154)
+                          Color.rgb(220, 40, 40)
                   );
+
+                  TextView trend =
+                          new TextView(this);
+
+                  trend.setText(
+                          "📉 DOWNTREND"
+                  );
+
+                  trend.setTextSize(14);
+                  trend.setTextColor(Color.DKGRAY);
 
                   TextView close =
                           new TextView(this);
@@ -486,14 +469,12 @@ jobs:
                   );
 
                   close.setTextSize(14);
-
-                  close.setTextColor(
-                          Color.RED
-                  );
+                  close.setTextColor(Color.RED);
 
                   box.addView(title);
                   box.addView(market);
                   box.addView(signal);
+                  box.addView(trend);
                   box.addView(close);
 
                   int type =
@@ -543,11 +524,8 @@ jobs:
 
                                       case MotionEvent.ACTION_DOWN:
 
-                                          initialX =
-                                                  params.x;
-
-                                          initialY =
-                                                  params.y;
+                                          initialX = params.x;
+                                          initialY = params.y;
 
                                           initialTouchX =
                                                   event.getRawX();
@@ -575,10 +553,16 @@ jobs:
                                                           initialTouchY
                                                   );
 
-                                          windowManager.updateViewLayout(
-                                                  floatingView,
-                                                  params
-                                          );
+                                          if (
+                                                  windowManager != null &&
+                                                  floatingView != null
+                                          ) {
+
+                                              windowManager.updateViewLayout(
+                                                      floatingView,
+                                                      params
+                                              );
+                                          }
 
                                           return true;
                                   }
@@ -610,6 +594,7 @@ jobs:
                               );
 
                       if (manager != null) {
+
                           manager.createNotificationChannel(
                                   channel
                           );
@@ -626,9 +611,11 @@ jobs:
                   ) {
 
                       try {
+
                           windowManager.removeView(
                                   floatingView
                           );
+
                       } catch (Exception ignored) {
                       }
                   }
@@ -643,6 +630,7 @@ jobs:
               public IBinder onBind(
                       Intent intent
               ) {
+
                   return null;
               }
           }
@@ -655,5 +643,5 @@ jobs:
       - name: Upload APK
         uses: actions/upload-artifact@v4
         with:
-          name: Trader-Pink-AI-Floating-v5
+          name: Trader-Pink-AI-Floating-v6
           path: app/build/outputs/apk/debug/app-debug.apk
