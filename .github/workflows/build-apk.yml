@@ -72,8 +72,8 @@ jobs:
                   applicationId 'com.traderpinkai.app'
                   minSdk 23
                   targetSdk 35
-                  versionCode 7
-                  versionName '7.0'
+                  versionCode 8
+                  versionName '8.0'
               }
           }
           EOF
@@ -166,7 +166,7 @@ jobs:
                   root.setBackgroundColor(Color.WHITE);
 
                   TextView title = new TextView(this);
-                  title.setText("🤖 Trader Pink AI v7.0");
+                  title.setText("🤖 Trader Pink AI v8.0");
                   title.setTextSize(22);
                   title.setTextColor(Color.BLACK);
                   title.setGravity(Gravity.CENTER);
@@ -343,6 +343,7 @@ jobs:
           import android.graphics.Color;
           import android.graphics.PixelFormat;
           import android.os.Build;
+          import android.os.Handler;
           import android.os.IBinder;
           import android.provider.Settings;
           import android.view.Gravity;
@@ -352,11 +353,51 @@ jobs:
           import android.widget.LinearLayout;
           import android.widget.TextView;
 
+          import org.json.JSONObject;
+
+          import java.io.BufferedReader;
+          import java.io.InputStream;
+          import java.io.InputStreamReader;
+          import java.net.HttpURLConnection;
+          import java.net.URL;
+
           public class FloatingService extends Service {
 
               private WindowManager windowManager;
               private View floatingView;
               private WindowManager.LayoutParams params;
+
+              private TextView title;
+              private TextView market;
+              private TextView candleTime;
+              private TextView signal;
+              private TextView strength;
+              private TextView trend;
+              private TextView updateStatus;
+              private TextView open;
+              private TextView close;
+
+              private final Handler handler = new Handler();
+
+              private static final String API =
+                      "https://bijondebnath51.workers.dev/analyze";
+
+              private static final String SYMBOL = "EURUSD";
+
+              private static final String TIMEFRAME = "1m";
+
+              private final Runnable updater = new Runnable() {
+                  @Override
+                  public void run() {
+
+                      updateSignal();
+
+                      handler.postDelayed(
+                          this,
+                          30000
+                      );
+                  }
+              };
 
               @Override
               public void onCreate() {
@@ -370,16 +411,23 @@ jobs:
                           "trader_pink_ai"
                       )
                       .setContentTitle("Trader Pink AI")
-                      .setContentText("Floating Bot চালু আছে")
+                      .setContentText(
+                          "Live Signal Bot চালু আছে"
+                      )
                       .setSmallIcon(
                           android.R.drawable.ic_dialog_info
                       )
                       .setOngoing(true)
                       .build();
 
-                  startForeground(1001, notification);
+                  startForeground(
+                      1001,
+                      notification
+                  );
 
                   showFloatingWindow();
+
+                  handler.post(updater);
               }
 
               private void showFloatingWindow() {
@@ -391,7 +439,9 @@ jobs:
 
                   windowManager =
                       (WindowManager)
-                          getSystemService(WINDOW_SERVICE);
+                          getSystemService(
+                              WINDOW_SERVICE
+                          );
 
                   LinearLayout box =
                       new LinearLayout(this);
@@ -401,81 +451,87 @@ jobs:
                   );
 
                   box.setPadding(
-                      20, 12, 20, 12
+                      24, 16, 24, 16
                   );
 
                   box.setBackgroundColor(
                       Color.WHITE
                   );
 
-                  TextView title =
-                      new TextView(this);
-
+                  title = new TextView(this);
                   title.setText(
                       "🤖 Trader Pink AI"
                   );
-
-                  title.setTextSize(17);
+                  title.setTextSize(18);
                   title.setTextColor(Color.BLACK);
 
-                  TextView market =
-                      new TextView(this);
-
+                  market = new TextView(this);
                   market.setText(
-                      "EURUSD • 1M / 5M / 15M"
+                      "Market: EURUSD • 1M"
                   );
-
-                  market.setTextSize(14);
+                  market.setTextSize(15);
                   market.setTextColor(Color.DKGRAY);
 
-                  TextView signal =
-                      new TextView(this);
-
-                  signal.setText(
-                      "⏳ WAIT • 50%"
+                  candleTime = new TextView(this);
+                  candleTime.setText(
+                      "🕐 Candle Time: Loading..."
                   );
+                  candleTime.setTextSize(14);
+                  candleTime.setTextColor(Color.DKGRAY);
 
-                  signal.setTextSize(20);
+                  signal = new TextView(this);
+                  signal.setText(
+                      "⏳ WAIT • --%"
+                  );
+                  signal.setTextSize(21);
                   signal.setTextColor(
                       Color.rgb(220, 140, 20)
                   );
 
-                  TextView trend =
-                      new TextView(this);
-
-                  trend.setText(
-                      "📉 DOWNTREND"
+                  strength = new TextView(this);
+                  strength.setText(
+                      "💪 Strength: --"
                   );
+                  strength.setTextSize(14);
+                  strength.setTextColor(Color.DKGRAY);
 
+                  trend = new TextView(this);
+                  trend.setText(
+                      "📊 Trend: --"
+                  );
                   trend.setTextSize(14);
                   trend.setTextColor(Color.DKGRAY);
 
-                  TextView open =
-                      new TextView(this);
+                  updateStatus = new TextView(this);
+                  updateStatus.setText(
+                      "🔄 Live analysis চলছে..."
+                  );
+                  updateStatus.setTextSize(12);
+                  updateStatus.setTextColor(Color.GRAY);
 
+                  open = new TextView(this);
                   open.setText(
                       "📈 অ্যাপ খুলুন"
                   );
-
                   open.setTextSize(15);
                   open.setTextColor(
                       Color.rgb(30, 100, 200)
                   );
 
-                  TextView close =
-                      new TextView(this);
-
+                  close = new TextView(this);
                   close.setText(
                       "✕ বন্ধ"
                   );
-
                   close.setTextSize(14);
                   close.setTextColor(Color.RED);
 
                   box.addView(title);
                   box.addView(market);
+                  box.addView(candleTime);
                   box.addView(signal);
+                  box.addView(strength);
                   box.addView(trend);
+                  box.addView(updateStatus);
                   box.addView(open);
                   box.addView(close);
 
@@ -586,15 +642,424 @@ jobs:
                   );
               }
 
+              private void updateSignal() {
+
+                  new Thread(() -> {
+
+                      HttpURLConnection connection = null;
+
+                      try {
+
+                          String urlString =
+                              API +
+                              "?symbol=" +
+                              SYMBOL +
+                              "&timeframe=" +
+                              TIMEFRAME;
+
+                          URL url =
+                              new URL(urlString);
+
+                          connection =
+                              (HttpURLConnection)
+                                  url.openConnection();
+
+                          connection.setRequestMethod(
+                              "GET"
+                          );
+
+                          connection.setConnectTimeout(
+                              10000
+                          );
+
+                          connection.setReadTimeout(
+                              10000
+                          );
+
+                          connection.setRequestProperty(
+                              "Accept",
+                              "application/json"
+                          );
+
+                          int responseCode =
+                              connection.getResponseCode();
+
+                          InputStream stream;
+
+                          if (responseCode >= 200 &&
+                              responseCode < 300) {
+
+                              stream =
+                                  connection.getInputStream();
+
+                          } else {
+
+                              stream =
+                                  connection.getErrorStream();
+                          }
+
+                          BufferedReader reader =
+                              new BufferedReader(
+                                  new InputStreamReader(
+                                      stream
+                                  )
+                              );
+
+                          StringBuilder result =
+                              new StringBuilder();
+
+                          String line;
+
+                          while (
+                              (line = reader.readLine())
+                                  != null
+                          ) {
+                              result.append(line);
+                          }
+
+                          reader.close();
+
+                          if (
+                              responseCode < 200 ||
+                              responseCode >= 300
+                          ) {
+
+                              postError(
+                                  "API Error: " +
+                                  responseCode
+                              );
+
+                              return;
+                          }
+
+                          JSONObject json =
+                              new JSONObject(
+                                  result.toString()
+                              );
+
+                          String direction =
+                              getNestedString(
+                                  json,
+                                  "signal",
+                                  "direction",
+                                  "WAIT"
+                              );
+
+                          String confidence =
+                              getNestedValue(
+                                  json,
+                                  "signal",
+                                  "confidence",
+                                  "--"
+                              );
+
+                          String trendValue =
+                              getNestedString(
+                                  json,
+                                  "analysis",
+                                  "trend",
+                                  "--"
+                              );
+
+                          String strengthValue =
+                              getNestedString(
+                                  json,
+                                  "analysis",
+                                  "market_strength",
+                                  "--"
+                              );
+
+                          String candle =
+                              findFirst(
+                                  json,
+                                  "candle_time",
+                                  "candleTime",
+                                  "timestamp",
+                                  "time",
+                                  "datetime"
+                              );
+
+                          if (
+                              candle == null ||
+                              candle.equals("--")
+                          ) {
+
+                              candle =
+                                  "Bangladesh Time";
+                          }
+
+                          final String finalDirection =
+                              direction.toUpperCase();
+
+                          final String finalConfidence =
+                              confidence;
+
+                          final String finalTrend =
+                              trendValue.toUpperCase();
+
+                          final String finalStrength =
+                              strengthValue.toUpperCase();
+
+                          final String finalCandle =
+                              candle;
+
+                          handler.post(() -> {
+
+                              market.setText(
+                                  "Market: " +
+                                  SYMBOL +
+                                  " • " +
+                                  TIMEFRAME.toUpperCase()
+                              );
+
+                              candleTime.setText(
+                                  "🕐 Candle Time: " +
+                                  finalCandle
+                              );
+
+                              signal.setText(
+                                  getSignalEmoji(
+                                      finalDirection
+                                  ) +
+                                  " " +
+                                  finalDirection +
+                                  " • " +
+                                  finalConfidence +
+                                  "%"
+                              );
+
+                              strength.setText(
+                                  "💪 Strength: " +
+                                  finalStrength
+                              );
+
+                              trend.setText(
+                                  getTrendEmoji(
+                                      finalTrend
+                                  ) +
+                                  " Trend: " +
+                                  finalTrend
+                              );
+
+                              updateStatus.setText(
+                                  "🟢 Live • প্রতি 30 সেকেন্ডে update"
+                              );
+
+                              setSignalTextColor(
+                                  finalDirection
+                              );
+                          });
+
+                      } catch (Exception e) {
+
+                          postError(
+                              "⚠️ Live data update হয়নি"
+                          );
+
+                      } finally {
+
+                          if (connection != null) {
+                              connection.disconnect();
+                          }
+                      }
+
+                  }).start();
+              }
+
+              private void postError(
+                  final String message
+              ) {
+
+                  handler.post(() -> {
+
+                      if (updateStatus != null) {
+
+                          updateStatus.setText(
+                              message
+                          );
+                      }
+                  });
+              }
+
+              private String getNestedString(
+                  JSONObject object,
+                  String parent,
+                  String key,
+                  String fallback
+              ) {
+
+                  try {
+
+                      if (
+                          object.has(parent) &&
+                          object.get(parent) instanceof JSONObject
+                      ) {
+
+                          JSONObject child =
+                              object.getJSONObject(parent);
+
+                          if (child.has(key)) {
+
+                              Object value =
+                                  child.get(key);
+
+                              return String.valueOf(
+                                  value
+                              );
+                          }
+                      }
+
+                  } catch (Exception ignored) {
+                  }
+
+                  return fallback;
+              }
+
+              private String getNestedValue(
+                  JSONObject object,
+                  String parent,
+                  String key,
+                  String fallback
+              ) {
+
+                  String value =
+                      getNestedString(
+                          object,
+                          parent,
+                          key,
+                          fallback
+                      );
+
+                  value =
+                      value.replace(
+                          "%",
+                          ""
+                      );
+
+                  return value;
+              }
+
+              private String findFirst(
+                  JSONObject json,
+                  String... keys
+              ) {
+
+                  for (String key : keys) {
+
+                      try {
+
+                          if (json.has(key)) {
+
+                              Object value =
+                                  json.get(key);
+
+                              if (
+                                  value != null &&
+                                  !String.valueOf(
+                                      value
+                                  ).equals("null")
+                              ) {
+
+                                  return String.valueOf(
+                                      value
+                                  );
+                              }
+                          }
+
+                      } catch (Exception ignored) {
+                      }
+                  }
+
+                  return "--";
+              }
+
+              private String getSignalEmoji(
+                  String direction
+              ) {
+
+                  if (
+                      direction.contains("BUY")
+                  ) {
+                      return "🟢";
+                  }
+
+                  if (
+                      direction.contains("SELL")
+                  ) {
+                      return "🔴";
+                  }
+
+                  return "⏳";
+              }
+
+              private String getTrendEmoji(
+                  String trendValue
+              ) {
+
+                  String value =
+                      trendValue.toUpperCase();
+
+                  if (
+                      value.contains("UP") ||
+                      value.contains("BULL")
+                  ) {
+                      return "📈";
+                  }
+
+                  if (
+                      value.contains("DOWN") ||
+                      value.contains("BEAR")
+                  ) {
+                      return "📉";
+                  }
+
+                  return "📊";
+              }
+
+              private void setSignalTextColor(
+                  String direction
+              ) {
+
+                  if (
+                      direction.contains("BUY")
+                  ) {
+
+                      signal.setTextColor(
+                          Color.rgb(
+                              0, 150, 70
+                          )
+                      );
+
+                  } else if (
+                      direction.contains("SELL")
+                  ) {
+
+                      signal.setTextColor(
+                          Color.RED
+                      );
+
+                  } else {
+
+                      signal.setTextColor(
+                          Color.rgb(
+                              220, 140, 20
+                          )
+                      );
+                  }
+              }
+
               private void createNotificationChannel() {
 
-                  if (Build.VERSION.SDK_INT >= 26) {
+                  if (
+                      Build.VERSION.SDK_INT >= 26
+                  ) {
 
                       NotificationChannel channel =
                           new NotificationChannel(
                               "trader_pink_ai",
                               "Trader Pink AI",
-                              NotificationManager.IMPORTANCE_LOW
+                              NotificationManager
+                                  .IMPORTANCE_LOW
                           );
 
                       NotificationManager manager =
@@ -603,6 +1068,7 @@ jobs:
                           );
 
                       if (manager != null) {
+
                           manager.createNotificationChannel(
                               channel
                           );
@@ -613,15 +1079,21 @@ jobs:
               @Override
               public void onDestroy() {
 
+                  handler.removeCallbacks(
+                      updater
+                  );
+
                   if (
                       floatingView != null &&
                       windowManager != null
                   ) {
 
                       try {
+
                           windowManager.removeView(
                               floatingView
                           );
+
                       } catch (Exception ignored) {
                       }
                   }
@@ -648,5 +1120,5 @@ jobs:
       - name: Upload APK
         uses: actions/upload-artifact@v4
         with:
-          name: Trader-Pink-AI-Floating-v7
+          name: Trader-Pink-AI-Floating-v8
           path: app/build/outputs/apk/debug/app-debug.apk
