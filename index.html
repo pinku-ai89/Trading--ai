@@ -252,6 +252,7 @@
 
   <!-- MARKET -->
   <div class="card">
+
     <div class="market-row">
       <div class="market-name">EURUSD</div>
       <div class="timeframe">1 MIN</div>
@@ -268,6 +269,7 @@
     <button class="button" onclick="manualAnalyze()">
       🔍 UPDATE SIGNAL
     </button>
+
   </div>
 
 
@@ -564,6 +566,42 @@
 
 
   // =========================================================
+  // VALID CONFIDENCE
+  //
+  // Worker থেকে confidence না এলে 0% দেখানো হবে না।
+  // =========================================================
+
+  function getConfidence(data) {
+
+    const possibleValues = [
+      data.confidence,
+      data.signal_confidence,
+      data.confluence,
+      data.confluence_score
+    ];
+
+    for (const value of possibleValues) {
+
+      if (
+        value !== null &&
+        value !== undefined &&
+        value !== "" &&
+        Number.isFinite(Number(value))
+      ) {
+
+        const n = Number(value);
+
+        if (n > 0) {
+          return Math.max(0, Math.min(100, n));
+        }
+      }
+    }
+
+    return null;
+  }
+
+
+  // =========================================================
   // SIGNAL STYLE
   // =========================================================
 
@@ -574,7 +612,7 @@
     el.className = "signal";
 
     const clean =
-      String(signal || "WAIT").toUpperCase();
+      String(signal || "WAIT").toUpperCase().trim();
 
     if (clean === "BUY") {
 
@@ -592,8 +630,25 @@
       el.classList.add("wait");
     }
 
-    $("confidence").textContent =
-      Number(confidence || 0) + "%";
+
+    // -------------------------------------------------------
+    // Confidence
+    // -------------------------------------------------------
+
+    if (
+      confidence !== null &&
+      confidence !== undefined &&
+      Number.isFinite(Number(confidence))
+    ) {
+
+      $("confidence").textContent =
+        Math.round(Number(confidence)) + "%";
+
+    } else {
+
+      $("confidence").textContent =
+        "--%";
+    }
   }
 
 
@@ -629,6 +684,7 @@
         });
 
       if (!response.ok) {
+
         throw new Error(
           "HTTP " + response.status
         );
@@ -638,10 +694,16 @@
         await response.json();
 
       if (!data || data.error) {
+
         throw new Error(
           data?.error || "Analysis error"
         );
       }
+
+      console.log(
+        "Trader Pink AI API:",
+        data
+      );
 
       renderSignal(data);
 
@@ -678,13 +740,23 @@
     const signal =
       data.signal || "WAIT";
 
+
+    // Worker-এর আসল confidence খোঁজা
     const confidence =
-      Number(data.confidence || 0);
-
-    setSignal(signal, confidence);
+      getConfidence(data);
 
 
+    // Signal এবং confidence display
+    setSignal(
+      signal,
+      confidence
+    );
+
+
+    // -------------------------------------------------------
     // Signal candle
+    // -------------------------------------------------------
+
     $("signalCandle").textContent =
       formatTime(
         data.signal_for_candle ||
@@ -692,7 +764,10 @@
       );
 
 
+    // -------------------------------------------------------
     // Target time
+    // -------------------------------------------------------
+
     $("targetTime").textContent =
       formatTime(
         data.signal_for_candle ||
@@ -700,34 +775,52 @@
       );
 
 
+    // -------------------------------------------------------
     // Trend
+    // -------------------------------------------------------
+
     $("trend").textContent =
       data.trend || "--";
 
 
+    // -------------------------------------------------------
     // Candle
+    // -------------------------------------------------------
+
     $("candle").textContent =
       data.candle || "--";
 
 
+    // -------------------------------------------------------
     // Strength
+    // -------------------------------------------------------
+
     $("strength").textContent =
-      data.candle_strength ||
-      data.market_strength ||
+      data.candle_strength ??
+      data.market_strength ??
       "--";
 
 
+    // -------------------------------------------------------
     // Support
+    // -------------------------------------------------------
+
     $("support").textContent =
       num(data.support);
 
 
+    // -------------------------------------------------------
     // Resistance
+    // -------------------------------------------------------
+
     $("resistance").textContent =
       num(data.resistance);
 
 
+    // -------------------------------------------------------
     // EMA
+    // -------------------------------------------------------
+
     $("ema9").textContent =
       num(data.ema9);
 
@@ -738,29 +831,44 @@
       num(data.ema200);
 
 
+    // -------------------------------------------------------
     // RSI
+    // -------------------------------------------------------
+
     $("rsi").textContent =
       num(data.rsi, 2);
 
 
+    // -------------------------------------------------------
     // ADX
+    // -------------------------------------------------------
+
     $("adx").textContent =
       num(data.adx, 2);
 
 
+    // -------------------------------------------------------
     // ATR
+    // -------------------------------------------------------
+
     $("atr").textContent =
       num(data.atr, 6);
 
 
+    // -------------------------------------------------------
     // Last closed candle
+    // -------------------------------------------------------
+
     $("closedCandle").textContent =
       formatTime(
         data.closed_candle_time
       );
 
 
+    // -------------------------------------------------------
     // Reasons
+    // -------------------------------------------------------
+
     if (Array.isArray(data.reasons)) {
 
       if (data.reasons.length === 0) {
@@ -773,7 +881,10 @@
         $("reasons").innerHTML =
           data.reasons
             .map(reason =>
-              "• " + escapeHtml(String(reason))
+              "• " +
+              escapeHtml(
+                String(reason)
+              )
             )
             .join("<br>");
       }
@@ -786,15 +897,20 @@
     } else {
 
       $("reasons").textContent =
-        "Indicator এবং price action অনুযায়ী analysis সম্পন্ন হয়েছে।";
+        "Indicator এবং price action অনুযায়ী analysis সম্পন্ন হয়েছে.";
     }
 
 
+    // -------------------------------------------------------
     // Remember target candle
+    // -------------------------------------------------------
+
     if (data.signal_for_timestamp) {
 
       lastSignalTimestamp =
-        Number(data.signal_for_timestamp);
+        Number(
+          data.signal_for_timestamp
+        );
     }
   }
 
@@ -826,21 +942,6 @@
 
   // =========================================================
   // MINUTE-ALIGNED SIGNAL SYSTEM
-  //
-  // Example:
-  //
-  // 12:34:58
-  //     ↓
-  // Fetch signal
-  //     ↓
-  // Signal prepared for 12:35 candle
-  //
-  // 12:35:00
-  //     ↓
-  // New candle starts
-  //     ↓
-  // Same signal remains for that candle
-  //
   // =========================================================
 
   function scheduleMinuteRefresh() {
