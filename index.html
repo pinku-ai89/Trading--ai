@@ -307,19 +307,6 @@ select{
   font-size:18px;
 }
 
-.loading{
-  text-align:center;
-  padding:18px;
-  color:#aaa;
-}
-
-.error{
-  color:#ff5c72;
-  text-align:center;
-  padding:12px;
-  line-height:1.5;
-}
-
 .footer{
   text-align:center;
   color:#777;
@@ -361,95 +348,1370 @@ select{
 
 <div class="app">
 
-  <div class="header">
+<div class="header">
 
-    <img
-      class="app-icon"
-      src="./CompressJPEG.Online_img(512x512).jpg"
-      alt="Trader Pink AI">
+<img
+class="app-icon"
+src="./CompressJPEG.Online_img(512x512).jpg"
+alt="Trader Pink AI">
 
-    <h1>Trader Pink AI 📈</h1>
+<h1>Trader Pink AI 📈</h1>
 
-    <div class="sub">
-      Smart Forex and Binary Trading Signal Assistant
-    </div>
+<div class="sub">
+Smart Forex and Binary Trading Signal Assistant
+</div>
 
-  </div>
+</div>
 
-  <div class="status" id="status">
-    ● Ready
-  </div>
+<div class="status" id="status">
+● Ready
+</div>
 
-  <div class="card">
+<div class="card">
 
-    <div class="label">
-      Market
-    </div>
+<div class="label">
+Market
+</div>
 
-    <select id="symbol">
+<select id="symbol">
 
-      <option value="EURUSD">
-        EURUSD
-      </option>
+<option value="EURUSD">
+EURUSD
+</option>
 
-      <option value="GBPUSD">
-        GBPUSD
-      </option>
+<option value="GBPUSD">
+GBPUSD
+</option>
 
-    </select>
+</select>
 
-    <div class="label" style="margin-top:15px">
-      Timeframe
-    </div>
+<div class="label" style="margin-top:15px">
+Timeframe
+</div>
 
-    <div class="tf">
+<div class="tf">
 
-      <button class="active" data-tf="1m">
-        1M
-      </button>
+<button class="active" data-tf="1m">
+1M
+</button>
 
-      <button data-tf="5m">
-        5M
-      </button>
+<button data-tf="5m">
+5M
+</button>
 
-      <button data-tf="15m">
-        15M
-      </button>
+<button data-tf="15m">
+15M
+</button>
 
-    </div>
+</div>
 
-    <button
-      class="analyze"
-      onclick="analyzeAll()">
+<button
+class="analyze"
+onclick="manualAnalyze()">
 
-      🔍 FULL AI MARKET ANALYSIS
+🔍 FULL AI MARKET ANALYSIS
 
-    </button>
+</button>
 
-    <button
-      class="results-btn"
-      onclick="loadResults()">
+<button
+class="results-btn"
+onclick="loadResults()">
 
-      📊 Signal Results
+📊 Signal Results
 
-    </button>
+</button>
 
-    <div class="countdown" id="countdown">
-      Next candle signal update: --
-    </div>
+<div class="countdown" id="countdown">
+Next candle: --
+</div>
 
-  </div>
+<div class="signal-note">
+নতুন candle শুরু হলে signal update হবে।
+</div>
+
+</div>
 
 
-  <!-- BEST SIGNAL -->
+<!-- BEST SIGNAL -->
 
-  <div class="card">
+<div class="card">
 
-    <div class="best">
+<div class="best">
 
-      <div class="best-title">
-        BEST CURRENT SIGNAL
-      </div>
+<div class="best-title">
+BEST CURRENT SIGNAL
+</div>
 
-      <div
-       
+<div
+class="best-market"
+id="bestMarket">
+
+EURUSD • 1M
+
+</div>
+
+<div
+class="best-signal wait"
+id="bestSignal">
+
+WAIT
+
+</div>
+
+<div id="bestConfidence">
+Confidence: --
+</div>
+
+</div>
+
+</div>
+
+
+<!-- MULTI TIMEFRAME -->
+
+<div class="card">
+
+<div class="section-title">
+📡 Multi-Timeframe Signals
+</div>
+
+
+<div class="signal-box">
+
+<div class="signal-head">
+
+<div
+class="signal-market"
+id="market1">
+EURUSD
+</div>
+
+<div class="signal-timeframe">
+1M Signal
+</div>
+
+</div>
+
+<div class="signal-main">
+
+<div
+class="signal-direction wait"
+id="signal1">
+WAIT
+</div>
+
+<div
+class="signal-confidence"
+id="confidence1">
+Confidence: --
+</div>
+
+</div>
+
+<div
+class="candle"
+id="candle1">
+🕐 Candle: --
+</div>
+
+</div>
+
+
+<div class="signal-box">
+
+<div class="signal-head">
+
+<div
+class="signal-market"
+id="market5">
+EURUSD
+</div>
+
+<div class="signal-timeframe">
+5M Signal
+</div>
+
+</div>
+
+<div class="signal-main">
+
+<div
+class="signal-direction wait"
+id="signal5">
+WAIT
+</div>
+
+<div
+class="signal-confidence"
+id="confidence5">
+Confidence: --
+</div>
+
+</div>
+
+<div
+class="candle"
+id="candle5">
+🕐 Candle: --
+</div>
+
+</div>
+
+
+<div class="signal-box">
+
+<div class="signal-head">
+
+<div
+class="signal-market"
+id="market15">
+EURUSD
+</div>
+
+<div class="signal-timeframe">
+15M Signal
+</div>
+
+</div>
+
+<div class="signal-main">
+
+<div
+class="signal-direction wait"
+id="signal15">
+WAIT
+</div>
+
+<div
+class="signal-confidence"
+id="confidence15">
+Confidence: --
+</div>
+
+</div>
+
+<div
+class="candle"
+id="candle15">
+🕐 Candle: --
+</div>
+
+</div>
+
+</div>
+
+
+<!-- MARKET ANALYSIS -->
+
+<div class="card">
+
+<div class="market-header">
+
+<h2 id="marketName">
+EURUSD
+</h2>
+
+<div
+class="price"
+id="price">
+Price: --
+</div>
+
+</div>
+
+<div class="grid">
+
+<div class="item">
+<small>Overall Signal</small>
+<b id="marketSignal">WAIT</b>
+</div>
+
+<div class="item">
+<small>Strength</small>
+<b id="strength">--</b>
+</div>
+
+<div class="item">
+<small>Trend</small>
+<b id="trend">--</b>
+</div>
+
+<div class="item">
+<small>Candle</small>
+<b id="candle">--</b>
+</div>
+
+<div class="item">
+<small>Support</small>
+<b id="support">--</b>
+</div>
+
+<div class="item">
+<small>Resistance</small>
+<b id="resistance">--</b>
+</div>
+
+<div class="item">
+<small>EMA 9</small>
+<b id="ema9">--</b>
+</div>
+
+<div class="item">
+<small>EMA 21</small>
+<b id="ema21">--</b>
+</div>
+
+<div class="item">
+<small>Candle Time</small>
+<b id="candleTime">--</b>
+</div>
+
+<div class="item">
+<small>Selected TF</small>
+<b id="currentTf">1M</b>
+</div>
+
+</div>
+
+</div>
+
+
+<!-- NEXT CANDLES -->
+
+<div class="card">
+
+<div class="section-title">
+🔮 Next 1–3 Candle Prediction
+</div>
+
+<div id="predictions">
+
+Analysis করলে এখানে prediction দেখা যাবে।
+
+</div>
+
+</div>
+
+
+<!-- AI ANALYSIS -->
+
+<div class="card">
+
+<div class="section-title">
+🧠 AI Market Analysis
+</div>
+
+<div id="analysisTags">
+
+<span class="analysis-tag">
+EMA
+</span>
+
+<span class="analysis-tag">
+RSI
+</span>
+
+<span class="analysis-tag">
+MACD
+</span>
+
+<span class="analysis-tag">
+Trend
+</span>
+
+<span class="analysis-tag">
+Candle
+</span>
+
+<span class="analysis-tag">
+Support/Resistance
+</span>
+
+</div>
+
+<br>
+
+<div
+id="reason"
+class="reason">
+
+🔹 FULL AI MARKET ANALYSIS চাপুন।
+
+</div>
+
+</div>
+
+
+<!-- RESULTS -->
+
+<div class="card">
+
+<div class="section-title">
+🎯 Signal Results
+</div>
+
+<div class="summary">
+
+<div class="summary-box">
+
+<span>Total Signals</span>
+
+<strong id="total">
+0
+</strong>
+
+</div>
+
+<div class="summary-box">
+
+<span>Correct</span>
+
+<strong id="correct">
+0
+</strong>
+
+</div>
+
+<div class="summary-box">
+
+<span>Accuracy</span>
+
+<strong id="accuracy">
+0%
+</strong>
+
+</div>
+
+</div>
+
+</div>
+
+
+<div class="footer">
+
+Trader Pink AI 🤖📈<br>
+
+Bangladesh Time (UTC+6)<br>
+
+AI technical analysis only. No guaranteed profit.
+
+</div>
+
+</div>
+
+
+<script>
+
+const API_BASE =
+"https://crimson-grass-f881.bijondebnath51.workers.dev";
+
+let timeframe = "1m";
+
+let lastCandleTimes = {
+"1m": null,
+"5m": null,
+"15m": null
+};
+
+let running = false;
+
+
+/* TIMEFRAME BUTTON */
+
+document
+.querySelectorAll(".tf button")
+.forEach(button => {
+
+button.addEventListener("click", () => {
+
+document
+.querySelectorAll(".tf button")
+.forEach(btn =>
+btn.classList.remove("active")
+);
+
+button.classList.add("active");
+
+timeframe =
+button.dataset.tf;
+
+document.getElementById(
+"currentTf"
+).textContent =
+timeframe.toUpperCase();
+
+});
+
+});
+
+
+/* SIGNAL COLOR */
+
+function signalClass(signal){
+
+signal =
+String(signal || "WAIT")
+.toUpperCase();
+
+if(signal === "BUY"){
+return "buy";
+}
+
+if(signal === "SELL"){
+return "sell";
+}
+
+return "wait";
+
+}
+
+
+/* DIRECTION */
+
+function getDirection(data){
+
+return String(
+data?.signal?.direction ||
+"WAIT"
+).toUpperCase();
+
+}
+
+
+/* CONFIDENCE */
+
+function getConfidence(data){
+
+let value =
+data?.signal?.confidence ?? 0;
+
+value =
+Number(
+String(value)
+.replace("%","")
+);
+
+return Number.isFinite(value)
+? value
+: 0;
+
+}
+
+
+/* FETCH */
+
+async function fetchAnalysis(
+symbol,
+tf
+){
+
+const url =
+API_BASE +
+"/analyze?symbol=" +
+encodeURIComponent(symbol) +
+"&timeframe=" +
+encodeURIComponent(tf) +
+"&t=" +
+Date.now();
+
+const response =
+await fetch(
+url,
+{
+method:"GET",
+cache:"no-store",
+headers:{
+"Accept":"application/json",
+"Cache-Control":"no-cache"
+}
+}
+);
+
+if(!response.ok){
+
+throw new Error(
+"Server Error: " +
+response.status
+);
+
+}
+
+const data =
+await response.json();
+
+if(data.status !== "ok"){
+
+throw new Error(
+data.message ||
+"Analysis failed"
+);
+
+}
+
+return data;
+
+}
+
+
+/* SET SIGNAL */
+
+function setTimeframeSignal(
+tf,
+data
+){
+
+const direction =
+getDirection(data);
+
+const confidence =
+getConfidence(data);
+
+const number =
+tf === "1m"
+? "1"
+: tf === "5m"
+? "5"
+: "15";
+
+const signalEl =
+document.getElementById(
+"signal" + number
+);
+
+signalEl.textContent =
+direction;
+
+signalEl.className =
+"signal-direction " +
+signalClass(direction);
+
+document.getElementById(
+"confidence" + number
+).textContent =
+"Confidence: " +
+confidence +
+"%";
+
+document.getElementById(
+"candle" + number
+).textContent =
+"🕐 Candle: " +
+(data.candle_time || "--");
+
+document.getElementById(
+"market" + number
+).textContent =
+document.getElementById(
+"symbol"
+).value;
+
+}
+
+
+/* BEST */
+
+function chooseBest(
+data1,
+data5,
+data15
+){
+
+const list = [
+data1,
+data5,
+data15
+];
+
+let best =
+data1;
+
+for(
+const data of list
+){
+
+const d =
+getDirection(data);
+
+const bd =
+getDirection(best);
+
+const c =
+getConfidence(data);
+
+const bc =
+getConfidence(best);
+
+if(
+d !== "WAIT" &&
+bd === "WAIT"
+){
+
+best = data;
+continue;
+
+}
+
+if(
+d !== "WAIT" &&
+bd !== "WAIT" &&
+c > bc
+){
+
+best = data;
+continue;
+
+}
+
+}
+
+return best;
+
+}
+
+
+/* MARKET DETAILS */
+
+function showMarketDetails(
+data,
+symbol
+){
+
+const market =
+data.market || {};
+
+document.getElementById(
+"marketName"
+).textContent =
+symbol;
+
+document.getElementById(
+"price"
+).textContent =
+"Price: " +
+(
+data.price ??
+market.price ??
+"--"
+);
+
+const direction =
+getDirection(data);
+
+const signalEl =
+document.getElementById(
+"marketSignal"
+);
+
+signalEl.textContent =
+direction;
+
+signalEl.className =
+signalClass(direction);
+
+document.getElementById(
+"strength"
+).textContent =
+market.strength || "--";
+
+document.getElementById(
+"trend"
+).textContent =
+market.trend || "--";
+
+document.getElementById(
+"candle"
+).textContent =
+market.candle || "--";
+
+document.getElementById(
+"support"
+).textContent =
+market.support ?? "--";
+
+document.getElementById(
+"resistance"
+).textContent =
+market.resistance ?? "--";
+
+document.getElementById(
+"candleTime"
+).textContent =
+data.candle_time || "--";
+
+document.getElementById(
+"ema9"
+).textContent =
+data.indicators?.EMA_9 ?? "--";
+
+document.getElementById(
+"ema21"
+).textContent =
+data.indicators?.EMA_21 ?? "--";
+
+}
+
+
+/* PREDICTION */
+
+function showPredictions(data){
+
+const box =
+document.getElementById(
+"predictions"
+);
+
+const predictions =
+data.next_candles || [];
+
+if(
+!Array.isArray(predictions) ||
+!predictions.length
+){
+
+box.textContent =
+"Next candle prediction পাওয়া যায়নি।";
+
+return;
+
+}
+
+box.innerHTML =
+predictions
+.map(
+(item,index) => {
+
+const direction =
+item.signal ||
+item.expected_direction ||
+"WAIT";
+
+return `
+<div class="prediction">
+
+🕯 Candle ${index + 1}
+
+• ${escapeHtml(
+item.time || "--"
+)}
+
+• <strong class="${signalClass(direction)}">
+
+${escapeHtml(direction)}
+
+</strong>
+
+</div>
+`;
+
+}
+)
+.join("");
+
+}
+
+
+/* REASON */
+
+function showReason(
+data1,
+data5,
+data15
+){
+
+const symbol =
+document.getElementById(
+"symbol"
+).value;
+
+const data =
+timeframe === "1m"
+? data1
+: timeframe === "5m"
+? data5
+: data15;
+
+const market =
+data.market || {};
+
+document.getElementById(
+"reason"
+).innerHTML =
+
+"📊 <strong>" +
+escapeHtml(symbol) +
+"</strong><br><br>" +
+
+"📈 Trend: " +
+escapeHtml(
+market.trend || "--"
+) +
+"<br>" +
+
+"🕯 Candle: " +
+escapeHtml(
+market.candle || "--"
+) +
+"<br>" +
+
+"💪 Strength: " +
+escapeHtml(
+market.strength || "--"
+) +
+"<br>" +
+
+"🟢 Support: " +
+escapeHtml(
+market.support ?? "--"
+) +
+"<br>" +
+
+"🔴 Resistance: " +
+escapeHtml(
+market.resistance ?? "--"
+) +
+"<br><br>" +
+
+"1M: " +
+escapeHtml(
+getDirection(data1)
+) +
+
+" • 5M: " +
+escapeHtml(
+getDirection(data5)
+) +
+
+" • 15M: " +
+escapeHtml(
+getDirection(data15)
+);
+
+}
+
+
+/* REAL ANALYSIS */
+
+async function analyzeAll(
+force = false
+){
+
+if(running){
+return;
+}
+
+running = true;
+
+const symbol =
+document.getElementById(
+"symbol"
+).value;
+
+const status =
+document.getElementById(
+"status"
+);
+
+try{
+
+if(force){
+
+status.textContent =
+"⏳ নতুন candle-এর signal নেওয়া হচ্ছে...";
+
+}
+else{
+
+status.textContent =
+"⏳ Candle check চলছে...";
+
+}
+
+const results =
+await Promise.all([
+fetchAnalysis(symbol,"1m"),
+fetchAnalysis(symbol,"5m"),
+fetchAnalysis(symbol,"15m")
+]);
+
+const data1 =
+results[0];
+
+const data5 =
+results[1];
+
+const data15 =
+results[2];
+
+
+/*
+IMPORTANT:
+
+Candle time পরিবর্তন না হলে
+নতুন signal display করা হবে না।
+
+অর্থাৎ একই candle-এর মাঝখানে
+signal বারবার update হবে না।
+*/
+
+const currentTimes = {
+"1m": data1.candle_time,
+"5m": data5.candle_time,
+"15m": data15.candle_time
+};
+
+const changed =
+force ||
+currentTimes["1m"] !== lastCandleTimes["1m"] ||
+currentTimes["5m"] !== lastCandleTimes["5m"] ||
+currentTimes["15m"] !== lastCandleTimes["15m"];
+
+
+if(changed){
+
+setTimeframeSignal(
+"1m",
+data1
+);
+
+setTimeframeSignal(
+"5m",
+data5
+);
+
+setTimeframeSignal(
+"15m",
+data15
+);
+
+const best =
+chooseBest(
+data1,
+data5,
+data15
+);
+
+const bestDirection =
+getDirection(best);
+
+const bestConfidence =
+getConfidence(best);
+
+document.getElementById(
+"bestMarket"
+).textContent =
+symbol +
+" • " +
+String(
+best.timeframe || timeframe
+).toUpperCase();
+
+const bestEl =
+document.getElementById(
+"bestSignal"
+);
+
+bestEl.textContent =
+bestDirection;
+
+bestEl.className =
+"best-signal " +
+signalClass(bestDirection);
+
+document.getElementById(
+"bestConfidence"
+).textContent =
+"Confidence: " +
+bestConfidence +
+"%";
+
+const selectedData =
+timeframe === "1m"
+? data1
+: timeframe === "5m"
+? data5
+: data15;
+
+showMarketDetails(
+selectedData,
+symbol
+);
+
+showPredictions(
+selectedData
+);
+
+showReason(
+data1,
+data5,
+data15
+);
+
+lastCandleTimes =
+currentTimes;
+
+status.textContent =
+"● Signal Updated • New Candle";
+
+}
+else{
+
+status.textContent =
+"● Waiting for next candle";
+
+}
+
+}
+catch(error){
+
+console.error(error);
+
+status.textContent =
+"● Analysis Error";
+
+document.getElementById(
+"reason"
+).innerHTML =
+"❌ Analysis error: " +
+escapeHtml(
+error.message
+);
+
+}
+finally{
+
+running = false;
+
+}
+
+}
+
+
+/* MANUAL BUTTON */
+
+function manualAnalyze(){
+
+lastCandleTimes = {
+"1m": null,
+"5m": null,
+"15m": null
+};
+
+analyzeAll(true);
+
+}
+
+
+/* COUNTDOWN */
+
+function updateCountdown(){
+
+const now =
+new Date();
+
+const seconds =
+now.getSeconds();
+
+const milliseconds =
+now.getMilliseconds();
+
+let remaining =
+60000 -
+(
+(seconds * 1000) +
+milliseconds
+);
+
+if(remaining < 0){
+remaining = 0;
+}
+
+const sec =
+Math.ceil(
+remaining / 1000
+);
+
+document.getElementById(
+"countdown"
+).textContent =
+"⏱ 1M next candle: " +
+sec +
+" sec";
+
+}
+
+
+/*
+CHECK MARKET FREQUENTLY.
+
+এটি প্রতি 2 সেকেন্ডে API check করবে।
+কিন্তু একই candle হলে UI signal
+update করবে না।
+
+নতুন candle_time আসলেই
+signal update হবে।
+*/
+
+setInterval(
+() => {
+
+analyzeAll(false);
+
+},
+2000
+);
+
+
+setInterval(
+updateCountdown,
+250
+);
+
+
+/* RESULTS */
+
+async function loadResults(){
+
+try{
+
+const response =
+await fetch(
+API_BASE +
+"/results?t=" +
+Date.now(),
+{
+method:"GET",
+cache:"no-store"
+}
+);
+
+if(!response.ok){
+return;
+}
+
+const data =
+await response.json();
+
+document.getElementById(
+"total"
+).textContent =
+data.total_signals ?? 0;
+
+document.getElementById(
+"correct"
+).textContent =
+data.correct ?? 0;
+
+document.getElementById(
+"accuracy"
+).textContent =
+data.accuracy || "0%";
+
+}
+catch(error){
+
+console.log(
+"Results error:",
+error
+);
+
+}
+
+}
+
+
+/* ESCAPE */
+
+function escapeHtml(value){
+
+return String(value)
+.replace(
+/&/g,
+"&amp;"
+)
+.replace(
+/</g,
+"&lt;"
+)
+.replace(
+/>/g,
+"&gt;"
+)
+.replace(
+/"/g,
+"&quot;"
+)
+.replace(
+/'/g,
+"&#039;"
+);
+
+}
+
+
+/* SERVICE WORKER */
+
+if(
+"serviceWorker" in navigator
+){
+
+window.addEventListener(
+"load",
+() => {
+
+navigator
+.serviceWorker
+.register("./sw.js")
+.then(
+() => {
+
+console.log(
+"Trader Pink AI Service Worker ready"
+);
+
+}
+)
+.catch(
+error => {
+
+console.log(
+"Service Worker error:",
+error
+);
+
+}
+);
+
+});
+
+}
+
+
+/* START */
+
+window.addEventListener(
+"load",
+() => {
+
+loadResults();
+
+/*
+প্রথমবার data নেওয়া হবে,
+কিন্তু manual force না হওয়া পর্যন্ত
+পরের নতুন candle-এর নিয়ম থাকবে।
+*/
+
+setTimeout(
+() => {
+
+analyzeAll(true);
+
+},
+1000
+);
+
+});
+
+</script>
+
+</body>
+</html>
