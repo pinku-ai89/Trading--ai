@@ -1,1715 +1,985 @@
 <!DOCTYPE html>
 <html lang="bn">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 
-<title>Trader Pink AI 📈</title>
+  <meta name="theme-color" content="#ff1493">
+  <meta name="description" content="Trader Pink AI - EURUSD 1 Minute Signal">
 
-<meta name="theme-color" content="#ff4f9a">
-<meta name="description" content="Trader Pink AI - Smart Forex and Binary Trading Signal Assistant">
+  <link rel="manifest" href="./manifest.json">
 
-<link rel="manifest" href="./manifest.json">
+  <title>Trader Pink AI 📈</title>
 
-<link rel="icon"
-      type="image/jpeg"
-      href="./CompressJPEG.Online_img(512x512).jpg">
+  <style>
+    * {
+      box-sizing: border-box;
+      -webkit-tap-highlight-color: transparent;
+    }
 
-<meta name="mobile-web-app-capable" content="yes">
-<meta name="apple-mobile-web-app-capable" content="yes">
-<meta name="apple-mobile-web-app-title" content="Trader Pink AI">
+    body {
+      margin: 0;
+      padding: 10px;
+      font-family: Arial, sans-serif;
+      background: #0b0b12;
+      color: #ffffff;
+    }
 
-<style>
+    .app {
+      width: 100%;
+      max-width: 480px;
+      margin: auto;
+    }
 
-*{
-  box-sizing:border-box;
-}
+    .header {
+      text-align: center;
+      padding: 10px 5px 14px;
+    }
 
-body{
-  margin:0;
-  font-family:Arial,sans-serif;
-  background:linear-gradient(180deg,#16051a,#090909);
-  color:#fff;
-  min-height:100vh;
-}
+    .title {
+      font-size: 25px;
+      font-weight: 800;
+      color: #ff1493;
+      margin-bottom: 4px;
+    }
 
-.app{
-  max-width:600px;
-  margin:auto;
-  padding:16px;
-}
+    .subtitle {
+      font-size: 12px;
+      color: #aaa;
+    }
 
-.header{
-  text-align:center;
-  padding:18px 5px;
-}
+    .status {
+      text-align: center;
+      font-size: 12px;
+      margin: 6px 0 10px;
+      color: #00ff9d;
+    }
 
-.app-icon{
-  width:80px;
-  height:80px;
-  border-radius:20px;
-  object-fit:cover;
-  display:block;
-  margin:0 auto 10px;
-}
+    .card {
+      background: #151520;
+      border: 1px solid #292938;
+      border-radius: 16px;
+      padding: 14px;
+      margin-bottom: 10px;
+      box-shadow: 0 4px 18px rgba(0,0,0,.25);
+    }
 
-h1{
-  margin:5px 0;
-  color:#ff4f9a;
-  font-size:28px;
-}
+    .market-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
 
-.sub{
-  color:#bbb;
-  font-size:14px;
-}
+    .market-name {
+      font-size: 22px;
+      font-weight: 800;
+    }
 
-.status{
-  text-align:center;
-  color:#21e6a3;
-  background:#151515;
-  border:1px solid #292929;
-  border-radius:12px;
-  padding:10px;
-  margin:10px 0;
-  font-size:13px;
-}
+    .timeframe {
+      background: #ff1493;
+      padding: 6px 12px;
+      border-radius: 20px;
+      font-weight: bold;
+      font-size: 13px;
+    }
 
-.card{
-  background:#171717;
-  border:1px solid #333;
-  border-radius:18px;
-  padding:16px;
-  margin:12px 0;
-  box-shadow:0 8px 25px #0007;
-}
+    .countdown-title {
+      text-align: center;
+      color: #aaa;
+      font-size: 12px;
+      margin-top: 12px;
+    }
 
-.label{
-  color:#aaa;
-  font-size:13px;
-  margin-bottom:8px;
-}
+    .countdown {
+      text-align: center;
+      font-size: 30px;
+      font-weight: 900;
+      color: #ffffff;
+      margin: 2px 0 4px;
+    }
 
-select,
-button{
-  width:100%;
-  border:0;
-  border-radius:12px;
-  padding:14px;
-  font-size:16px;
-}
+    .signal-label {
+      text-align: center;
+      font-size: 12px;
+      color: #aaa;
+      margin-top: 8px;
+    }
 
-select{
-  background:#252525;
-  color:#fff;
-  border:1px solid #444;
-}
+    .signal {
+      text-align: center;
+      font-size: 48px;
+      font-weight: 900;
+      margin: 5px 0;
+    }
 
-.tf{
-  display:grid;
-  grid-template-columns:repeat(3,1fr);
-  gap:8px;
-}
+    .buy {
+      color: #00ff88;
+    }
 
-.tf button{
-  background:#292929;
-  color:#fff;
-  border:1px solid #444;
-}
+    .sell {
+      color: #ff4d6d;
+    }
 
-.tf button.active{
-  background:#ff4f9a;
-  border-color:#ff4f9a;
-}
+    .wait {
+      color: #ffd166;
+    }
 
-.analyze{
-  margin-top:14px;
-  background:linear-gradient(90deg,#ff4f9a,#ff78b3);
-  color:#fff;
-  font-weight:bold;
-}
+    .confidence {
+      text-align: center;
+      font-size: 22px;
+      font-weight: 800;
+      margin-bottom: 10px;
+    }
 
-.results-btn{
-  margin-top:8px;
-  background:#252525;
-  color:#fff;
-  border:1px solid #444;
-}
+    .confidence-text {
+      text-align: center;
+      color: #aaa;
+      font-size: 11px;
+      margin-bottom: 12px;
+    }
 
-.best{
-  text-align:center;
-  padding:18px;
-  border-radius:16px;
-  background:#202020;
-}
+    .info-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 8px;
+    }
 
-.best-title{
-  font-size:13px;
-  color:#aaa;
-}
+    .info {
+      background: #0f0f18;
+      border-radius: 10px;
+      padding: 9px;
+      border: 1px solid #242432;
+    }
 
-.best-market{
-  color:#ff4f9a;
-  font-size:18px;
-  font-weight:bold;
-  margin-top:5px;
-}
+    .info-title {
+      color: #888;
+      font-size: 10px;
+      margin-bottom: 4px;
+    }
 
-.best-signal{
-  font-size:40px;
-  font-weight:bold;
-  margin:8px 0;
-}
+    .info-value {
+      font-size: 13px;
+      font-weight: 700;
+      word-break: break-word;
+    }
 
-.signal-box{
-  background:#202020;
-  border:1px solid #333;
-  border-radius:15px;
-  padding:14px;
-  margin:10px 0;
-}
+    .target-card {
+      border: 1px solid #ff1493;
+      background: #19101a;
+    }
 
-.signal-head{
-  display:flex;
-  justify-content:space-between;
-  align-items:center;
-}
+    .target-title {
+      text-align: center;
+      color: #ff66b5;
+      font-size: 12px;
+      font-weight: bold;
+    }
 
-.signal-market{
-  color:#ff4f9a;
-  font-size:16px;
-  font-weight:bold;
-}
+    .target-time {
+      text-align: center;
+      font-size: 18px;
+      font-weight: 800;
+      margin-top: 5px;
+    }
 
-.signal-timeframe{
-  color:#fff;
-  font-size:17px;
-  font-weight:bold;
-}
+    .button {
+      width: 100%;
+      border: 0;
+      border-radius: 12px;
+      padding: 13px;
+      background: #ff1493;
+      color: white;
+      font-size: 15px;
+      font-weight: 800;
+      margin-top: 8px;
+      cursor: pointer;
+    }
 
-.signal-main{
-  text-align:center;
-  padding:8px 0;
-}
+    .button:active {
+      transform: scale(.98);
+    }
 
-.signal-direction{
-  font-size:30px;
-  font-weight:bold;
-}
+    .reason {
+      color: #ddd;
+      font-size: 12px;
+      line-height: 1.6;
+      margin-top: 5px;
+    }
 
-.signal-confidence{
-  color:#ddd;
-  font-size:14px;
-  margin-top:4px;
-}
+    .footer {
+      text-align: center;
+      color: #666;
+      font-size: 10px;
+      padding: 8px 0 15px;
+      line-height: 1.5;
+    }
 
-.candle{
-  text-align:center;
-  color:#aaa;
-  font-size:12px;
-  margin-top:8px;
-}
+    .loading {
+      opacity: .65;
+    }
 
-.buy{
-  color:#21e6a3;
-}
+    .error {
+      color: #ff6b6b;
+    }
 
-.sell{
-  color:#ff5c72;
-}
+    .online {
+      color: #00ff88;
+    }
 
-.wait{
-  color:#ffd166;
-}
-
-.grid{
-  display:grid;
-  grid-template-columns:1fr 1fr;
-  gap:10px;
-}
-
-.item{
-  background:#222;
-  border-radius:12px;
-  padding:12px;
-}
-
-.item small{
-  display:block;
-  color:#999;
-  margin-bottom:5px;
-  font-size:11px;
-}
-
-.item b{
-  font-size:14px;
-  word-break:break-word;
-}
-
-.section-title{
-  font-size:18px;
-  margin:4px 0 12px;
-}
-
-.market-header{
-  display:flex;
-  justify-content:space-between;
-  align-items:center;
-  margin-bottom:12px;
-}
-
-.market-header h2{
-  margin:0;
-  font-size:21px;
-}
-
-.price{
-  color:#21e6a3;
-  font-weight:bold;
-  font-size:15px;
-}
-
-.reason{
-  color:#ddd;
-  line-height:1.6;
-  font-size:14px;
-}
-
-.prediction{
-  background:#222;
-  padding:10px;
-  border-radius:10px;
-  margin:6px 0;
-  color:#ddd;
-}
-
-.summary{
-  display:grid;
-  grid-template-columns:repeat(3,1fr);
-  gap:8px;
-}
-
-.summary-box{
-  background:#222;
-  border-radius:12px;
-  padding:12px 5px;
-  text-align:center;
-}
-
-.summary-box span{
-  display:block;
-  color:#999;
-  font-size:11px;
-  margin-bottom:5px;
-}
-
-.summary-box strong{
-  font-size:18px;
-}
-
-.footer{
-  text-align:center;
-  color:#777;
-  font-size:11px;
-  padding:20px 0;
-  line-height:1.6;
-}
-
-.analysis-tag{
-  display:inline-block;
-  background:#292929;
-  border-radius:8px;
-  padding:5px 8px;
-  margin:3px;
-  font-size:11px;
-  color:#ccc;
-}
-
-.signal-note{
-  text-align:center;
-  color:#aaa;
-  font-size:12px;
-  margin-top:10px;
-  line-height:1.5;
-}
-
-.countdown{
-  text-align:center;
-  color:#ff4f9a;
-  font-weight:bold;
-  font-size:13px;
-  margin-top:8px;
-}
-
-</style>
+    .dot {
+      display: inline-block;
+      width: 7px;
+      height: 7px;
+      background: #00ff88;
+      border-radius: 50%;
+      margin-right: 5px;
+    }
+  </style>
 </head>
 
 <body>
 
 <div class="app">
 
-<div class="header">
+  <div class="header">
+    <div class="title">Trader Pink AI 📈</div>
+    <div class="subtitle">EURUSD Smart 1 Minute Signal Engine</div>
+  </div>
 
-<img
-class="app-icon"
-src="./CompressJPEG.Online_img(512x512).jpg"
-alt="Trader Pink AI">
+  <div id="status" class="status">
+    <span class="dot"></span>Connecting...
+  </div>
 
-<h1>Trader Pink AI 📈</h1>
+  <!-- MARKET -->
+  <div class="card">
+    <div class="market-row">
+      <div class="market-name">EURUSD</div>
+      <div class="timeframe">1 MIN</div>
+    </div>
 
-<div class="sub">
-Smart Forex and Binary Trading Signal Assistant
-</div>
+    <div class="countdown-title">
+      নতুন Candle শুরু হতে বাকি
+    </div>
 
-</div>
+    <div id="countdown" class="countdown">
+      00:00
+    </div>
 
-<div class="status" id="status">
-● Ready
-</div>
+    <button class="button" onclick="manualAnalyze()">
+      🔍 UPDATE SIGNAL
+    </button>
+  </div>
 
-<div class="card">
 
-<div class="label">
-Market
-</div>
+  <!-- SIGNAL -->
+  <div class="card">
 
-<select id="symbol">
+    <div class="signal-label">
+      NEXT CANDLE SIGNAL
+    </div>
 
-<option value="EURUSD">
-EURUSD
-</option>
+    <div id="signal" class="signal wait">
+      WAIT
+    </div>
 
-<option value="GBPUSD">
-GBPUSD
-</option>
+    <div id="confidence" class="confidence">
+      --%
+    </div>
 
-</select>
+    <div class="confidence-text">
+      Confidence = indicator confluence score, guaranteed profit নয়
+    </div>
 
-<div class="label" style="margin-top:15px">
-Timeframe
-</div>
+    <div class="info-grid">
 
-<div class="tf">
+      <div class="info">
+        <div class="info-title">SIGNAL CANDLE</div>
+        <div id="signalCandle" class="info-value">--</div>
+      </div>
 
-<button class="active" data-tf="1m">
-1M
-</button>
+      <div class="info">
+        <div class="info-title">TREND</div>
+        <div id="trend" class="info-value">--</div>
+      </div>
 
-<button data-tf="5m">
-5M
-</button>
+      <div class="info">
+        <div class="info-title">CANDLE</div>
+        <div id="candle" class="info-value">--</div>
+      </div>
 
-<button data-tf="15m">
-15M
-</button>
+      <div class="info">
+        <div class="info-title">STRENGTH</div>
+        <div id="strength" class="info-value">--</div>
+      </div>
 
-</div>
+      <div class="info">
+        <div class="info-title">SUPPORT</div>
+        <div id="support" class="info-value">--</div>
+      </div>
 
-<button
-class="analyze"
-onclick="manualAnalyze()">
+      <div class="info">
+        <div class="info-title">RESISTANCE</div>
+        <div id="resistance" class="info-value">--</div>
+      </div>
 
-🔍 FULL AI MARKET ANALYSIS
+    </div>
+  </div>
 
-</button>
 
-<button
-class="results-btn"
-onclick="loadResults()">
+  <!-- TARGET CANDLE -->
+  <div class="card target-card">
 
-📊 Signal Results
+    <div class="target-title">
+      🎯 SIGNAL FOR CANDLE
+    </div>
 
-</button>
+    <div id="targetTime" class="target-time">
+      --
+    </div>
 
-<div class="countdown" id="countdown">
-Next candle: --
-</div>
+    <div style="text-align:center;color:#999;font-size:11px;margin-top:5px;">
+      এই candle-এর জন্য signal প্রস্তুত করা হয়েছে
+    </div>
 
-<div class="signal-note">
-নতুন candle শুরু হলে signal update হবে।
-</div>
+  </div>
 
-</div>
 
+  <!-- INDICATORS -->
+  <div class="card">
 
-<!-- BEST SIGNAL -->
+    <div style="font-weight:800;margin-bottom:10px;">
+      📊 MARKET DATA
+    </div>
 
-<div class="card">
+    <div class="info-grid">
 
-<div class="best">
+      <div class="info">
+        <div class="info-title">EMA 9</div>
+        <div id="ema9" class="info-value">--</div>
+      </div>
 
-<div class="best-title">
-BEST CURRENT SIGNAL
-</div>
+      <div class="info">
+        <div class="info-title">EMA 21</div>
+        <div id="ema21" class="info-value">--</div>
+      </div>
 
-<div
-class="best-market"
-id="bestMarket">
+      <div class="info">
+        <div class="info-title">EMA 200</div>
+        <div id="ema200" class="info-value">--</div>
+      </div>
 
-EURUSD • 1M
+      <div class="info">
+        <div class="info-title">RSI 7</div>
+        <div id="rsi" class="info-value">--</div>
+      </div>
 
-</div>
+      <div class="info">
+        <div class="info-title">ADX</div>
+        <div id="adx" class="info-value">--</div>
+      </div>
 
-<div
-class="best-signal wait"
-id="bestSignal">
+      <div class="info">
+        <div class="info-title">ATR</div>
+        <div id="atr" class="info-value">--</div>
+      </div>
 
-WAIT
+    </div>
 
-</div>
+  </div>
 
-<div id="bestConfidence">
-Confidence: --
-</div>
 
-</div>
+  <!-- AI REASONS -->
+  <div class="card">
 
-</div>
+    <div style="font-weight:800;margin-bottom:8px;">
+      🤖 AI ANALYSIS
+    </div>
 
+    <div id="reasons" class="reason">
+      Signal analysis অপেক্ষা করছে...
+    </div>
 
-<!-- MULTI TIMEFRAME -->
+  </div>
 
-<div class="card">
 
-<div class="section-title">
-📡 Multi-Timeframe Signals
-</div>
+  <!-- LAST CLOSED CANDLE -->
+  <div class="card">
 
+    <div style="font-weight:800;margin-bottom:8px;">
+      🕐 LAST CLOSED CANDLE
+    </div>
 
-<div class="signal-box">
+    <div id="closedCandle" style="font-size:13px;color:#ddd;">
+      --
+    </div>
 
-<div class="signal-head">
+  </div>
 
-<div
-class="signal-market"
-id="market1">
-EURUSD
-</div>
 
-<div class="signal-timeframe">
-1M Signal
-</div>
-
-</div>
-
-<div class="signal-main">
-
-<div
-class="signal-direction wait"
-id="signal1">
-WAIT
-</div>
-
-<div
-class="signal-confidence"
-id="confidence1">
-Confidence: --
-</div>
-
-</div>
-
-<div
-class="candle"
-id="candle1">
-🕐 Candle: --
-</div>
-
-</div>
-
-
-<div class="signal-box">
-
-<div class="signal-head">
-
-<div
-class="signal-market"
-id="market5">
-EURUSD
-</div>
-
-<div class="signal-timeframe">
-5M Signal
-</div>
-
-</div>
-
-<div class="signal-main">
-
-<div
-class="signal-direction wait"
-id="signal5">
-WAIT
-</div>
-
-<div
-class="signal-confidence"
-id="confidence5">
-Confidence: --
-</div>
-
-</div>
-
-<div
-class="candle"
-id="candle5">
-🕐 Candle: --
-</div>
-
-</div>
-
-
-<div class="signal-box">
-
-<div class="signal-head">
-
-<div
-class="signal-market"
-id="market15">
-EURUSD
-</div>
-
-<div class="signal-timeframe">
-15M Signal
-</div>
-
-</div>
-
-<div class="signal-main">
-
-<div
-class="signal-direction wait"
-id="signal15">
-WAIT
-</div>
-
-<div
-class="signal-confidence"
-id="confidence15">
-Confidence: --
-</div>
-
-</div>
-
-<div
-class="candle"
-id="candle15">
-🕐 Candle: --
-</div>
-
-</div>
-
-</div>
-
-
-<!-- MARKET ANALYSIS -->
-
-<div class="card">
-
-<div class="market-header">
-
-<h2 id="marketName">
-EURUSD
-</h2>
-
-<div
-class="price"
-id="price">
-Price: --
-</div>
-
-</div>
-
-<div class="grid">
-
-<div class="item">
-<small>Overall Signal</small>
-<b id="marketSignal">WAIT</b>
-</div>
-
-<div class="item">
-<small>Strength</small>
-<b id="strength">--</b>
-</div>
-
-<div class="item">
-<small>Trend</small>
-<b id="trend">--</b>
-</div>
-
-<div class="item">
-<small>Candle</small>
-<b id="candle">--</b>
-</div>
-
-<div class="item">
-<small>Support</small>
-<b id="support">--</b>
-</div>
-
-<div class="item">
-<small>Resistance</small>
-<b id="resistance">--</b>
-</div>
-
-<div class="item">
-<small>EMA 9</small>
-<b id="ema9">--</b>
-</div>
-
-<div class="item">
-<small>EMA 21</small>
-<b id="ema21">--</b>
-</div>
-
-<div class="item">
-<small>Candle Time</small>
-<b id="candleTime">--</b>
-</div>
-
-<div class="item">
-<small>Selected TF</small>
-<b id="currentTf">1M</b>
-</div>
-
-</div>
-
-</div>
-
-
-<!-- NEXT CANDLES -->
-
-<div class="card">
-
-<div class="section-title">
-🔮 Next 1–3 Candle Prediction
-</div>
-
-<div id="predictions">
-
-Analysis করলে এখানে prediction দেখা যাবে।
-
-</div>
-
-</div>
-
-
-<!-- AI ANALYSIS -->
-
-<div class="card">
-
-<div class="section-title">
-🧠 AI Market Analysis
-</div>
-
-<div id="analysisTags">
-
-<span class="analysis-tag">
-EMA
-</span>
-
-<span class="analysis-tag">
-RSI
-</span>
-
-<span class="analysis-tag">
-MACD
-</span>
-
-<span class="analysis-tag">
-Trend
-</span>
-
-<span class="analysis-tag">
-Candle
-</span>
-
-<span class="analysis-tag">
-Support/Resistance
-</span>
-
-</div>
-
-<br>
-
-<div
-id="reason"
-class="reason">
-
-🔹 FULL AI MARKET ANALYSIS চাপুন।
-
-</div>
-
-</div>
-
-
-<!-- RESULTS -->
-
-<div class="card">
-
-<div class="section-title">
-🎯 Signal Results
-</div>
-
-<div class="summary">
-
-<div class="summary-box">
-
-<span>Total Signals</span>
-
-<strong id="total">
-0
-</strong>
-
-</div>
-
-<div class="summary-box">
-
-<span>Correct</span>
-
-<strong id="correct">
-0
-</strong>
-
-</div>
-
-<div class="summary-box">
-
-<span>Accuracy</span>
-
-<strong id="accuracy">
-0%
-</strong>
-
-</div>
-
-</div>
-
-</div>
-
-
-<div class="footer">
-
-Trader Pink AI 🤖📈<br>
-
-Bangladesh Time (UTC+6)<br>
-
-AI technical analysis only. No guaranteed profit.
-
-</div>
+  <div class="footer">
+    Bangladesh Time • UTC+6<br>
+    Trader Pink AI শুধুমাত্র analysis assistance দেয়।
+    Trading-এ loss হতে পারে।
+  </div>
 
 </div>
 
 
 <script>
 
-const API_BASE =
-"https://crimson-grass-f881.bijondebnath51.workers.dev";
+  // =========================================================
+  // TRADER PINK AI
+  // EURUSD ONLY
+  // 1 MINUTE ONLY
+  // =========================================================
 
-let timeframe = "1m";
+  const API_BASE =
+    "https://crimson-grass-f881.bijondebnath51.workers.dev";
 
-let lastCandleTimes = {
-"1m": null,
-"5m": null,
-"15m": null
-};
+  const SYMBOL = "EURUSD";
+  const TIMEFRAME = "1m";
 
-let running = false;
+  let lastSignalTimestamp = null;
+  let preTimer = null;
+  let postTimer = null;
+  let loading = false;
 
 
-/* TIMEFRAME BUTTON */
+  // =========================================================
+  // ELEMENT HELPER
+  // =========================================================
 
-document
-.querySelectorAll(".tf button")
-.forEach(button => {
+  function $(id) {
+    return document.getElementById(id);
+  }
 
-button.addEventListener("click", () => {
 
-document
-.querySelectorAll(".tf button")
-.forEach(btn =>
-btn.classList.remove("active")
-);
+  // =========================================================
+  // FORMAT NUMBER
+  // =========================================================
 
-button.classList.add("active");
+  function num(value, digits = 5) {
 
-timeframe =
-button.dataset.tf;
+    if (
+      value === null ||
+      value === undefined ||
+      value === "" ||
+      Number.isNaN(Number(value))
+    ) {
+      return "--";
+    }
 
-document.getElementById(
-"currentTf"
-).textContent =
-timeframe.toUpperCase();
+    return Number(value).toFixed(digits);
+  }
 
-});
 
-});
+  // =========================================================
+  // FORMAT TIME
+  // =========================================================
 
+  function formatTime(value) {
 
-/* SIGNAL COLOR */
+    if (!value) return "--";
 
-function signalClass(signal){
+    const d = new Date(value);
 
-signal =
-String(signal || "WAIT")
-.toUpperCase();
+    if (Number.isNaN(d.getTime())) {
+      return String(value);
+    }
 
-if(signal === "BUY"){
-return "buy";
-}
+    return d.toLocaleString("en-GB", {
+      timeZone: "Asia/Dhaka",
+      year: "numeric",
+      month: "2-digit",
+      day: "2-digit",
+      hour: "2-digit",
+      minute: "2-digit",
+      second: "2-digit",
+      hour12: false
+    });
+  }
 
-if(signal === "SELL"){
-return "sell";
-}
 
-return "wait";
+  // =========================================================
+  // COUNTDOWN
+  // =========================================================
 
-}
+  function getNextMinute() {
 
+    const now = Date.now();
 
-/* DIRECTION */
+    return Math.floor(now / 60000) * 60000 + 60000;
+  }
 
-function getDirection(data){
 
-return String(
-data?.signal?.direction ||
-"WAIT"
-).toUpperCase();
+  function updateCountdown() {
 
-}
+    const nextMinute = getNextMinute();
 
+    let diff = nextMinute - Date.now();
 
-/* CONFIDENCE */
+    if (diff < 0) {
+      diff = 0;
+    }
 
-function getConfidence(data){
+    const totalSeconds =
+      Math.ceil(diff / 1000);
 
-let value =
-data?.signal?.confidence ?? 0;
+    const minutes =
+      Math.floor(totalSeconds / 60);
 
-value =
-Number(
-String(value)
-.replace("%","")
-);
+    const seconds =
+      totalSeconds % 60;
 
-return Number.isFinite(value)
-? value
-: 0;
+    $("countdown").textContent =
+      String(minutes).padStart(2, "0") +
+      ":" +
+      String(seconds).padStart(2, "0");
+  }
 
-}
 
+  setInterval(updateCountdown, 250);
+  updateCountdown();
 
-/* FETCH */
 
-async function fetchAnalysis(
-symbol,
-tf
-){
-
-const url =
-API_BASE +
-"/analyze?symbol=" +
-encodeURIComponent(symbol) +
-"&timeframe=" +
-encodeURIComponent(tf) +
-"&t=" +
-Date.now();
-
-const response =
-await fetch(
-url,
-{
-method:"GET",
-cache:"no-store",
-headers:{
-"Accept":"application/json",
-"Cache-Control":"no-cache"
-}
-}
-);
-
-if(!response.ok){
-
-throw new Error(
-"Server Error: " +
-response.status
-);
-
-}
-
-const data =
-await response.json();
+  // =========================================================
+  // STATUS
+  // =========================================================
 
-if(data.status !== "ok"){
-
-throw new Error(
-data.message ||
-"Analysis failed"
-);
-
-}
-
-return data;
+  function setStatus(text, type = "online") {
 
-}
+    $("status").className =
+      "status " + type;
 
+    if (type === "online") {
 
-/* SET SIGNAL */
+      $("status").innerHTML =
+        '<span class="dot"></span>' + text;
 
-function setTimeframeSignal(
-tf,
-data
-){
-
-const direction =
-getDirection(data);
+    } else {
 
-const confidence =
-getConfidence(data);
+      $("status").textContent = text;
+    }
+  }
 
-const number =
-tf === "1m"
-? "1"
-: tf === "5m"
-? "5"
-: "15";
 
-const signalEl =
-document.getElementById(
-"signal" + number
-);
+  // =========================================================
+  // SIGNAL STYLE
+  // =========================================================
 
-signalEl.textContent =
-direction;
+  function setSignal(signal, confidence) {
 
-signalEl.className =
-"signal-direction " +
-signalClass(direction);
+    const el = $("signal");
 
-document.getElementById(
-"confidence" + number
-).textContent =
-"Confidence: " +
-confidence +
-"%";
+    el.className = "signal";
 
-document.getElementById(
-"candle" + number
-).textContent =
-"🕐 Candle: " +
-(data.candle_time || "--");
+    const clean =
+      String(signal || "WAIT").toUpperCase();
 
-document.getElementById(
-"market" + number
-).textContent =
-document.getElementById(
-"symbol"
-).value;
+    if (clean === "BUY") {
 
-}
+      el.textContent = "BUY";
+      el.classList.add("buy");
 
+    } else if (clean === "SELL") {
 
-/* BEST */
+      el.textContent = "SELL";
+      el.classList.add("sell");
 
-function chooseBest(
-data1,
-data5,
-data15
-){
+    } else {
 
-const list = [
-data1,
-data5,
-data15
-];
+      el.textContent = "WAIT";
+      el.classList.add("wait");
+    }
 
-let best =
-data1;
+    $("confidence").textContent =
+      Number(confidence || 0) + "%";
+  }
 
-for(
-const data of list
-){
 
-const d =
-getDirection(data);
+  // =========================================================
+  // FETCH SIGNAL
+  // =========================================================
 
-const bd =
-getDirection(best);
+  async function fetchSignal(silent = false) {
 
-const c =
-getConfidence(data);
+    if (loading) return;
 
-const bc =
-getConfidence(best);
+    loading = true;
 
-if(
-d !== "WAIT" &&
-bd === "WAIT"
-){
+    if (!silent) {
+      setStatus("Analyzing EURUSD...", "online");
+    }
 
-best = data;
-continue;
+    try {
 
-}
+      const url =
+        API_BASE +
+        "/analyze?symbol=" +
+        encodeURIComponent(SYMBOL) +
+        "&timeframe=" +
+        encodeURIComponent(TIMEFRAME) +
+        "&t=" +
+        Date.now();
 
-if(
-d !== "WAIT" &&
-bd !== "WAIT" &&
-c > bc
-){
+      const response =
+        await fetch(url, {
+          method: "GET",
+          cache: "no-store"
+        });
 
-best = data;
-continue;
+      if (!response.ok) {
+        throw new Error(
+          "HTTP " + response.status
+        );
+      }
 
-}
+      const data =
+        await response.json();
 
-}
+      if (!data || data.error) {
+        throw new Error(
+          data?.error || "Analysis error"
+        );
+      }
 
-return best;
+      renderSignal(data);
 
-}
+      setStatus(
+        "EURUSD 1M • Signal Ready",
+        "online"
+      );
 
+    } catch (error) {
 
-/* MARKET DETAILS */
+      console.error(error);
 
-function showMarketDetails(
-data,
-symbol
-){
+      setStatus(
+        "Connection / Analysis Error",
+        "error"
+      );
 
-const market =
-data.market || {};
+      $("reasons").textContent =
+        "Signal পাওয়া যায়নি। কিছুক্ষণ পরে আবার চেষ্টা করা হবে।";
 
-document.getElementById(
-"marketName"
-).textContent =
-symbol;
+    } finally {
 
-document.getElementById(
-"price"
-).textContent =
-"Price: " +
-(
-data.price ??
-market.price ??
-"--"
-);
+      loading = false;
+    }
+  }
 
-const direction =
-getDirection(data);
 
-const signalEl =
-document.getElementById(
-"marketSignal"
-);
+  // =========================================================
+  // RENDER SIGNAL
+  // =========================================================
 
-signalEl.textContent =
-direction;
+  function renderSignal(data) {
 
-signalEl.className =
-signalClass(direction);
+    const signal =
+      data.signal || "WAIT";
 
-document.getElementById(
-"strength"
-).textContent =
-market.strength || "--";
+    const confidence =
+      Number(data.confidence || 0);
 
-document.getElementById(
-"trend"
-).textContent =
-market.trend || "--";
+    setSignal(signal, confidence);
 
-document.getElementById(
-"candle"
-).textContent =
-market.candle || "--";
 
-document.getElementById(
-"support"
-).textContent =
-market.support ?? "--";
+    // Signal candle
+    $("signalCandle").textContent =
+      formatTime(
+        data.signal_for_candle ||
+        data.next_candle_time
+      );
 
-document.getElementById(
-"resistance"
-).textContent =
-market.resistance ?? "--";
 
-document.getElementById(
-"candleTime"
-).textContent =
-data.candle_time || "--";
+    // Target time
+    $("targetTime").textContent =
+      formatTime(
+        data.signal_for_candle ||
+        data.next_candle_time
+      );
 
-document.getElementById(
-"ema9"
-).textContent =
-data.indicators?.EMA_9 ?? "--";
 
-document.getElementById(
-"ema21"
-).textContent =
-data.indicators?.EMA_21 ?? "--";
+    // Trend
+    $("trend").textContent =
+      data.trend || "--";
 
-}
 
+    // Candle
+    $("candle").textContent =
+      data.candle || "--";
 
-/* PREDICTION */
 
-function showPredictions(data){
+    // Strength
+    $("strength").textContent =
+      data.candle_strength ||
+      data.market_strength ||
+      "--";
 
-const box =
-document.getElementById(
-"predictions"
-);
 
-const predictions =
-data.next_candles || [];
+    // Support
+    $("support").textContent =
+      num(data.support);
 
-if(
-!Array.isArray(predictions) ||
-!predictions.length
-){
 
-box.textContent =
-"Next candle prediction পাওয়া যায়নি।";
+    // Resistance
+    $("resistance").textContent =
+      num(data.resistance);
 
-return;
 
-}
+    // EMA
+    $("ema9").textContent =
+      num(data.ema9);
 
-box.innerHTML =
-predictions
-.map(
-(item,index) => {
+    $("ema21").textContent =
+      num(data.ema21);
 
-const direction =
-item.signal ||
-item.expected_direction ||
-"WAIT";
+    $("ema200").textContent =
+      num(data.ema200);
 
-return `
-<div class="prediction">
 
-🕯 Candle ${index + 1}
+    // RSI
+    $("rsi").textContent =
+      num(data.rsi, 2);
 
-• ${escapeHtml(
-item.time || "--"
-)}
 
-• <strong class="${signalClass(direction)}">
+    // ADX
+    $("adx").textContent =
+      num(data.adx, 2);
 
-${escapeHtml(direction)}
 
-</strong>
+    // ATR
+    $("atr").textContent =
+      num(data.atr, 6);
 
-</div>
-`;
 
-}
-)
-.join("");
+    // Last closed candle
+    $("closedCandle").textContent =
+      formatTime(
+        data.closed_candle_time
+      );
 
-}
 
+    // Reasons
+    if (Array.isArray(data.reasons)) {
 
-/* REASON */
+      if (data.reasons.length === 0) {
 
-function showReason(
-data1,
-data5,
-data15
-){
+        $("reasons").textContent =
+          "বর্তমানে শক্তিশালী confluence পাওয়া যায়নি।";
 
-const symbol =
-document.getElementById(
-"symbol"
-).value;
+      } else {
 
-const data =
-timeframe === "1m"
-? data1
-: timeframe === "5m"
-? data5
-: data15;
+        $("reasons").innerHTML =
+          data.reasons
+            .map(reason =>
+              "• " + escapeHtml(String(reason))
+            )
+            .join("<br>");
+      }
 
-const market =
-data.market || {};
+    } else if (data.reasons) {
 
-document.getElementById(
-"reason"
-).innerHTML =
+      $("reasons").textContent =
+        String(data.reasons);
 
-"📊 <strong>" +
-escapeHtml(symbol) +
-"</strong><br><br>" +
+    } else {
 
-"📈 Trend: " +
-escapeHtml(
-market.trend || "--"
-) +
-"<br>" +
+      $("reasons").textContent =
+        "Indicator এবং price action অনুযায়ী analysis সম্পন্ন হয়েছে।";
+    }
 
-"🕯 Candle: " +
-escapeHtml(
-market.candle || "--"
-) +
-"<br>" +
 
-"💪 Strength: " +
-escapeHtml(
-market.strength || "--"
-) +
-"<br>" +
+    // Remember target candle
+    if (data.signal_for_timestamp) {
 
-"🟢 Support: " +
-escapeHtml(
-market.support ?? "--"
-) +
-"<br>" +
+      lastSignalTimestamp =
+        Number(data.signal_for_timestamp);
+    }
+  }
 
-"🔴 Resistance: " +
-escapeHtml(
-market.resistance ?? "--"
-) +
-"<br><br>" +
 
-"1M: " +
-escapeHtml(
-getDirection(data1)
-) +
+  // =========================================================
+  // ESCAPE HTML
+  // =========================================================
 
-" • 5M: " +
-escapeHtml(
-getDirection(data5)
-) +
+  function escapeHtml(text) {
 
-" • 15M: " +
-escapeHtml(
-getDirection(data15)
-);
+    const div =
+      document.createElement("div");
 
-}
+    div.textContent = text;
 
+    return div.innerHTML;
+  }
 
-/* REAL ANALYSIS */
 
-async function analyzeAll(
-force = false
-){
+  // =========================================================
+  // MANUAL ANALYZE
+  // =========================================================
 
-if(running){
-return;
-}
+  async function manualAnalyze() {
 
-running = true;
+    await fetchSignal(false);
+  }
 
-const symbol =
-document.getElementById(
-"symbol"
-).value;
 
-const status =
-document.getElementById(
-"status"
-);
+  // =========================================================
+  // MINUTE-ALIGNED SIGNAL SYSTEM
+  //
+  // Example:
+  //
+  // 12:34:58
+  //     ↓
+  // Fetch signal
+  //     ↓
+  // Signal prepared for 12:35 candle
+  //
+  // 12:35:00
+  //     ↓
+  // New candle starts
+  //     ↓
+  // Same signal remains for that candle
+  //
+  // =========================================================
 
-try{
+  function scheduleMinuteRefresh() {
 
-if(force){
+    clearTimeout(preTimer);
+    clearTimeout(postTimer);
 
-status.textContent =
-"⏳ নতুন candle-এর signal নেওয়া হচ্ছে...";
+    const now =
+      Date.now();
 
-}
-else{
+    const nextMinute =
+      Math.floor(now / 60000) * 60000 +
+      60000;
 
-status.textContent =
-"⏳ Candle check চলছে...";
 
-}
+    // Approximately 2 seconds before
+    const preFetchTime =
+      nextMinute - 2000;
 
-const results =
-await Promise.all([
-fetchAnalysis(symbol,"1m"),
-fetchAnalysis(symbol,"5m"),
-fetchAnalysis(symbol,"15m")
-]);
+    let preDelay =
+      preFetchTime - now;
 
-const data1 =
-results[0];
+    if (preDelay < 0) {
+      preDelay = 0;
+    }
 
-const data5 =
-results[1];
 
-const data15 =
-results[2];
+    preTimer =
+      setTimeout(async () => {
 
+        await fetchSignal(true);
 
-/*
-IMPORTANT:
+        schedulePostMinuteRefresh(
+          nextMinute
+        );
 
-Candle time পরিবর্তন না হলে
-নতুন signal display করা হবে না।
+      }, preDelay);
+  }
 
-অর্থাৎ একই candle-এর মাঝখানে
-signal বারবার update হবে না।
-*/
 
-const currentTimes = {
-"1m": data1.candle_time,
-"5m": data5.candle_time,
-"15m": data15.candle_time
-};
+  function schedulePostMinuteRefresh(
+    minuteTimestamp
+  ) {
 
-const changed =
-force ||
-currentTimes["1m"] !== lastCandleTimes["1m"] ||
-currentTimes["5m"] !== lastCandleTimes["5m"] ||
-currentTimes["15m"] !== lastCandleTimes["15m"];
+    clearTimeout(postTimer);
 
+    const postFetchTime =
+      minuteTimestamp + 1200;
 
-if(changed){
+    let delay =
+      postFetchTime - Date.now();
 
-setTimeframeSignal(
-"1m",
-data1
-);
+    if (delay < 0) {
+      delay = 0;
+    }
 
-setTimeframeSignal(
-"5m",
-data5
-);
 
-setTimeframeSignal(
-"15m",
-data15
-);
+    postTimer =
+      setTimeout(async () => {
 
-const best =
-chooseBest(
-data1,
-data5,
-data15
-);
+        await fetchSignal(true);
 
-const bestDirection =
-getDirection(best);
+        scheduleMinuteRefresh();
 
-const bestConfidence =
-getConfidence(best);
+      }, delay);
+  }
 
-document.getElementById(
-"bestMarket"
-).textContent =
-symbol +
-" • " +
-String(
-best.timeframe || timeframe
-).toUpperCase();
 
-const bestEl =
-document.getElementById(
-"bestSignal"
-);
+  // =========================================================
+  // START
+  // =========================================================
 
-bestEl.textContent =
-bestDirection;
+  window.addEventListener(
+    "load",
+    async () => {
 
-bestEl.className =
-"best-signal " +
-signalClass(bestDirection);
+      setStatus(
+        "Connecting to AI...",
+        "online"
+      );
 
-document.getElementById(
-"bestConfidence"
-).textContent =
-"Confidence: " +
-bestConfidence +
-"%";
+      await fetchSignal(false);
 
-const selectedData =
-timeframe === "1m"
-? data1
-: timeframe === "5m"
-? data5
-: data15;
+      scheduleMinuteRefresh();
 
-showMarketDetails(
-selectedData,
-symbol
-);
+      updateCountdown();
+    }
+  );
 
-showPredictions(
-selectedData
-);
 
-showReason(
-data1,
-data5,
-data15
-);
+  // =========================================================
+  // VISIBILITY CHANGE
+  // =========================================================
 
-lastCandleTimes =
-currentTimes;
+  document.addEventListener(
+    "visibilitychange",
+    () => {
 
-status.textContent =
-"● Signal Updated • New Candle";
+      if (!document.hidden) {
 
-}
-else{
+        fetchSignal(true);
 
-status.textContent =
-"● Waiting for next candle";
+        scheduleMinuteRefresh();
 
-}
+        updateCountdown();
+      }
+    }
+  );
 
-}
-catch(error){
 
-console.error(error);
+  // =========================================================
+  // SERVICE WORKER
+  // =========================================================
 
-status.textContent =
-"● Analysis Error";
+  if ("serviceWorker" in navigator) {
 
-document.getElementById(
-"reason"
-).innerHTML =
-"❌ Analysis error: " +
-escapeHtml(
-error.message
-);
+    window.addEventListener(
+      "load",
+      () => {
 
-}
-finally{
+        navigator.serviceWorker
+          .register("./sw.js")
+          .then(() => {
 
-running = false;
+            console.log(
+              "Service Worker registered"
+            );
 
-}
+          })
+          .catch(error => {
 
-}
-
-
-/* MANUAL BUTTON */
-
-function manualAnalyze(){
-
-lastCandleTimes = {
-"1m": null,
-"5m": null,
-"15m": null
-};
-
-analyzeAll(true);
-
-}
-
-
-/* COUNTDOWN */
-
-function updateCountdown(){
-
-const now =
-new Date();
-
-const seconds =
-now.getSeconds();
-
-const milliseconds =
-now.getMilliseconds();
-
-let remaining =
-60000 -
-(
-(seconds * 1000) +
-milliseconds
-);
-
-if(remaining < 0){
-remaining = 0;
-}
-
-const sec =
-Math.ceil(
-remaining / 1000
-);
-
-document.getElementById(
-"countdown"
-).textContent =
-"⏱ 1M next candle: " +
-sec +
-" sec";
-
-}
-
-
-/*
-CHECK MARKET FREQUENTLY.
-
-এটি প্রতি 2 সেকেন্ডে API check করবে।
-কিন্তু একই candle হলে UI signal
-update করবে না।
-
-নতুন candle_time আসলেই
-signal update হবে।
-*/
-
-setInterval(
-() => {
-
-analyzeAll(false);
-
-},
-2000
-);
-
-
-setInterval(
-updateCountdown,
-250
-);
-
-
-/* RESULTS */
-
-async function loadResults(){
-
-try{
-
-const response =
-await fetch(
-API_BASE +
-"/results?t=" +
-Date.now(),
-{
-method:"GET",
-cache:"no-store"
-}
-);
-
-if(!response.ok){
-return;
-}
-
-const data =
-await response.json();
-
-document.getElementById(
-"total"
-).textContent =
-data.total_signals ?? 0;
-
-document.getElementById(
-"correct"
-).textContent =
-data.correct ?? 0;
-
-document.getElementById(
-"accuracy"
-).textContent =
-data.accuracy || "0%";
-
-}
-catch(error){
-
-console.log(
-"Results error:",
-error
-);
-
-}
-
-}
-
-
-/* ESCAPE */
-
-function escapeHtml(value){
-
-return String(value)
-.replace(
-/&/g,
-"&amp;"
-)
-.replace(
-/</g,
-"&lt;"
-)
-.replace(
-/>/g,
-"&gt;"
-)
-.replace(
-/"/g,
-"&quot;"
-)
-.replace(
-/'/g,
-"&#039;"
-);
-
-}
-
-
-/* SERVICE WORKER */
-
-if(
-"serviceWorker" in navigator
-){
-
-window.addEventListener(
-"load",
-() => {
-
-navigator
-.serviceWorker
-.register("./sw.js")
-.then(
-() => {
-
-console.log(
-"Trader Pink AI Service Worker ready"
-);
-
-}
-)
-.catch(
-error => {
-
-console.log(
-"Service Worker error:",
-error
-);
-
-}
-);
-
-});
-
-}
-
-
-/* START */
-
-window.addEventListener(
-"load",
-() => {
-
-loadResults();
-
-/*
-প্রথমবার data নেওয়া হবে,
-কিন্তু manual force না হওয়া পর্যন্ত
-পরের নতুন candle-এর নিয়ম থাকবে।
-*/
-
-setTimeout(
-() => {
-
-analyzeAll(true);
-
-},
-1000
-);
-
-});
+            console.log(
+              "Service Worker error:",
+              error
+            );
+          });
+      }
+    );
+  }
 
 </script>
 
