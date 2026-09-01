@@ -1,4 +1,4 @@
-name: Build Trader Pink AI Floating APK v10
+name: Build Trader Pink AI Floating APK v11
 
 on:
   push:
@@ -72,8 +72,8 @@ jobs:
                   applicationId 'com.traderpinkai.app'
                   minSdk 23
                   targetSdk 35
-                  versionCode 10
-                  versionName '10.0'
+                  versionCode 11
+                  versionName '11.0'
               }
           }
           EOF
@@ -166,7 +166,7 @@ jobs:
                   root.setBackgroundColor(Color.WHITE);
 
                   TextView title = new TextView(this);
-                  title.setText("🤖 Trader Pink AI v10.0");
+                  title.setText("🤖 Trader Pink AI v11.0");
                   title.setTextSize(22);
                   title.setTextColor(Color.BLACK);
                   title.setGravity(Gravity.CENTER);
@@ -208,6 +208,7 @@ jobs:
                   settings.setUseWideViewPort(true);
 
                   webView.setWebViewClient(new WebViewClient());
+
                   webView.loadUrl(
                       "https://pinku-ai89.github.io/Trading--ai/"
                   );
@@ -229,6 +230,7 @@ jobs:
                           );
 
                           try {
+
                               Intent intent = new Intent(
                                   Settings.ACTION_MANAGE_OVERLAY_PERMISSION,
                                   Uri.parse(
@@ -358,20 +360,24 @@ jobs:
               private TextView market;
               private TextView signal;
               private TextView trend;
+              private TextView candleTime;
               private TextView status;
               private TextView nextButton;
               private TextView closeButton;
 
               private final Handler handler = new Handler();
 
+              /*
+               * IMPORTANT:
+               * This is the working Signal Engine URL.
+               */
               private static final String API =
-                  "https://bijondebnath51.workers.dev/analyze";
+                  "https://crimson-grass-f881.bijondebnath51.workers.dev/analyze";
 
               private static final String SYMBOL = "EURUSD";
               private static final String TIMEFRAME = "5m";
 
               private boolean scanning = false;
-              private String lastSignal = "";
 
               private final Runnable autoScanner = new Runnable() {
 
@@ -442,58 +448,91 @@ jobs:
                   );
 
                   floatingView.setPadding(
-                      12,
-                      8,
-                      12,
-                      8
+                      14,
+                      10,
+                      14,
+                      10
                   );
 
                   floatingView.setBackgroundColor(
                       Color.WHITE
                   );
 
-                  LinearLayout.LayoutParams textParams =
-                      new LinearLayout.LayoutParams(
-                          WindowManager.LayoutParams.WRAP_CONTENT,
-                          WindowManager.LayoutParams.WRAP_CONTENT
-                      );
-
                   title = new TextView(this);
+
                   title.setText(
                       "🤖 Trader Pink AI"
                   );
+
                   title.setTextSize(15);
-                  title.setTextColor(Color.BLACK);
+
+                  title.setTextColor(
+                      Color.BLACK
+                  );
 
                   market = new TextView(this);
+
                   market.setText(
                       "EURUSD • 5M"
                   );
+
                   market.setTextSize(11);
-                  market.setTextColor(Color.DKGRAY);
+
+                  market.setTextColor(
+                      Color.DKGRAY
+                  );
 
                   signal = new TextView(this);
+
                   signal.setText(
                       "⏳ WAIT --%"
                   );
-                  signal.setTextSize(17);
+
+                  signal.setTextSize(20);
+
                   signal.setTextColor(
-                      Color.rgb(220, 140, 20)
+                      Color.rgb(
+                          220,
+                          140,
+                          20
+                      )
                   );
 
                   trend = new TextView(this);
+
                   trend.setText(
                       "📊 --"
                   );
+
                   trend.setTextSize(11);
-                  trend.setTextColor(Color.DKGRAY);
+
+                  trend.setTextColor(
+                      Color.DKGRAY
+                  );
+
+                  candleTime = new TextView(this);
+
+                  candleTime.setText(
+                      "⏱ Candle: --"
+                  );
+
+                  candleTime.setTextSize(10);
+
+                  candleTime.setTextColor(
+                      Color.GRAY
+                  );
 
                   status = new TextView(this);
+
                   status.setText(
                       "🔎 Scanning..."
                   );
+
                   status.setTextSize(9);
-                  status.setTextColor(Color.GRAY);
+
+                  status.setTextColor(
+                      Color.GRAY
+                  );
 
                   LinearLayout buttons =
                       new LinearLayout(this);
@@ -510,8 +549,13 @@ jobs:
                   );
 
                   nextButton.setTextSize(11);
+
                   nextButton.setTextColor(
-                      Color.rgb(30, 100, 200)
+                      Color.rgb(
+                          30,
+                          100,
+                          200
+                      )
                   );
 
                   nextButton.setPadding(
@@ -529,6 +573,7 @@ jobs:
                   );
 
                   closeButton.setTextSize(15);
+
                   closeButton.setTextColor(
                       Color.RED
                   );
@@ -539,6 +584,12 @@ jobs:
                       0,
                       2
                   );
+
+                  LinearLayout.LayoutParams textParams =
+                      new LinearLayout.LayoutParams(
+                          WindowManager.LayoutParams.WRAP_CONTENT,
+                          WindowManager.LayoutParams.WRAP_CONTENT
+                      );
 
                   buttons.addView(
                       nextButton,
@@ -568,6 +619,10 @@ jobs:
 
                   floatingView.addView(
                       trend
+                  );
+
+                  floatingView.addView(
+                      candleTime
                   );
 
                   floatingView.addView(
@@ -689,18 +744,11 @@ jobs:
 
                   handler.post(() -> {
 
-                      if (manual) {
-
-                          status.setText(
-                              "🔎 NEXT SIGNAL খোঁজা হচ্ছে..."
-                          );
-
-                      } else {
-
-                          status.setText(
-                              "🔄 Auto scanning..."
-                          );
-                      }
+                      status.setText(
+                          manual
+                              ? "🔎 NEXT SIGNAL খোঁজা হচ্ছে..."
+                              : "🔄 Live signal scanning..."
+                      );
 
                       nextButton.setText(
                           "⏳ SEARCHING..."
@@ -788,6 +836,19 @@ jobs:
                                   result.toString()
                               );
 
+                          /*
+                           * Correct API structure:
+                           *
+                           * signal.direction
+                           * signal.confidence
+                           * signal.strength
+                           *
+                           * market.trend
+                           * market.strength
+                           *
+                           * candle_time
+                           */
+
                           String direction =
                               getNestedString(
                                   json,
@@ -807,19 +868,27 @@ jobs:
                                   ""
                               );
 
+                          String signalStrength =
+                              getNestedString(
+                                  json,
+                                  "signal",
+                                  "strength",
+                                  "--"
+                              ).toUpperCase();
+
                           String trendValue =
                               getNestedString(
                                   json,
-                                  "analysis",
+                                  "market",
                                   "trend",
                                   "--"
                               ).toUpperCase();
 
-                          String strengthValue =
+                          String marketStrength =
                               getNestedString(
                                   json,
-                                  "analysis",
-                                  "market_strength",
+                                  "market",
+                                  "strength",
                                   "--"
                               ).toUpperCase();
 
@@ -827,10 +896,14 @@ jobs:
                               findFirst(
                                   json,
                                   "candle_time",
-                                  "candleTime",
-                                  "timestamp",
-                                  "time",
-                                  "datetime"
+                                  "candleTime"
+                              );
+
+                          String signalTime =
+                              findFirst(
+                                  json,
+                                  "signal_time",
+                                  "signalTime"
                               );
 
                           if (
@@ -838,15 +911,18 @@ jobs:
                               candleValue.equals("--")
                           ) {
 
-                              candleValue = "Live";
+                              candleValue =
+                                  "Live";
                           }
 
-                          boolean strong =
-                              isStrong(
-                                  direction,
-                                  confidence,
-                                  strengthValue
-                              );
+                          if (
+                              signalTime == null ||
+                              signalTime.equals("--")
+                          ) {
+
+                              signalTime =
+                                  "Live";
+                          }
 
                           final String d =
                               direction;
@@ -857,16 +933,34 @@ jobs:
                           final String t =
                               trendValue;
 
-                          final boolean strongSetup =
-                              strong;
+                          final String ms =
+                              marketStrength;
+
+                          final String ss =
+                              signalStrength;
 
                           final String ct =
                               candleValue;
 
+                          final String st =
+                              signalTime;
+
                           handler.post(() -> {
 
+                              /*
+                               * API already gives a real
+                               * BUY/SELL signal.
+                               *
+                               * Do NOT hide it just because
+                               * of the old strength check.
+                               */
+
+                              boolean validSignal =
+                                  d.equals("BUY") ||
+                                  d.equals("SELL");
+
                               if (
-                                  strongSetup
+                                  validSignal
                               ) {
 
                                   signal.setText(
@@ -886,8 +980,16 @@ jobs:
                                       t
                                   );
 
+                                  candleTime.setText(
+                                      "⏱ Candle: " +
+                                      ct
+                                  );
+
                                   status.setText(
-                                      "🟢 Strong setup"
+                                      "🟢 " +
+                                      ss +
+                                      " • " +
+                                      ms
                                   );
 
                               } else {
@@ -910,8 +1012,13 @@ jobs:
                                       t
                                   );
 
+                                  candleTime.setText(
+                                      "⏱ Candle: " +
+                                      ct
+                                  );
+
                                   status.setText(
-                                      "⏳ No strong setup"
+                                      "⏳ WAIT • No signal"
                                   );
                               }
 
@@ -926,11 +1033,6 @@ jobs:
                               );
 
                               scanning = false;
-
-                              lastSignal =
-                                  strongSetup
-                                      ? d + c + ct
-                                      : "WAIT";
                           });
 
                       } catch (Exception e) {
@@ -952,42 +1054,6 @@ jobs:
                       }
 
                   }).start();
-              }
-
-              private boolean isStrong(
-                  String direction,
-                  String confidence,
-                  String strength
-              ) {
-
-                  try {
-
-                      int score =
-                          Integer.parseInt(
-                              confidence.trim()
-                          );
-
-                      boolean directionOK =
-                          direction.contains(
-                              "BUY"
-                          ) ||
-                          direction.contains(
-                              "SELL"
-                          );
-
-                      boolean strengthOK =
-                          strength.contains(
-                              "STRONG"
-                          );
-
-                      return directionOK &&
-                             score >= 80 &&
-                             strengthOK;
-
-                  } catch (Exception e) {
-
-                      return false;
-                  }
               }
 
               private void showError(
@@ -1089,14 +1155,14 @@ jobs:
               ) {
 
                   if (
-                      direction.contains("BUY")
+                      direction.equals("BUY")
                   ) {
 
                       return "🟢";
                   }
 
                   if (
-                      direction.contains("SELL")
+                      direction.equals("SELL")
                   ) {
 
                       return "🔴";
@@ -1133,7 +1199,7 @@ jobs:
               ) {
 
                   if (
-                      direction.contains("BUY")
+                      direction.equals("BUY")
                   ) {
 
                       signal.setTextColor(
@@ -1145,7 +1211,7 @@ jobs:
                       );
 
                   } else if (
-                      direction.contains("SELL")
+                      direction.equals("SELL")
                   ) {
 
                       signal.setTextColor(
@@ -1237,5 +1303,5 @@ jobs:
       - name: Upload APK
         uses: actions/upload-artifact@v4
         with:
-          name: Trader-Pink-AI-Floating-v10
+          name: Trader-Pink-AI-Floating-v11
           path: app/build/outputs/apk/debug/app-debug.apk
