@@ -13,185 +13,203 @@ content="width=device-width,initial-scale=1.0,maximum-scale=1.0,user-scalable=no
 <title>Trader Pink AI 📈</title>
 
 <style>
-
 *{
-box-sizing:border-box;
--webkit-tap-highlight-color:transparent;
+  box-sizing:border-box;
+  -webkit-tap-highlight-color:transparent;
 }
 
 body{
-margin:0;
-background:#0b1020;
-color:#fff;
-font-family:Arial,sans-serif;
+  margin:0;
+  padding:0;
+  background:#0b1020;
+  color:#fff;
+  font-family:Arial,Helvetica,sans-serif;
 }
 
 .app{
-width:100%;
-max-width:520px;
-margin:auto;
-padding:12px;
+  width:100%;
+  max-width:600px;
+  margin:auto;
+  padding:14px;
 }
 
 .header{
-text-align:center;
-padding:12px 5px 16px;
+  text-align:center;
+  margin-bottom:14px;
 }
 
 .header h1{
-margin:0;
-font-size:25px;
+  margin:0;
+  font-size:25px;
 }
 
 .header p{
-margin:6px 0 0;
-color:#aeb8ca;
-font-size:13px;
+  margin:6px 0 0;
+  color:#aeb7d0;
+  font-size:13px;
 }
 
 .card{
-background:#151c2f;
-border:1px solid #29334d;
-border-radius:18px;
-padding:16px;
-margin-bottom:12px;
+  background:#11182d;
+  border:1px solid #222d4d;
+  border-radius:18px;
+  padding:16px;
+  margin-bottom:12px;
+  box-shadow:0 8px 25px rgba(0,0,0,.22);
 }
 
-.market{
-text-align:center;
+.market-row{
+  display:flex;
+  gap:8px;
+  margin-bottom:14px;
 }
 
-.market-name{
-font-size:28px;
-font-weight:bold;
+.market,
+.tf{
+  flex:1;
+  border:1px solid #334064;
+  background:#151e36;
+  color:#fff;
+  border-radius:12px;
+  padding:12px 8px;
+  font-size:14px;
+  font-weight:bold;
 }
 
-.timeframe{
-margin-top:4px;
-color:#9da9bd;
+.tf.active{
+  background:#ff4f9a;
+  border-color:#ff4f9a;
+}
+
+.count-title{
+  text-align:center;
+  color:#aeb7d0;
+  font-size:13px;
 }
 
 .countdown{
-margin-top:12px;
-color:#cbd5e1;
-font-size:14px;
+  text-align:center;
+  font-size:34px;
+  font-weight:bold;
+  margin:4px 0 12px;
 }
 
-.timer{
-margin-top:4px;
-font-size:30px;
-font-weight:bold;
+.update{
+  width:100%;
+  border:0;
+  border-radius:13px;
+  padding:13px;
+  background:#ff4f9a;
+  color:white;
+  font-size:15px;
+  font-weight:bold;
 }
 
-.signal-card{
-text-align:center;
+.update:disabled{
+  opacity:.65;
 }
 
-.label{
-color:#aeb8ca;
-font-size:13px;
-margin-bottom:8px;
+.signal-title{
+  text-align:center;
+  color:#aeb7d0;
+  font-size:13px;
+  margin-bottom:6px;
 }
 
 .signal{
-font-size:42px;
-font-weight:900;
-}
-
-.signal.buy{
-color:#22c55e;
-}
-
-.signal.sell{
-color:#ef4444;
-}
-
-.signal.wait{
-color:#facc15;
+  text-align:center;
+  font-size:40px;
+  font-weight:900;
+  margin:2px 0;
 }
 
 .confidence{
-margin-top:5px;
-font-size:18px;
-font-weight:bold;
-}
-
-button{
-width:100%;
-border:0;
-border-radius:14px;
-padding:15px;
-margin-top:12px;
-background:#2563eb;
-color:#fff;
-font-size:16px;
-font-weight:bold;
-}
-
-button:active{
-transform:scale(.98);
+  text-align:center;
+  font-size:20px;
+  font-weight:bold;
+  margin-bottom:8px;
 }
 
 .status{
-margin-top:8px;
-text-align:center;
-color:#94a3b8;
-font-size:12px;
-}
-
-.error{
-margin-top:8px;
-color:#f87171;
-text-align:center;
-font-size:13px;
+  text-align:center;
+  color:#8f9bb7;
+  font-size:12px;
 }
 
 .grid{
-display:grid;
-grid-template-columns:1fr 1fr;
-gap:10px;
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:9px;
 }
 
 .item{
-background:#101728;
-border-radius:12px;
-padding:11px;
+  background:#0d1427;
+  border:1px solid #202b48;
+  border-radius:12px;
+  padding:11px;
 }
 
-.item-title{
-color:#8f9bb0;
-font-size:11px;
+.item .label{
+  color:#8995b3;
+  font-size:11px;
+  margin-bottom:5px;
 }
 
-.item-value{
-margin-top:4px;
-font-size:15px;
-font-weight:bold;
+.item .value{
+  font-size:14px;
+  font-weight:bold;
+  word-break:break-word;
+}
+
+.section-title{
+  font-size:15px;
+  font-weight:bold;
+  margin-bottom:10px;
 }
 
 .reason{
-padding:7px 0;
-border-bottom:1px solid #273149;
-color:#d7deea;
-font-size:13px;
-}
-
-.reason:last-child{
-border-bottom:0;
+  background:#0d1427;
+  border:1px solid #202b48;
+  border-radius:10px;
+  padding:9px;
+  margin-top:7px;
+  color:#cbd3e8;
+  font-size:12px;
 }
 
 .footer{
-padding:8px 5px 20px;
-text-align:center;
-color:#77839a;
-font-size:11px;
-line-height:1.5;
+  text-align:center;
+  color:#697590;
+  font-size:10px;
+  margin:15px 0 8px;
 }
 
-.loading{
-opacity:.6;
+.error{
+  display:none;
+  background:#351725;
+  border:1px solid #71324b;
+  color:#ff9cbc;
+  border-radius:12px;
+  padding:11px;
+  font-size:12px;
+  margin-bottom:12px;
 }
 
+@media(max-width:380px){
+
+  .app{
+    padding:10px;
+  }
+
+  .signal{
+    font-size:34px;
+  }
+
+  .countdown{
+    font-size:30px;
+  }
+
+}
 </style>
 </head>
 
@@ -199,1177 +217,1431 @@ opacity:.6;
 
 <div class="app">
 
-<div class="header">
+  <!-- HEADER -->
+  <div class="header">
 
-<h1>Trader Pink AI 📈</h1>
+    <h1>
+      Trader Pink AI 📈
+    </h1>
 
-<p>
-EURUSD Smart 1 Minute Signal Engine
-</p>
+    <p>
+      EUR/USD Smart Signal Engine
+    </p>
 
-</div>
+  </div>
 
 
-<!-- MARKET -->
+  <!-- CONTROL CARD -->
+  <div class="card">
 
-<div class="card market">
+    <div class="market-row">
 
-<div class="market-name">
-EURUSD
-</div>
+      <button class="market"
+              type="button">
+        EUR/USD
+      </button>
 
-<div class="timeframe">
-EURUSD 1M • Signal Ready
-</div>
+      <button class="tf active"
+              id="tf1m"
+              type="button">
+        1 MIN
+      </button>
 
-<div class="countdown">
-নতুন Candle শুরু হতে বাকি
-</div>
+      <button class="tf"
+              id="tf5m"
+              type="button">
+        5 MIN
+      </button>
 
-<div id="timer" class="timer">
-00:60
-</div>
+    </div>
 
-</div>
 
+    <div class="count-title">
+      নতুন Candle শুরু হতে বাকি
+    </div>
 
-<!-- SIGNAL -->
 
-<div class="card signal-card">
+    <div class="countdown"
+         id="countdown">
+      00:00
+    </div>
 
-<div class="label">
-NEXT CANDLE SIGNAL
-</div>
 
-<div id="signal" class="signal wait">
-WAIT
-</div>
+    <button class="update"
+            id="updateBtn"
+            type="button">
 
-<div id="confidence" class="confidence">
-0%
-</div>
+      🔍 UPDATE SIGNAL
 
-<button
-id="updateBtn"
-onclick="loadSignal(true)">
-🔍 UPDATE SIGNAL
-</button>
+    </button>
 
-<div id="status" class="status">
-Signal loading...
-</div>
+  </div>
 
-<div id="error" class="error">
-</div>
 
-</div>
+  <!-- ERROR -->
+  <div id="errorBox"
+       class="error">
+  </div>
 
 
-<!-- SIGNAL CANDLE -->
+  <!-- SIGNAL CARD -->
+  <div class="card">
 
-<div class="card">
+    <div class="signal-title">
+      NEXT CANDLE SIGNAL
+    </div>
 
-<div class="label">
-SIGNAL CANDLE
-</div>
 
-<div
-id="signalCandle"
-style="text-align:center;font-weight:bold;">
---
-</div>
+    <div class="signal"
+         id="signal">
 
-</div>
+      WAIT
 
+    </div>
 
-<!-- MARKET DATA -->
 
-<div class="card">
+    <div class="confidence"
+         id="confidence">
 
-<div class="label">
-MARKET DATA
-</div>
+      0%
 
-<div class="grid">
+    </div>
 
 
-<div class="item">
-<div class="item-title">
-TREND
-</div>
-<div id="trend" class="item-value">
---
-</div>
-</div>
-
-
-<div class="item">
-<div class="item-title">
-CANDLE
-</div>
-<div id="candle" class="item-value">
---
-</div>
-</div>
-
-
-<div class="item">
-<div class="item-title">
-STRENGTH
-</div>
-<div id="strength" class="item-value">
---
-</div>
-</div>
-
-
-<div class="item">
-<div class="item-title">
-EMA 9
-</div>
-<div id="ema9" class="item-value">
---
-</div>
-</div>
-
-
-<div class="item">
-<div class="item-title">
-EMA 21
-</div>
-<div id="ema21" class="item-value">
---
-</div>
-</div>
+    <div class="status"
+         id="status">
 
+      Signal Ready
 
-<div class="item">
-<div class="item-title">
-EMA 200
-</div>
-<div id="ema200" class="item-value">
---
-</div>
-</div>
-
-
-<div class="item">
-<div class="item-title">
-RSI 7
-</div>
-<div id="rsi" class="item-value">
---
-</div>
-</div>
+    </div>
 
+  </div>
 
-<div class="item">
-<div class="item-title">
-ADX
-</div>
-<div id="adx" class="item-value">
---
-</div>
-</div>
 
-
-<div class="item">
-<div class="item-title">
-ATR
-</div>
-<div id="atr" class="item-value">
---
-</div>
-</div>
-
-
-<div class="item">
-<div class="item-title">
-SUPPORT
-</div>
-<div id="support" class="item-value">
---
-</div>
-</div>
+  <!-- SIGNAL INFORMATION -->
+  <div class="card">
 
+    <div class="section-title">
+      📊 Signal Information
+    </div>
 
-<div class="item">
-<div class="item-title">
-RESISTANCE
-</div>
-<div id="resistance" class="item-value">
---
-</div>
-</div>
 
+    <div class="grid">
 
-<div class="item">
-<div class="item-title">
-SCORE
-</div>
-<div id="score" class="item-value">
---
-</div>
-</div>
+      <div class="item">
 
+        <div class="label">
+          SIGNAL CANDLE
+        </div>
 
-</div>
+        <div class="value"
+             id="signalCandle">
+          --
+        </div>
 
-</div>
+      </div>
 
 
-<!-- AI ANALYSIS -->
+      <div class="item">
 
-<div class="card">
+        <div class="label">
+          NEXT CANDLE
+        </div>
 
-<div class="label">
-🤖 AI ANALYSIS
-</div>
+        <div class="value"
+             id="nextCandle">
+          --
+        </div>
 
-<div id="reasons">
-Analysis waiting...
-</div>
+      </div>
 
-</div>
 
+      <div class="item">
 
-<!-- TARGET -->
+        <div class="label">
+          LAST CLOSED
+        </div>
 
-<div class="card">
+        <div class="value"
+             id="lastClosed">
+          --
+        </div>
 
-<div class="label">
-🎯 SIGNAL FOR CANDLE
-</div>
+      </div>
 
-<div
-id="targetCandle"
-style="text-align:center;font-weight:bold;">
---
-</div>
 
-<div
-style="
-text-align:center;
-color:#94a3b8;
-font-size:12px;
-margin-top:6px;">
-এই candle-এর জন্য signal প্রস্তুত করা হয়েছে
-</div>
+      <div class="item">
 
-</div>
+        <div class="label">
+          PRICE
+        </div>
 
+        <div class="value"
+             id="price">
+          --
+        </div>
 
-<!-- LAST CLOSED -->
+      </div>
 
-<div class="card">
 
-<div class="label">
-🕐 LAST CLOSED CANDLE
-</div>
+      <div class="item">
 
-<div
-id="lastCandle"
-style="text-align:center;font-weight:bold;">
---
-</div>
+        <div class="label">
+          TREND
+        </div>
 
-<div
-style="
-text-align:center;
-color:#94a3b8;
-font-size:11px;
-margin-top:5px;">
-Bangladesh Time • UTC+6
-</div>
+        <div class="value"
+             id="trend">
+          --
+        </div>
 
-</div>
+      </div>
 
 
-<div class="footer">
+      <div class="item">
 
-Trader Pink AI শুধুমাত্র analysis assistance দেয়।
+        <div class="label">
+          CANDLE
+        </div>
 
-<br>
+        <div class="value"
+             id="candle">
+          --
+        </div>
 
-Trading-এ loss হতে পারে।
+      </div>
 
-</div>
+
+      <div class="item">
+
+        <div class="label">
+          STRENGTH
+        </div>
+
+        <div class="value"
+             id="strength">
+          --
+        </div>
+
+      </div>
+
+
+      <div class="item">
+
+        <div class="label">
+          ADX
+        </div>
+
+        <div class="value"
+             id="adx">
+          --
+        </div>
+
+      </div>
+
+    </div>
+
+  </div>
+
+
+  <!-- INDICATOR CARD -->
+  <div class="card">
+
+    <div class="section-title">
+      📈 Indicator Data
+    </div>
+
+
+    <div class="grid">
+
+      <div class="item">
+
+        <div class="label">
+          EMA 9
+        </div>
+
+        <div class="value"
+             id="ema9">
+          --
+        </div>
+
+      </div>
+
+
+      <div class="item">
+
+        <div class="label">
+          EMA 21
+        </div>
+
+        <div class="value"
+             id="ema21">
+          --
+        </div>
+
+      </div>
+
+
+      <div class="item">
+
+        <div class="label">
+          EMA 50
+        </div>
+
+        <div class="value"
+             id="ema50">
+          --
+        </div>
+
+      </div>
+
+
+      <div class="item">
+
+        <div class="label">
+          EMA 200
+        </div>
+
+        <div class="value"
+             id="ema200">
+          --
+        </div>
+
+      </div>
+
+
+      <div class="item">
+
+        <div class="label">
+          RSI
+        </div>
+
+        <div class="value"
+             id="rsi">
+          --
+        </div>
+
+      </div>
+
+
+      <div class="item">
+
+        <div class="label">
+          MACD
+        </div>
+
+        <div class="value"
+             id="macd">
+          --
+        </div>
+
+      </div>
+
+
+      <div class="item">
+
+        <div class="label">
+          STOCH K
+        </div>
+
+        <div class="value"
+             id="stochK">
+          --
+        </div>
+
+      </div>
+
+
+      <div class="item">
+
+        <div class="label">
+          STOCH D
+        </div>
+
+        <div class="value"
+             id="stochD">
+          --
+        </div>
+
+      </div>
+
+    </div>
+
+  </div>
+
+
+  <!-- SUPPORT RESISTANCE -->
+  <div class="card">
+
+    <div class="section-title">
+      🎯 Support / Resistance
+    </div>
+
+
+    <div class="grid">
+
+      <div class="item">
+
+        <div class="label">
+          SUPPORT
+        </div>
+
+        <div class="value"
+             id="support">
+          --
+        </div>
+
+      </div>
+
+
+      <div class="item">
+
+        <div class="label">
+          RESISTANCE
+        </div>
+
+        <div class="value"
+             id="resistance">
+          --
+        </div>
+
+      </div>
+
+
+      <div class="item">
+
+        <div class="label">
+          BUY SCORE
+        </div>
+
+        <div class="value"
+             id="buyScore">
+          --
+        </div>
+
+      </div>
+
+
+      <div class="item">
+
+        <div class="label">
+          SELL SCORE
+        </div>
+
+        <div class="value"
+             id="sellScore">
+          --
+        </div>
+
+      </div>
+
+
+      <div class="item">
+
+        <div class="label">
+          SCORE DIFFERENCE
+        </div>
+
+        <div class="value"
+             id="difference">
+          --
+        </div>
+
+      </div>
+
+
+      <div class="item">
+
+        <div class="label">
+          ATR
+        </div>
+
+        <div class="value"
+             id="atr">
+          --
+        </div>
+
+      </div>
+
+    </div>
+
+  </div>
+
+
+  <!-- REASONS -->
+  <div class="card">
+
+    <div class="section-title">
+      🧠 Analysis Reasons
+    </div>
+
+
+    <div id="reasons">
+      Waiting for analysis...
+    </div>
+
+  </div>
+
+
+  <div class="footer">
+    Confidence = indicator confluence score, guaranteed profit নয়
+  </div>
 
 </div>
 
 
 <script>
 
-
-/* =====================================================
-   API
-   ===================================================== */
+/* ==========================================================
+   TRADER PINK AI
+   CLOUDFLARE WORKER CONNECTION
+   ========================================================== */
 
 const API_BASE =
 "https://crimson-grass-f881.bijondebnath51.workers.dev";
 
-const ANALYZE_URL =
-API_BASE +
-"/analyze?symbol=EURUSD&timeframe=1m";
 
-let loading=false;
+/* ==========================================================
+   STATE
+   ========================================================== */
+
+let currentInterval = "1min";
+
+let nextCandleEpoch = 0;
+
+let lastLoadedCandle = "";
 
 
-/* =====================================================
-   NUMBER
-   ===================================================== */
+/* ==========================================================
+   API URL
+   ========================================================== */
 
-function num(value,digits=5){
+function getApiUrl(){
 
-if(
-value===undefined ||
-value===null ||
-value===""
-){
-
-return "--";
-
-}
-
-const n=Number(value);
-
-if(!Number.isFinite(n)){
-
-return "--";
-
-}
-
-return n.toFixed(digits);
+  return (
+    API_BASE +
+    "/?interval=" +
+    encodeURIComponent(currentInterval)
+  );
 
 }
 
 
-/* =====================================================
-   TIME
-   ===================================================== */
+/* ==========================================================
+   ELEMENTS
+   ========================================================== */
+
+const signalEl =
+document.getElementById("signal");
+
+const confidenceEl =
+document.getElementById("confidence");
+
+const statusEl =
+document.getElementById("status");
+
+const errorBox =
+document.getElementById("errorBox");
+
+const updateBtn =
+document.getElementById("updateBtn");
+
+const countdownEl =
+document.getElementById("countdown");
+
+const tf1m =
+document.getElementById("tf1m");
+
+const tf5m =
+document.getElementById("tf5m");
+
+
+/* ==========================================================
+   TEXT HELPER
+   ========================================================== */
+
+function setText(id,value){
+
+  const el =
+    document.getElementById(id);
+
+  if(!el)
+    return;
+
+  if(
+    value === null ||
+    value === undefined ||
+    value === ""
+  ){
+
+    el.textContent = "--";
+
+  }
+  else{
+
+    el.textContent = value;
+
+  }
+
+}
+
+
+/* ==========================================================
+   NUMBER FORMAT
+   ========================================================== */
+
+function number(value,digits=5){
+
+  if(
+    value === null ||
+    value === undefined ||
+    value === ""
+  ){
+
+    return "--";
+
+  }
+
+  const n =
+    Number(value);
+
+  if(!Number.isFinite(n))
+    return String(value);
+
+  return n.toFixed(digits);
+
+}
+
+
+/* ==========================================================
+   BANGLADESH TIME
+   ========================================================== */
 
 function formatTime(value){
 
-if(!value){
+  if(!value)
+    return "--";
 
-return "--";
+  const d =
+    new Date(value);
 
-}
+  if(isNaN(d.getTime()))
+    return String(value);
 
-try{
+  return d.toLocaleString(
+    "en-GB",
+    {
+      timeZone:"Asia/Dhaka",
 
-const d=new Date(value);
+      day:"2-digit",
+      month:"2-digit",
+      year:"numeric",
 
-if(isNaN(d.getTime())){
+      hour:"2-digit",
+      minute:"2-digit",
+      second:"2-digit",
 
-return value;
-
-}
-
-return d.toLocaleString(
-"en-GB",
-{
-timeZone:"Asia/Dhaka",
-day:"2-digit",
-month:"2-digit",
-year:"numeric",
-hour:"2-digit",
-minute:"2-digit",
-second:"2-digit",
-hour12:false
-}
-);
-
-}catch(e){
-
-return value;
-
-}
+      hour12:false
+    }
+  );
 
 }
 
 
-/* =====================================================
-   SIGNAL
-   ===================================================== */
+/* ==========================================================
+   SIGNAL STYLE
+   ========================================================== */
 
-function normalizeSignal(value){
+function updateSignalStyle(signal){
 
-if(!value){
-
-return "WAIT";
-
-}
-
-const s=
-String(value).toUpperCase();
-
-if(s.includes("BUY")){
-
-return "BUY";
-
-}
-
-if(s.includes("SELL")){
-
-return "SELL";
-
-}
-
-return "WAIT";
-
-}
+  signal =
+    String(signal || "WAIT")
+      .toUpperCase();
 
 
-/* =====================================================
-   CONFIDENCE
-   ===================================================== */
+  if(signal === "BUY"){
 
-function getConfidence(data){
+    signalEl.style.color =
+      "#35e58c";
 
-const values=[
+  }
 
-data?.confidence,
+  else if(signal === "SELL"){
 
-data?.signal?.confidence,
+    signalEl.style.color =
+      "#ff5c7c";
 
-data?.result?.confidence,
+  }
 
-data?.analysis?.confidence
+  else{
 
-];
+    signalEl.style.color =
+      "#ffd166";
 
-
-for(
-const value of values
-){
-
-const n=Number(value);
-
-if(Number.isFinite(n)){
-
-return Math.max(
-0,
-Math.min(
-100,
-Math.round(n)
-)
-);
-
-}
-
-}
-
-return 0;
+  }
 
 }
 
 
-/* =====================================================
-   LOAD SIGNAL
-   ===================================================== */
+/* ==========================================================
+   ERROR
+   ========================================================== */
 
-async function loadSignal(manual=false){
+function showError(message){
 
-if(loading){
+  errorBox.style.display =
+    "block";
 
-return;
-
-}
-
-loading=true;
-
-
-const statusEl=
-document.getElementById(
-"status"
-);
-
-const errorEl=
-document.getElementById(
-"error"
-);
-
-const btn=
-document.getElementById(
-"updateBtn"
-);
-
-
-errorEl.textContent="";
-
-
-statusEl.textContent=
-manual
-?
-"নতুন signal নেওয়া হচ্ছে..."
-:
-"নতুন candle-এর signal check হচ্ছে...";
-
-
-btn.classList.add(
-"loading"
-);
-
-btn.textContent=
-"⏳ UPDATING...";
-
-
-try{
-
-
-/*
-নতুন timestamp যোগ করা হচ্ছে।
-এতে পুরোনো cache ব্যবহার হওয়ার
-সম্ভাবনা কমে যায়।
-*/
-
-const url=
-ANALYZE_URL+
-"&_="+
-Date.now();
-
-
-const response=
-await fetch(
-url,
-{
-method:"GET",
-cache:"no-store",
-headers:{
-"Accept":"application/json",
-"Cache-Control":"no-cache"
-}
-}
-);
-
-
-if(!response.ok){
-
-throw new Error(
-"Server Error: "+
-response.status
-);
+  errorBox.textContent =
+    "⚠️ " + message;
 
 }
 
 
-const data=
-await response.json();
+function hideError(){
 
+  errorBox.style.display =
+    "none";
 
-console.log(
-"Trader Pink AI DATA:",
-data
-);
-
-
-renderSignal(data);
-
-
-statusEl.textContent=
-"● LIVE • Signal updated";
-
-
-}catch(error){
-
-
-console.error(
-"Signal Error:",
-error
-);
-
-
-errorEl.textContent=
-"⚠️ Signal update হয়নি। Internet/API check করুন।";
-
-
-statusEl.textContent=
-"Signal update failed";
-
-
-}finally{
-
-
-loading=false;
-
-
-btn.classList.remove(
-"loading"
-);
-
-
-btn.textContent=
-"🔍 UPDATE SIGNAL";
-
-
-}
+  errorBox.textContent =
+    "";
 
 }
 
 
-/* =====================================================
-   RENDER SIGNAL
-   ===================================================== */
+/* ==========================================================
+   DISPLAY DATA
+   ========================================================== */
 
-function renderSignal(data){
+function displayData(data){
 
+  if(
+    !data ||
+    data.ok !== true
+  ){
 
-const signalData=
-data?.signal ||
-data?.result ||
-data;
+    showError(
+      data?.error ||
+      "Signal data পাওয়া যায়নি"
+    );
 
+    return;
 
-const direction=
-normalizeSignal(
+  }
 
-signalData?.direction ||
 
-signalData?.signal ||
+  hideError();
 
-data?.direction
 
-);
+  /* ----------------------------------------------------------
+     SIGNAL
+     ---------------------------------------------------------- */
 
+  const signal =
+    String(
+      data.signal || "WAIT"
+    ).toUpperCase();
 
-const confidence=
-getConfidence(data);
 
+  const confidence =
+    Number(
+      data.confidence || 0
+    );
 
-/* SIGNAL */
 
-const signalEl=
-document.getElementById(
-"signal"
-);
+  signalEl.textContent =
+    signal;
 
 
-signalEl.textContent=
-direction;
+  confidenceEl.textContent =
+    confidence + "%";
 
 
-signalEl.className=
-"signal "+
-direction.toLowerCase();
+  updateSignalStyle(signal);
 
 
-/* CONFIDENCE */
+  if(signal === "WAIT"){
 
-document.getElementById(
-"confidence"
-).textContent=
-confidence+"%";
+    statusEl.textContent =
+      "NO TRADE • WAIT";
 
+  }
 
-/* SIGNAL CANDLE */
+  else{
 
-const signalCandle=
+    statusEl.textContent =
+      "Signal Ready • Next Candle";
 
-data?.signalCandle ||
+  }
 
-data?.signal_candle ||
 
-data?.candleTime ||
+  /* ----------------------------------------------------------
+     CANDLE TIME
+     ---------------------------------------------------------- */
 
-data?.signal_time ||
+  setText(
+    "signalCandle",
+    formatTime(
+      data.closed_candle_time
+    )
+  );
 
-signalData?.candleTime ||
 
-signalData?.signalTime;
+  setText(
+    "nextCandle",
+    formatTime(
+      data.next_candle_time
+    )
+  );
 
 
-document.getElementById(
-"signalCandle"
-).textContent=
-formatTime(signalCandle);
+  setText(
+    "lastClosed",
+    formatTime(
+      data.closed_candle_time
+    )
+  );
 
 
-/* TARGET */
+  /* ----------------------------------------------------------
+     PRICE
+     ---------------------------------------------------------- */
 
-const target=
+  setText(
+    "price",
+    number(
+      data.price,
+      6
+    )
+  );
 
-data?.targetCandle ||
 
-data?.target_candle ||
+  /* ----------------------------------------------------------
+     TREND
+     ---------------------------------------------------------- */
 
-data?.nextCandle ||
+  setText(
+    "trend",
+    data.trend
+  );
 
-signalData?.targetCandle ||
 
-signalData?.nextCandle;
+  /* ----------------------------------------------------------
+     CANDLE TYPE
+     ---------------------------------------------------------- */
 
+  let candle =
+    data.candle;
 
-document.getElementById(
-"targetCandle"
-).textContent=
-formatTime(target);
 
+  if(
+    typeof candle === "object" &&
+    candle !== null
+  ){
 
-/* LAST CLOSED */
+    candle =
+      candle.type ||
+      candle.direction ||
+      candle.name ||
+      "--";
 
-const lastClosed=
+  }
 
-data?.lastClosedCandle ||
 
-data?.last_closed_candle ||
+  setText(
+    "candle",
+    candle
+  );
 
-data?.lastCandle ||
 
-data?.last_candle ||
+  /* ----------------------------------------------------------
+     CANDLE STRENGTH
+     ---------------------------------------------------------- */
 
-signalData?.lastClosedCandle;
+  let strength =
+    data.candle_strength;
 
 
-document.getElementById(
-"lastCandle"
-).textContent=
-formatTime(lastClosed);
+  if(
+    typeof strength === "number"
+  ){
 
+    strength =
+      strength.toFixed(0) + "%";
 
-/* TREND */
+  }
 
-document.getElementById(
-"trend"
-).textContent=
 
-data?.trend ||
+  setText(
+    "strength",
+    strength
+  );
 
-data?.analysis?.trend ||
 
-"--";
+  /* ----------------------------------------------------------
+     ADX
+     ---------------------------------------------------------- */
 
+  setText(
+    "adx",
+    number(
+      data.adx,
+      2
+    )
+  );
 
-/* CANDLE */
 
-const candle=
+  /* ----------------------------------------------------------
+     EMA
+     ---------------------------------------------------------- */
 
-data?.candle ||
+  setText(
+    "ema9",
+    number(
+      data.ema9,
+      6
+    )
+  );
 
-data?.analysis?.candle ||
 
-{};
+  setText(
+    "ema21",
+    number(
+      data.ema21,
+      6
+    )
+  );
 
 
-document.getElementById(
-"candle"
-).textContent=
+  setText(
+    "ema50",
+    number(
+      data.ema50,
+      6
+    )
+  );
 
-candle?.type ||
 
-candle?.direction ||
+  setText(
+    "ema200",
+    number(
+      data.ema200,
+      6
+    )
+  );
 
-data?.candle_type ||
 
-"--";
+  /* ----------------------------------------------------------
+     RSI
+     ---------------------------------------------------------- */
 
+  setText(
+    "rsi",
+    number(
+      data.rsi,
+      2
+    )
+  );
 
-/* STRENGTH */
 
-document.getElementById(
-"strength"
-).textContent=
+  /* ----------------------------------------------------------
+     MACD
+     ---------------------------------------------------------- */
 
-num(
+  setText(
+    "macd",
+    number(
+      data.macd,
+      6
+    )
+  );
 
-candle?.strength ||
 
-data?.strength ||
+  /* ----------------------------------------------------------
+     STOCHASTIC
+     ---------------------------------------------------------- */
 
-data?.analysis?.strength,
+  setText(
+    "stochK",
+    number(
+      data.stochastic_k,
+      2
+    )
+  );
 
-0
 
-);
+  setText(
+    "stochD",
+    number(
+      data.stochastic_d,
+      2
+    )
+  );
 
 
-/* EMA 9 */
+  /* ----------------------------------------------------------
+     SUPPORT / RESISTANCE
+     ---------------------------------------------------------- */
 
-document.getElementById(
-"ema9"
-).textContent=
+  setText(
+    "support",
+    number(
+      data.support,
+      6
+    )
+  );
 
-num(
 
-data?.ema9 ||
+  setText(
+    "resistance",
+    number(
+      data.resistance,
+      6
+    )
+  );
 
-data?.indicators?.ema9 ||
 
-data?.analysis?.ema9,
+  /* ----------------------------------------------------------
+     SCORES
+     ---------------------------------------------------------- */
 
-5
+  setText(
+    "buyScore",
+    data.buy_score
+  );
 
-);
 
+  setText(
+    "sellScore",
+    data.sell_score
+  );
 
-/* EMA 21 */
 
-document.getElementById(
-"ema21"
-).textContent=
+  setText(
+    "difference",
+    data.score_difference
+  );
 
-num(
 
-data?.ema21 ||
+  /* ----------------------------------------------------------
+     ATR
+     ---------------------------------------------------------- */
 
-data?.indicators?.ema21 ||
+  setText(
+    "atr",
+    number(
+      data.atr,
+      6
+    )
+  );
 
-data?.analysis?.ema21,
 
-5
+  /* ----------------------------------------------------------
+     REASONS
+     ---------------------------------------------------------- */
 
-);
+  const reasonsEl =
+    document.getElementById("reasons");
 
 
-/* EMA 200 */
+  reasonsEl.innerHTML = "";
 
-document.getElementById(
-"ema200"
-).textContent=
 
-num(
+  if(
+    Array.isArray(data.reasons) &&
+    data.reasons.length > 0
+  ){
 
-data?.ema200 ||
+    data.reasons.forEach(
+      reason => {
 
-data?.indicators?.ema200 ||
+        const div =
+          document.createElement(
+            "div"
+          );
 
-data?.analysis?.ema200,
+        div.className =
+          "reason";
 
-5
+        div.textContent =
+          "• " + reason;
 
-);
+        reasonsEl.appendChild(
+          div
+        );
 
+      }
+    );
 
-/* RSI */
+  }
 
-document.getElementById(
-"rsi"
-).textContent=
+  else{
 
-num(
+    reasonsEl.textContent =
+      "No additional confirmation.";
 
-data?.rsi ||
+  }
 
-data?.indicators?.rsi ||
 
-data?.analysis?.rsi,
+  /* ----------------------------------------------------------
+     NEXT CANDLE
+     ---------------------------------------------------------- */
 
-2
+  if(data.next_candle){
 
-);
+    const next =
+      String(
+        data.next_candle
+      ).toUpperCase();
 
 
-/* ADX */
+    if(next === "UP"){
 
-document.getElementById(
-"adx"
-).textContent=
+      statusEl.textContent =
+        "NEXT CANDLE → UP";
 
-num(
+    }
 
-data?.adx ||
+    else if(next === "DOWN"){
 
-data?.indicators?.adx ||
+      statusEl.textContent =
+        "NEXT CANDLE → DOWN";
 
-data?.analysis?.adx,
+    }
 
-2
+    else{
 
-);
+      statusEl.textContent =
+        "NEXT CANDLE → NO TRADE";
 
+    }
 
-/* ATR */
+  }
 
-document.getElementById(
-"atr"
-).textContent=
 
-num(
+  /* ----------------------------------------------------------
+     COUNTDOWN
+     ---------------------------------------------------------- */
 
-data?.atr ||
+  if(data.next_candle_time){
 
-data?.indicators?.atr ||
+    const nextDate =
+      new Date(
+        data.next_candle_time
+      );
 
-data?.analysis?.atr,
 
-6
+    if(!isNaN(nextDate.getTime())){
 
-);
+      nextCandleEpoch =
+        Math.floor(
+          nextDate.getTime() / 1000
+        );
 
+    }
 
-/* SUPPORT */
+  }
 
-document.getElementById(
-"support"
-).textContent=
 
-num(
+  /* ----------------------------------------------------------
+     LAST CANDLE MEMORY
+     ---------------------------------------------------------- */
 
-data?.support ||
-
-data?.levels?.support ||
-
-data?.analysis?.support,
-
-5
-
-);
-
-
-/* RESISTANCE */
-
-document.getElementById(
-"resistance"
-).textContent=
-
-num(
-
-data?.resistance ||
-
-data?.levels?.resistance ||
-
-data?.analysis?.resistance,
-
-5
-
-);
-
-
-/* SCORE */
-
-const score=
-
-data?.score ||
-
-signalData?.score ||
-
-{};
-
-
-if(
-score.buy!==undefined ||
-score.sell!==undefined
-){
-
-document.getElementById(
-"score"
-).textContent=
-
-"BUY "+
-(score.buy ?? 0)+
-" / SELL "+
-(score.sell ?? 0);
-
-}else{
-
-document.getElementById(
-"score"
-).textContent=
-"--";
+  lastLoadedCandle =
+    data.closed_candle_time || "";
 
 }
 
 
-/* REASONS */
+/* ==========================================================
+   UPDATE SIGNAL
+   ========================================================== */
 
-const reasons=
+async function updateSignal(){
 
-data?.reasons ||
-
-data?.analysis?.reasons ||
-
-signalData?.reasons ||
-
-[];
+  if(updateBtn.disabled)
+    return;
 
 
-const reasonsEl=
-document.getElementById(
-"reasons"
+  updateBtn.disabled =
+    true;
+
+
+  updateBtn.textContent =
+    "🔄 ANALYZING...";
+
+
+  statusEl.textContent =
+    "Market analysis চলছে...";
+
+
+  try{
+
+    const url =
+      getApiUrl();
+
+
+    const response =
+      await fetch(
+        url,
+        {
+          method:"GET",
+
+          cache:"no-store",
+
+          headers:{
+            "Accept":
+              "application/json"
+          }
+        }
+      );
+
+
+    if(!response.ok){
+
+      throw new Error(
+        "Worker HTTP " +
+        response.status
+      );
+
+    }
+
+
+    const data =
+      await response.json();
+
+
+    if(!data.ok){
+
+      throw new Error(
+        data.error ||
+        "Worker returned error"
+      );
+
+    }
+
+
+    displayData(data);
+
+
+  }
+
+  catch(error){
+
+    console.error(
+      "Signal update error:",
+      error
+    );
+
+
+    showError(
+      "Signal update failed: " +
+      (
+        error.message ||
+        "Unknown error"
+      )
+    );
+
+
+    statusEl.textContent =
+      "Connection error";
+
+  }
+
+  finally{
+
+    updateBtn.disabled =
+      false;
+
+
+    updateBtn.textContent =
+      "🔍 UPDATE SIGNAL";
+
+  }
+
+}
+
+
+/* ==========================================================
+   TIMEFRAME
+   ========================================================== */
+
+function selectTimeframe(interval){
+
+  currentInterval =
+    interval;
+
+
+  if(interval === "1min"){
+
+    tf1m.classList.add(
+      "active"
+    );
+
+    tf5m.classList.remove(
+      "active"
+    );
+
+  }
+
+  else{
+
+    tf5m.classList.add(
+      "active"
+    );
+
+    tf1m.classList.remove(
+      "active"
+    );
+
+  }
+
+
+  /*
+     New timeframe selected.
+     Immediately request the correct Worker endpoint.
+  */
+
+  nextCandleEpoch = 0;
+
+  updateSignal();
+
+}
+
+
+tf1m.addEventListener(
+  "click",
+  function(){
+
+    selectTimeframe(
+      "1min"
+    );
+
+  }
 );
 
 
-if(
-Array.isArray(reasons) &&
-reasons.length>0
-){
+tf5m.addEventListener(
+  "click",
+  function(){
 
-reasonsEl.innerHTML=
+    selectTimeframe(
+      "5min"
+    );
 
-reasons
-.map(
-reason =>
-`<div class="reason">
-• ${escapeHtml(reason)}
-</div>`
-)
-.join("");
-
-
-}else if(
-typeof reasons==="string"
-){
-
-reasonsEl.innerHTML=
-
-`<div class="reason">
-• ${escapeHtml(reasons)}
-</div>`;
-
-
-}else{
-
-reasonsEl.innerHTML=
-
-`<div class="reason">
-• বর্তমান বাজারের তথ্য বিশ্লেষণ করা হচ্ছে
-</div>`;
-
-}
-
-}
-
-
-/* =====================================================
-   HTML SECURITY
-   ===================================================== */
-
-function escapeHtml(value){
-
-return String(value)
-
-.replaceAll(
-"&",
-"&amp;"
-)
-
-.replaceAll(
-"<",
-"&lt;"
-)
-
-.replaceAll(
-">",
-"&gt;"
-)
-
-.replaceAll(
-'"',
-"&quot;"
-)
-
-.replaceAll(
-"'",
-"&#039;"
+  }
 );
 
+
+/* ==========================================================
+   MANUAL UPDATE
+   ========================================================== */
+
+updateBtn.addEventListener(
+  "click",
+  updateSignal
+);
+
+
+/* ==========================================================
+   COUNTDOWN
+   ========================================================== */
+
+function updateCountdown(){
+
+  if(!nextCandleEpoch){
+
+    countdownEl.textContent =
+      "00:00";
+
+    return;
+
+  }
+
+
+  const now =
+    Math.floor(
+      Date.now() / 1000
+    );
+
+
+  let remaining =
+    nextCandleEpoch - now;
+
+
+  if(remaining < 0)
+    remaining = 0;
+
+
+  const minutes =
+    Math.floor(
+      remaining / 60
+    );
+
+
+  const seconds =
+    remaining % 60;
+
+
+  countdownEl.textContent =
+    String(minutes)
+      .padStart(2,"0")
+    + ":" +
+    String(seconds)
+      .padStart(2,"0");
+
+
+  /*
+     Candle ended.
+     Wait 2.5 seconds so the Worker
+     can use the newly closed candle.
+  */
+
+  if(remaining === 0){
+
+    setTimeout(
+      function(){
+
+        updateSignal();
+
+      },
+      2500
+    );
+
+  }
+
 }
 
 
-/* =====================================================
-   TIMER
-   ===================================================== */
-
-function updateTimer(){
-
-
-const now=
-new Date();
-
-
-const seconds=
-now.getSeconds();
-
-
-const remaining=
-60-seconds;
-
-
-document.getElementById(
-"timer"
-).textContent=
-
-"00:"+
-String(remaining)
-.padStart(2,"0");
-
-
-/*
-নতুন minute শুরু হওয়ার
-১ সেকেন্ড পরে signal update
-*/
-
-if(seconds===1){
-
-loadSignal(false);
-
-}
-
-}
-
-
-/* =====================================================
-   START
-   ===================================================== */
+/* ==========================================================
+   COUNTDOWN LOOP
+   ========================================================== */
 
 setInterval(
-updateTimer,
-1000
+  updateCountdown,
+  1000
 );
 
 
-updateTimer();
-
-
-/* FIRST SIGNAL */
-
-loadSignal(false);
-
-
-/* =====================================================
-   BACKUP REFRESH
-   ===================================================== */
+/* ==========================================================
+   AUTO SIGNAL REFRESH
+   ========================================================== */
 
 setInterval(
-()=>{
+  function(){
 
-loadSignal(false);
+    updateSignal();
 
-},
-20000
+  },
+  30000
 );
 
 
-/* =====================================================
-   APP FOREGROUND
-   ===================================================== */
+/* ==========================================================
+   INITIAL LOAD
+   ========================================================== */
 
-document.addEventListener(
-"visibilitychange",
-()=>{
-
-if(!document.hidden){
-
-loadSignal(false);
-
-}
-
-}
-);
-
-
-/* =====================================================
-   INTERNET RETURN
-   ===================================================== */
-
-window.addEventListener(
-"online",
-()=>{
-
-loadSignal(false);
-
-}
-);
+updateSignal();
 
 </script>
 
