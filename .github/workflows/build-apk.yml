@@ -8,7 +8,7 @@ build:
 runs-on: ubuntu-latest
 
 steps:
-  - name: Checkout
+  - name: Checkout repository
     uses: actions/checkout@v4
 
   - name: Setup Java
@@ -18,105 +18,97 @@ steps:
       java-version: '17'
 
   - name: Create Android project
+    shell: bash
     run: |
       mkdir -p app/src/main/java/com/traderpinkai/app
       mkdir -p app/src/main/res/values
 
-      cat > settings.gradle <<'EOF'
-      pluginManagement {
-          repositories {
-              google()
-              mavenCentral()
-              gradlePluginPortal()
-          }
-      }
+      printf '%s\n' \
+      'pluginManagement {' \
+      '    repositories {' \
+      '        google()' \
+      '        mavenCentral()' \
+      '        gradlePluginPortal()' \
+      '    }' \
+      '}' \
+      '' \
+      'dependencyResolutionManagement {' \
+      '    repositoriesMode.set(RepositoriesMode.FAIL_ON_PROJECT_REPOS)' \
+      '    repositories {' \
+      '        google()' \
+      '        mavenCentral()' \
+      '    }' \
+      '}' \
+      '' \
+      'rootProject.name = "TraderPinkAI"' \
+      'include(":app")' > settings.gradle
 
-      dependencyResolutionManagement {
-          repositoriesMode.set(RepositoriesMode.FAIL_ON_PROJECT_REPOS)
-          repositories {
-              google()
-              mavenCentral()
-          }
-      }
+      printf '%s\n' \
+      'plugins {' \
+      '    id "com.android.application" version "8.7.3" apply false' \
+      '}' > build.gradle
 
-      rootProject.name = "TraderPinkAI"
-      include(":app")
-      EOF
+      printf '%s\n' \
+      'plugins {' \
+      '    id "com.android.application"' \
+      '}' \
+      '' \
+      'android {' \
+      '    namespace "com.traderpinkai.app"' \
+      '    compileSdk 35' \
+      '' \
+      '    defaultConfig {' \
+      '        applicationId "com.traderpinkai.app"' \
+      '        minSdk 23' \
+      '        targetSdk 35' \
+      '        versionCode 14' \
+      '        versionName "1.0"' \
+      '    }' \
+      '}' > app/build.gradle
 
-      cat > build.gradle <<'EOF'
-      plugins {
-          id 'com.android.application' version '8.7.3' apply false
-      }
-      EOF
+      printf '%s\n' \
+      '<resources>' \
+      '    <style name="AppTheme" parent="android:style/Theme.Material.Light.NoActionBar">' \
+      '        <item name="android:fontFamily">sans</item>' \
+      '        <item name="android:colorAccent">#ff4fa3</item>' \
+      '        <item name="android:statusBarColor">#0b1020</item>' \
+      '        <item name="android:navigationBarColor">#0b1020</item>' \
+      '    </style>' \
+      '</resources>' > app/src/main/res/values/styles.xml
 
-      cat > app/build.gradle <<'EOF'
-      plugins {
-          id 'com.android.application'
-      }
-
-      android {
-          namespace 'com.traderpinkai.app'
-          compileSdk 35
-
-          defaultConfig {
-              applicationId 'com.traderpinkai.app'
-              minSdk 23
-              targetSdk 35
-              versionCode 14
-              versionName '1.0'
-          }
-      }
-      EOF
-
-      cat > app/src/main/res/values/styles.xml <<'EOF'
-      <resources>
-          <style name="AppTheme" parent="android:style/Theme.Material.Light.NoActionBar">
-              <item name="android:fontFamily">sans</item>
-              <item name="android:colorAccent">#ff4fa3</item>
-              <item name="android:navigationBarColor">#0b1020</item>
-              <item name="android:statusBarColor">#0b1020</item>
-          </style>
-      </resources>
-      EOF
-
-      cat > app/src/main/AndroidManifest.xml <<'EOF'
-      <manifest xmlns:android="http://schemas.android.com/apk/res/android">
-
-          <uses-permission android:name="android.permission.INTERNET" />
-          <uses-permission android:name="android.permission.SYSTEM_ALERT_WINDOW" />
-          <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
-          <uses-permission android:name="android.permission.FOREGROUND_SERVICE_SPECIAL_USE" />
-
-          <application
-              android:allowBackup="true"
-              android:label="Trader Pink AI"
-              android:theme="@style/AppTheme">
-
-              <activity
-                  android:name=".MainActivity"
-                  android:exported="true">
-
-                  <intent-filter>
-                      <action android:name="android.intent.action.MAIN" />
-                      <category android:name="android.intent.category.LAUNCHER" />
-                  </intent-filter>
-
-              </activity>
-
-              <service
-                  android:name=".FloatingService"
-                  android:enabled="true"
-                  android:exported="false"
-                  android:foregroundServiceType="specialUse" />
-
-          </application>
-
-      </manifest>
-      EOF
+      printf '%s\n' \
+      '<manifest xmlns:android="http://schemas.android.com/apk/res/android">' \
+      '    <uses-permission android:name="android.permission.INTERNET" />' \
+      '    <uses-permission android:name="android.permission.SYSTEM_ALERT_WINDOW" />' \
+      '    <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />' \
+      '    <uses-permission android:name="android.permission.FOREGROUND_SERVICE_SPECIAL_USE" />' \
+      '' \
+      '    <application' \
+      '        android:allowBackup="true"' \
+      '        android:label="Trader Pink AI"' \
+      '        android:theme="@style/AppTheme">' \
+      '' \
+      '        <activity' \
+      '            android:name=".MainActivity"' \
+      '            android:exported="true">' \
+      '            <intent-filter>' \
+      '                <action android:name="android.intent.action.MAIN" />' \
+      '                <category android:name="android.intent.category.LAUNCHER" />' \
+      '            </intent-filter>' \
+      '        </activity>' \
+      '' \
+      '        <service' \
+      '            android:name=".FloatingService"' \
+      '            android:exported="false"' \
+      '            android:foregroundServiceType="specialUse" />' \
+      '' \
+      '    </application>' \
+      '</manifest>' > app/src/main/AndroidManifest.xml
 
   - name: Create MainActivity
+    shell: bash
     run: |
-      cat > app/src/main/java/com/traderpinkai/app/MainActivity.java <<'EOF'
+      cat > app/src/main/java/com/traderpinkai/app/MainActivity.java <<'JAVA'
       package com.traderpinkai.app;
 
       import android.app.Activity;
@@ -125,7 +117,6 @@ steps:
       import android.os.Bundle;
       import android.provider.Settings;
       import android.view.Gravity;
-      import android.view.View;
       import android.widget.Button;
       import android.widget.LinearLayout;
       import android.widget.TextView;
@@ -177,6 +168,7 @@ steps:
               });
 
               start.setOnClickListener(v -> {
+
                   if (!Settings.canDrawOverlays(this)) {
                       Intent intent = new Intent(
                           Settings.ACTION_MANAGE_OVERLAY_PERMISSION,
@@ -193,11 +185,12 @@ steps:
               });
           }
       }
-      EOF
+      JAVA
 
   - name: Create FloatingService
+    shell: bash
     run: |
-      cat > app/src/main/java/com/traderpinkai/app/FloatingService.java <<'EOF'
+      cat > app/src/main/java/com/traderpinkai/app/FloatingService.java <<'JAVA'
       package com.traderpinkai.app;
 
       import android.app.Notification;
@@ -227,14 +220,12 @@ steps:
           private WindowManager windowManager;
           private LinearLayout box;
 
-          private TextView title;
-          private TextView market;
-          private TextView candle;
           private TextView signal;
           private TextView confidence;
           private TextView trend;
+          private TextView candle;
 
-          private Handler handler = new Handler();
+          private final Handler handler = new Handler();
 
           private static final String API =
               "https://crimson-grass-f881.bijondebnath51.workers.dev/";
@@ -252,10 +243,6 @@ steps:
               super.onCreate();
 
               createNotification();
-
-              windowManager =
-                  (WindowManager) getSystemService(WINDOW_SERVICE);
-
               createFloatingView();
 
               handler.post(updater);
@@ -266,6 +253,7 @@ steps:
               String channelId = "trader_pink_ai";
 
               if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+
                   NotificationChannel channel =
                       new NotificationChannel(
                           channelId,
@@ -295,19 +283,45 @@ steps:
               startForeground(1001, builder.build());
           }
 
+          private TextView makeText(String text, int size) {
+
+              TextView t = new TextView(this);
+
+              t.setText(text);
+              t.setTextColor(Color.WHITE);
+              t.setTextSize(size);
+              t.setPadding(4, 4, 4, 4);
+
+              return t;
+          }
+
           private void createFloatingView() {
+
+              windowManager =
+                  (WindowManager) getSystemService(WINDOW_SERVICE);
 
               box = new LinearLayout(this);
               box.setOrientation(LinearLayout.VERTICAL);
               box.setPadding(22, 18, 22, 18);
               box.setBackgroundColor(Color.rgb(11, 16, 32));
 
-              title = makeText("🤖 Trader Pink AI", 18);
-              market = makeText("EURUSD • 1 MIN", 15);
-              candle = makeText("Candle: --", 13);
-              signal = makeText("SIGNAL: WAIT", 24);
-              confidence = makeText("Confidence: --", 16);
-              trend = makeText("Trend: --", 14);
+              TextView title =
+                  makeText("🤖 Trader Pink AI", 18);
+
+              TextView market =
+                  makeText("EURUSD • 1 MIN", 15);
+
+              candle =
+                  makeText("Closed Candle: --", 13);
+
+              signal =
+                  makeText("SIGNAL: WAIT", 24);
+
+              confidence =
+                  makeText("Confidence: --", 16);
+
+              trend =
+                  makeText("Trend: --", 14);
 
               box.addView(title);
               box.addView(market);
@@ -327,23 +341,13 @@ steps:
                       PixelFormat.TRANSLUCENT
                   );
 
-              params.gravity = Gravity.TOP | Gravity.RIGHT;
+              params.gravity =
+                  Gravity.TOP | Gravity.RIGHT;
+
               params.x = 15;
               params.y = 120;
 
               windowManager.addView(box, params);
-          }
-
-          private TextView makeText(String text, int size) {
-
-              TextView t = new TextView(this);
-
-              t.setText(text);
-              t.setTextColor(Color.WHITE);
-              t.setTextSize(size);
-              t.setPadding(4, 4, 4, 4);
-
-              return t;
           }
 
           private void updateSignal() {
@@ -370,7 +374,8 @@ steps:
                               )
                           );
 
-                      StringBuilder result = new StringBuilder();
+                      StringBuilder result =
+                          new StringBuilder();
 
                       String line;
 
@@ -390,7 +395,10 @@ steps:
                           data.optInt("confidence", 0);
 
                       String finalTrend =
-                          data.optString("trend", "SIDEWAYS");
+                          data.optString(
+                              "trend",
+                              "SIDEWAYS"
+                          );
 
                       String candleTime =
                           data.optString(
@@ -398,21 +406,60 @@ steps:
                               "--"
                           );
 
-                      runOnMainThread(
-                          finalSignal,
-                          conf,
-                          finalTrend,
-                          candleTime
-                      );
+                      handler.post(() -> {
+
+                          signal.setText(
+                              "SIGNAL: " + finalSignal
+                          );
+
+                          confidence.setText(
+                              "Confidence: " + conf + "%"
+                          );
+
+                          trend.setText(
+                              "Trend: " + finalTrend
+                          );
+
+                          candle.setText(
+                              "Closed Candle: " +
+                              candleTime
+                          );
+
+                          if (finalSignal.equalsIgnoreCase("BUY")) {
+
+                              signal.setTextColor(
+                                  Color.rgb(0, 220, 120)
+                              );
+
+                          } else if (
+                              finalSignal.equalsIgnoreCase("SELL")
+                          ) {
+
+                              signal.setTextColor(
+                                  Color.rgb(255, 80, 100)
+                              );
+
+                          } else {
+
+                              signal.setTextColor(
+                                  Color.WHITE
+                              );
+                          }
+                      });
 
                   } catch (Exception e) {
 
-                      runOnMainThread(
-                          "WAIT",
-                          0,
-                          "OFFLINE",
-                          "--"
-                      );
+                      handler.post(() -> {
+
+                          signal.setText("SIGNAL: WAIT");
+                          confidence.setText(
+                              "Confidence: 0%"
+                          );
+                          trend.setText("Trend: OFFLINE");
+                          candle.setText(
+                              "Closed Candle: --"
+                          );
+                      });
 
                   } finally {
 
@@ -424,59 +471,12 @@ steps:
               }).start();
           }
 
-          private void runOnMainThread(
-              String finalSignal,
-              int conf,
-              String finalTrend,
-              String candleTime
-          ) {
-
-              handler.post(() -> {
-
-                  signal.setText(
-                      "SIGNAL: " + finalSignal
-                  );
-
-                  confidence.setText(
-                      "Confidence: " + conf + "%"
-                  );
-
-                  trend.setText(
-                      "Trend: " + finalTrend
-                  );
-
-                  candle.setText(
-                      "Closed Candle: " + candleTime
-                  );
-
-                  if (finalSignal.equalsIgnoreCase("BUY")) {
-
-                      signal.setTextColor(
-                          Color.rgb(0, 220, 120)
-                      );
-
-                  } else if (
-                      finalSignal.equalsIgnoreCase("SELL")
-                  ) {
-
-                      signal.setTextColor(
-                          Color.rgb(255, 80, 100)
-                      );
-
-                  } else {
-
-                      signal.setTextColor(Color.WHITE);
-                  }
-              });
-          }
-
           @Override
           public int onStartCommand(
               Intent intent,
               int flags,
               int startId
           ) {
-
               return START_STICKY;
           }
 
@@ -485,7 +485,9 @@ steps:
 
               handler.removeCallbacks(updater);
 
-              if (windowManager != null && box != null) {
+              if (windowManager != null &&
+                  box != null) {
+
                   windowManager.removeView(box);
               }
 
@@ -497,9 +499,10 @@ steps:
               return null;
           }
       }
-      EOF
+      JAVA
 
-  - name: Download Gradle
+  - name: Build APK
+    shell: bash
     run: |
       wget -q https://services.gradle.org/distributions/gradle-8.9-bin.zip
       unzip -q gradle-8.9-bin.zip
