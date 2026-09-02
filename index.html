@@ -1,1088 +1,886 @@
 <!DOCTYPE html>
 <html lang="bn">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<meta charset="UTF-8">
 
-  <meta name="theme-color" content="#ff1493">
-  <meta name="description" content="Trader Pink AI - EURUSD 1 Minute Signal">
+<meta name="viewport"
+      content="width=device-width,
+      initial-scale=1.0,
+      maximum-scale=1.0,
+      user-scalable=no">
 
-  <link rel="manifest" href="./manifest.json">
+<meta name="theme-color" content="#0b1020">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
 
-  <title>Trader Pink AI 📈</title>
+<title>Trader Pink AI 📈</title>
 
-  <style>
-    * {
-      box-sizing: border-box;
-      -webkit-tap-highlight-color: transparent;
-    }
+<style>
 
-    body {
-      margin: 0;
-      padding: 10px;
-      font-family: Arial, sans-serif;
-      background: #0b0b12;
-      color: #ffffff;
-    }
+*{
+  box-sizing:border-box;
+  -webkit-tap-highlight-color:transparent;
+}
 
-    .app {
-      width: 100%;
-      max-width: 480px;
-      margin: auto;
-    }
+body{
+  margin:0;
+  background:#0b1020;
+  color:#fff;
+  font-family:Arial,sans-serif;
+}
 
-    .header {
-      text-align: center;
-      padding: 10px 5px 14px;
-    }
+.app{
+  width:100%;
+  max-width:520px;
+  margin:auto;
+  padding:12px;
+}
 
-    .title {
-      font-size: 25px;
-      font-weight: 800;
-      color: #ff1493;
-      margin-bottom: 4px;
-    }
+.header{
+  text-align:center;
+  padding:12px 5px 16px;
+}
 
-    .subtitle {
-      font-size: 12px;
-      color: #aaa;
-    }
+.header h1{
+  margin:0;
+  font-size:25px;
+}
 
-    .status {
-      text-align: center;
-      font-size: 12px;
-      margin: 6px 0 10px;
-      color: #00ff9d;
-    }
+.header p{
+  margin:6px 0 0;
+  color:#aeb8ca;
+  font-size:13px;
+}
 
-    .card {
-      background: #151520;
-      border: 1px solid #292938;
-      border-radius: 16px;
-      padding: 14px;
-      margin-bottom: 10px;
-      box-shadow: 0 4px 18px rgba(0,0,0,.25);
-    }
+.card{
+  background:#151c2f;
+  border:1px solid #29334d;
+  border-radius:18px;
+  padding:16px;
+  margin-bottom:12px;
+}
 
-    .market-row {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-    }
+.market{
+  text-align:center;
+}
 
-    .market-name {
-      font-size: 22px;
-      font-weight: 800;
-    }
+.market-name{
+  font-size:28px;
+  font-weight:bold;
+}
 
-    .timeframe {
-      background: #ff1493;
-      padding: 6px 12px;
-      border-radius: 20px;
-      font-weight: bold;
-      font-size: 13px;
-    }
+.timeframe{
+  margin-top:4px;
+  color:#9da9bd;
+}
 
-    .countdown-title {
-      text-align: center;
-      color: #aaa;
-      font-size: 12px;
-      margin-top: 12px;
-    }
+.countdown{
+  margin-top:12px;
+  color:#cbd5e1;
+  font-size:14px;
+}
 
-    .countdown {
-      text-align: center;
-      font-size: 30px;
-      font-weight: 900;
-      color: #ffffff;
-      margin: 2px 0 4px;
-    }
+.timer{
+  margin-top:4px;
+  font-size:30px;
+  font-weight:bold;
+}
 
-    .signal-label {
-      text-align: center;
-      font-size: 12px;
-      color: #aaa;
-      margin-top: 8px;
-    }
+.signal-card{
+  text-align:center;
+}
 
-    .signal {
-      text-align: center;
-      font-size: 48px;
-      font-weight: 900;
-      margin: 5px 0;
-    }
+.label{
+  color:#aeb8ca;
+  font-size:13px;
+  margin-bottom:8px;
+}
 
-    .buy {
-      color: #00ff88;
-    }
+.signal{
+  font-size:42px;
+  font-weight:900;
+}
 
-    .sell {
-      color: #ff4d6d;
-    }
+.signal.buy{
+  color:#22c55e;
+}
 
-    .wait {
-      color: #ffd166;
-    }
+.signal.sell{
+  color:#ef4444;
+}
 
-    .confidence {
-      text-align: center;
-      font-size: 22px;
-      font-weight: 800;
-      margin-bottom: 10px;
-    }
+.signal.wait{
+  color:#facc15;
+}
 
-    .confidence-text {
-      text-align: center;
-      color: #aaa;
-      font-size: 11px;
-      margin-bottom: 12px;
-    }
+.confidence{
+  margin-top:5px;
+  font-size:18px;
+  font-weight:bold;
+}
 
-    .info-grid {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 8px;
-    }
+button{
+  width:100%;
+  border:0;
+  border-radius:14px;
+  padding:15px;
+  margin-top:12px;
+  background:#2563eb;
+  color:#fff;
+  font-size:16px;
+  font-weight:bold;
+}
 
-    .info {
-      background: #0f0f18;
-      border-radius: 10px;
-      padding: 9px;
-      border: 1px solid #242432;
-    }
+button:active{
+  transform:scale(.98);
+}
 
-    .info-title {
-      color: #888;
-      font-size: 10px;
-      margin-bottom: 4px;
-    }
+.status{
+  margin-top:8px;
+  text-align:center;
+  color:#94a3b8;
+  font-size:12px;
+}
 
-    .info-value {
-      font-size: 13px;
-      font-weight: 700;
-      word-break: break-word;
-    }
+.error{
+  margin-top:8px;
+  color:#f87171;
+  text-align:center;
+  font-size:13px;
+}
 
-    .target-card {
-      border: 1px solid #ff1493;
-      background: #19101a;
-    }
+.grid{
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:10px;
+}
 
-    .target-title {
-      text-align: center;
-      color: #ff66b5;
-      font-size: 12px;
-      font-weight: bold;
-    }
+.item{
+  background:#101728;
+  border-radius:12px;
+  padding:11px;
+}
 
-    .target-time {
-      text-align: center;
-      font-size: 18px;
-      font-weight: 800;
-      margin-top: 5px;
-    }
+.item-title{
+  color:#8f9bb0;
+  font-size:11px;
+}
 
-    .button {
-      width: 100%;
-      border: 0;
-      border-radius: 12px;
-      padding: 13px;
-      background: #ff1493;
-      color: white;
-      font-size: 15px;
-      font-weight: 800;
-      margin-top: 8px;
-      cursor: pointer;
-    }
+.item-value{
+  margin-top:4px;
+  font-size:15px;
+  font-weight:bold;
+}
 
-    .button:active {
-      transform: scale(.98);
-    }
+.reason{
+  padding:7px 0;
+  border-bottom:1px solid #273149;
+  color:#d7deea;
+  font-size:13px;
+}
 
-    .reason {
-      color: #ddd;
-      font-size: 12px;
-      line-height: 1.6;
-      margin-top: 5px;
-    }
+.reason:last-child{
+  border-bottom:0;
+}
 
-    .footer {
-      text-align: center;
-      color: #666;
-      font-size: 10px;
-      padding: 8px 0 15px;
-      line-height: 1.5;
-    }
+.footer{
+  padding:8px 5px 20px;
+  text-align:center;
+  color:#77839a;
+  font-size:11px;
+  line-height:1.5;
+}
 
-    .loading {
-      opacity: .65;
-    }
+.loading{
+  opacity:.6;
+}
 
-    .error {
-      color: #ff6b6b;
-    }
-
-    .online {
-      color: #00ff88;
-    }
-
-    .dot {
-      display: inline-block;
-      width: 7px;
-      height: 7px;
-      background: #00ff88;
-      border-radius: 50%;
-      margin-right: 5px;
-    }
-  </style>
+</style>
 </head>
 
 <body>
 
 <div class="app">
 
-  <div class="header">
-    <div class="title">Trader Pink AI 📈</div>
-    <div class="subtitle">EURUSD Smart 1 Minute Signal Engine</div>
-  </div>
+<div class="header">
 
-  <div id="status" class="status">
-    <span class="dot"></span>Connecting...
-  </div>
+<h1>Trader Pink AI 📈</h1>
 
-  <!-- MARKET -->
-  <div class="card">
+<p>
+EURUSD Smart 1 Minute Signal Engine
+</p>
 
-    <div class="market-row">
-      <div class="market-name">EURUSD</div>
-      <div class="timeframe">1 MIN</div>
-    </div>
-
-    <div class="countdown-title">
-      নতুন Candle শুরু হতে বাকি
-    </div>
-
-    <div id="countdown" class="countdown">
-      00:00
-    </div>
-
-    <button class="button" onclick="manualAnalyze()">
-      🔍 UPDATE SIGNAL
-    </button>
-
-  </div>
+</div>
 
 
-  <!-- SIGNAL -->
-  <div class="card">
+<div class="card market">
 
-    <div class="signal-label">
-      NEXT CANDLE SIGNAL
-    </div>
+<div class="market-name">
+EURUSD
+</div>
 
-    <div id="signal" class="signal wait">
-      WAIT
-    </div>
+<div class="timeframe">
+EURUSD 1M • Signal Ready
+</div>
 
-    <div id="confidence" class="confidence">
-      --%
-    </div>
+<div class="countdown">
+নতুন Candle শুরু হতে বাকি
+</div>
 
-    <div class="confidence-text">
-      Confidence = indicator confluence score, guaranteed profit নয়
-    </div>
+<div id="timer" class="timer">
+00:60
+</div>
 
-    <div class="info-grid">
-
-      <div class="info">
-        <div class="info-title">SIGNAL CANDLE</div>
-        <div id="signalCandle" class="info-value">--</div>
-      </div>
-
-      <div class="info">
-        <div class="info-title">TREND</div>
-        <div id="trend" class="info-value">--</div>
-      </div>
-
-      <div class="info">
-        <div class="info-title">CANDLE</div>
-        <div id="candle" class="info-value">--</div>
-      </div>
-
-      <div class="info">
-        <div class="info-title">STRENGTH</div>
-        <div id="strength" class="info-value">--</div>
-      </div>
-
-      <div class="info">
-        <div class="info-title">SUPPORT</div>
-        <div id="support" class="info-value">--</div>
-      </div>
-
-      <div class="info">
-        <div class="info-title">RESISTANCE</div>
-        <div id="resistance" class="info-value">--</div>
-      </div>
-
-    </div>
-  </div>
+</div>
 
 
-  <!-- TARGET CANDLE -->
-  <div class="card target-card">
+<div class="card signal-card">
 
-    <div class="target-title">
-      🎯 SIGNAL FOR CANDLE
-    </div>
+<div class="label">
+NEXT CANDLE SIGNAL
+</div>
 
-    <div id="targetTime" class="target-time">
-      --
-    </div>
+<div id="signal"
+     class="signal wait">
+WAIT
+</div>
 
-    <div style="text-align:center;color:#999;font-size:11px;margin-top:5px;">
-      এই candle-এর জন্য signal প্রস্তুত করা হয়েছে
-    </div>
+<div id="confidence"
+     class="confidence">
+0%
+</div>
 
-  </div>
+<button id="updateBtn"
+        onclick="loadSignal(true)">
+🔍 UPDATE SIGNAL
+</button>
 
+<div id="status"
+     class="status">
+Signal loading...
+</div>
 
-  <!-- INDICATORS -->
-  <div class="card">
+<div id="error"
+     class="error">
+</div>
 
-    <div style="font-weight:800;margin-bottom:10px;">
-      📊 MARKET DATA
-    </div>
-
-    <div class="info-grid">
-
-      <div class="info">
-        <div class="info-title">EMA 9</div>
-        <div id="ema9" class="info-value">--</div>
-      </div>
-
-      <div class="info">
-        <div class="info-title">EMA 21</div>
-        <div id="ema21" class="info-value">--</div>
-      </div>
-
-      <div class="info">
-        <div class="info-title">EMA 200</div>
-        <div id="ema200" class="info-value">--</div>
-      </div>
-
-      <div class="info">
-        <div class="info-title">RSI 7</div>
-        <div id="rsi" class="info-value">--</div>
-      </div>
-
-      <div class="info">
-        <div class="info-title">ADX</div>
-        <div id="adx" class="info-value">--</div>
-      </div>
-
-      <div class="info">
-        <div class="info-title">ATR</div>
-        <div id="atr" class="info-value">--</div>
-      </div>
-
-    </div>
-
-  </div>
+</div>
 
 
-  <!-- AI REASONS -->
-  <div class="card">
+<div class="card">
 
-    <div style="font-weight:800;margin-bottom:8px;">
-      🤖 AI ANALYSIS
-    </div>
+<div class="label">
+SIGNAL CANDLE
+</div>
 
-    <div id="reasons" class="reason">
-      Signal analysis অপেক্ষা করছে...
-    </div>
+<div id="signalCandle"
+     style="text-align:center;font-weight:bold;">
+--
+</div>
 
-  </div>
-
-
-  <!-- LAST CLOSED CANDLE -->
-  <div class="card">
-
-    <div style="font-weight:800;margin-bottom:8px;">
-      🕐 LAST CLOSED CANDLE
-    </div>
-
-    <div id="closedCandle" style="font-size:13px;color:#ddd;">
-      --
-    </div>
-
-  </div>
+</div>
 
 
-  <div class="footer">
-    Bangladesh Time • UTC+6<br>
-    Trader Pink AI শুধুমাত্র analysis assistance দেয়।
-    Trading-এ loss হতে পারে।
-  </div>
+<div class="card">
+
+<div class="label">
+MARKET DATA
+</div>
+
+<div class="grid">
+
+
+<div class="item">
+<div class="item-title">
+TREND
+</div>
+<div id="trend"
+     class="item-value">
+--
+</div>
+</div>
+
+
+<div class="item">
+<div class="item-title">
+CANDLE
+</div>
+<div id="candle"
+     class="item-value">
+--
+</div>
+</div>
+
+
+<div class="item">
+<div class="item-title">
+STRENGTH
+</div>
+<div id="strength"
+     class="item-value">
+--
+</div>
+</div>
+
+
+<div class="item">
+<div class="item-title">
+EMA 9
+</div>
+<div id="ema9"
+     class="item-value">
+--
+</div>
+</div>
+
+
+<div class="item">
+<div class="item-title">
+EMA 21
+</div>
+<div id="ema21"
+     class="item-value">
+--
+</div>
+</div>
+
+
+<div class="item">
+<div class="item-title">
+EMA 200
+</div>
+<div id="ema200"
+     class="item-value">
+--
+</div>
+</div>
+
+
+<div class="item">
+<div class="item-title">
+RSI 7
+</div>
+<div id="rsi"
+     class="item-value">
+--
+</div>
+</div>
+
+
+<div class="item">
+<div class="item-title">
+ADX
+</div>
+<div id="adx"
+     class="item-value">
+--
+</div>
+</div>
+
+
+<div class="item">
+<div class="item-title">
+ATR
+</div>
+<div id="atr"
+     class="item-value">
+--
+</div>
+</div>
+
+
+<div class="item">
+<div class="item-title">
+SUPPORT
+</div>
+<div id="support"
+     class="item-value">
+--
+</div>
+</div>
+
+
+<div class="item">
+<div class="item-title">
+RESISTANCE
+</div>
+<div id="resistance"
+     class="item-value">
+--
+</div>
+</div>
+
+
+<div class="item">
+<div class="item-title">
+SCORE
+</div>
+<div id="score"
+     class="item-value">
+--
+</div>
+</div>
+
+
+</div>
+
+</div>
+
+
+<div class="card">
+
+<div class="label">
+🤖 AI ANALYSIS
+</div>
+
+<div id="reasons">
+Analysis waiting...
+</div>
+
+</div>
+
+
+<div class="card">
+
+<div class="label">
+🎯 SIGNAL FOR CANDLE
+</div>
+
+<div id="targetCandle"
+     style="text-align:center;font-weight:bold;">
+--
+</div>
+
+<div style="
+text-align:center;
+color:#94a3b8;
+font-size:12px;
+margin-top:6px;">
+
+এই candle-এর জন্য signal প্রস্তুত করা হয়েছে
+
+</div>
+
+</div>
+
+
+<div class="card">
+
+<div class="label">
+🕐 LAST CLOSED CANDLE
+</div>
+
+<div id="lastCandle"
+     style="text-align:center;font-weight:bold;">
+--
+</div>
+
+<div style="
+text-align:center;
+color:#94a3b8;
+font-size:11px;
+margin-top:5px;">
+
+Bangladesh Time • UTC+6
+
+</div>
+
+</div>
+
+
+<div class="footer">
+
+Trader Pink AI শুধুমাত্র analysis assistance দেয়।<br>
+
+Trading-এ loss হতে পারে।
+
+</div>
 
 </div>
 
 
 <script>
 
-  // =========================================================
-  // TRADER PINK AI
-  // EURUSD ONLY
-  // 1 MINUTE ONLY
-  // =========================================================
 
-  const API_BASE =
-    "https://crimson-grass-f881.bijondebnath51.workers.dev";
+/* ==========================================
+   CLOUDFLARE WORKER
+========================================== */
 
-  const SYMBOL = "EURUSD";
-  const TIMEFRAME = "1m";
+const API_BASE =
+"https://crimson-grass-f881.bijondebnath51.workers.dev";
 
-  let lastSignalTimestamp = null;
-  let preTimer = null;
-  let postTimer = null;
-  let loading = false;
+const ANALYZE_URL =
+API_BASE +
+"/analyze?symbol=EURUSD&timeframe=1m";
 
 
-  // =========================================================
-  // ELEMENT HELPER
-  // =========================================================
+let loading=false;
 
-  function $(id) {
-    return document.getElementById(id);
-  }
 
+/* ==========================================
+   NUMBER
+========================================== */
 
-  // =========================================================
-  // FORMAT NUMBER
-  // =========================================================
+function num(value,digits=5){
 
-  function num(value, digits = 5) {
+if(
+value===undefined ||
+value===null ||
+value===""
+){
+return "--";
+}
 
-    if (
-      value === null ||
-      value === undefined ||
-      value === "" ||
-      Number.isNaN(Number(value))
-    ) {
-      return "--";
-    }
+const n=Number(value);
 
-    return Number(value).toFixed(digits);
-  }
+if(!Number.isFinite(n)){
+return "--";
+}
 
+return n.toFixed(digits);
 
-  // =========================================================
-  // FORMAT TIME
-  // =========================================================
+}
 
-  function formatTime(value) {
 
-    if (!value) return "--";
+/* ==========================================
+   TIME
+========================================== */
 
-    const d = new Date(value);
+function formatTime(value){
 
-    if (Number.isNaN(d.getTime())) {
-      return String(value);
-    }
+if(!value){
+return "--";
+}
 
-    return d.toLocaleString("en-GB", {
-      timeZone: "Asia/Dhaka",
-      year: "numeric",
-      month: "2-digit",
-      day: "2-digit",
-      hour: "2-digit",
-      minute: "2-digit",
-      second: "2-digit",
-      hour12: false
-    });
-  }
+try{
 
+const d=new Date(value);
 
-  // =========================================================
-  // COUNTDOWN
-  // =========================================================
+if(isNaN(d.getTime())){
+return value;
+}
 
-  function getNextMinute() {
+return d.toLocaleString(
+"en-GB",
+{
+timeZone:"Asia/Dhaka",
+day:"2-digit",
+month:"2-digit",
+year:"numeric",
+hour:"2-digit",
+minute:"2-digit",
+second:"2-digit",
+hour12:false
+}
+);
 
-    const now = Date.now();
+}catch(e){
 
-    return Math.floor(now / 60000) * 60000 + 60000;
-  }
+return value;
 
+}
 
-  function updateCountdown() {
+}
 
-    const nextMinute = getNextMinute();
 
-    let diff = nextMinute - Date.now();
+/* ==========================================
+   SIGNAL
+========================================== */
 
-    if (diff < 0) {
-      diff = 0;
-    }
+function normalizeSignal(value){
 
-    const totalSeconds =
-      Math.ceil(diff / 1000);
+if(!value){
+return "WAIT";
+}
 
-    const minutes =
-      Math.floor(totalSeconds / 60);
+const s=
+String(value).toUpperCase();
 
-    const seconds =
-      totalSeconds % 60;
+if(s.includes("BUY")){
+return "BUY";
+}
 
-    $("countdown").textContent =
-      String(minutes).padStart(2, "0") +
-      ":" +
-      String(seconds).padStart(2, "0");
-  }
+if(s.includes("SELL")){
+return "SELL";
+}
 
+return "WAIT";
 
-  setInterval(updateCountdown, 250);
-  updateCountdown();
+}
 
 
-  // =========================================================
-  // STATUS
-  // =========================================================
+/* ==========================================
+   CONFIDENCE
+========================================== */
 
-  function setStatus(text, type = "online") {
+function getConfidence(data){
 
-    $("status").className =
-      "status " + type;
+const values=[
 
-    if (type === "online") {
+data?.confidence,
 
-      $("status").innerHTML =
-        '<span class="dot"></span>' + text;
+data?.signal?.confidence,
 
-    } else {
+data?.result?.confidence,
 
-      $("status").textContent = text;
-    }
-  }
+data?.analysis?.confidence
 
+];
 
-  // =========================================================
-  // VALID CONFIDENCE
-  //
-  // Worker থেকে confidence না এলে 0% দেখানো হবে না।
-  // =========================================================
 
-  function getConfidence(data) {
+for(const value of values){
 
-    const possibleValues = [
-      data.confidence,
-      data.signal_confidence,
-      data.confluence,
-      data.confluence_score
-    ];
+const n=Number(value);
 
-    for (const value of possibleValues) {
+if(Number.isFinite(n)){
 
-      if (
-        value !== null &&
-        value !== undefined &&
-        value !== "" &&
-        Number.isFinite(Number(value))
-      ) {
+return Math.max(
+0,
+Math.min(100,Math.round(n))
+);
 
-        const n = Number(value);
+}
 
-        if (n > 0) {
-          return Math.max(0, Math.min(100, n));
-        }
-      }
-    }
+}
 
-    return null;
-  }
+return 0;
 
+}
 
-  // =========================================================
-  // SIGNAL STYLE
-  // =========================================================
 
-  function setSignal(signal, confidence) {
+/* ==========================================
+   LOAD SIGNAL
+========================================== */
 
-    const el = $("signal");
+async function loadSignal(manual=false){
 
-    el.className = "signal";
+if(loading){
+return;
+}
 
-    const clean =
-      String(signal || "WAIT").toUpperCase().trim();
+loading=true;
 
-    if (clean === "BUY") {
 
-      el.textContent = "BUY";
-      el.classList.add("buy");
+const signalEl=
+document.getElementById("signal");
 
-    } else if (clean === "SELL") {
+const statusEl=
+document.getElementById("status");
 
-      el.textContent = "SELL";
-      el.classList.add("sell");
+const errorEl=
+document.getElementById("error");
 
-    } else {
+const btn=
+document.getElementById("updateBtn");
 
-      el.textContent = "WAIT";
-      el.classList.add("wait");
-    }
 
+errorEl.textContent="";
 
-    // -------------------------------------------------------
-    // Confidence
-    // -------------------------------------------------------
 
-    if (
-      confidence !== null &&
-      confidence !== undefined &&
-      Number.isFinite(Number(confidence))
-    ) {
+if(manual){
 
-      $("confidence").textContent =
-        Math.round(Number(confidence)) + "%";
+statusEl.textContent=
+"নতুন signal নেওয়া হচ্ছে...";
 
-    } else {
+}else{
 
-      $("confidence").textContent =
-        "--%";
-    }
-  }
+statusEl.textContent=
+"নতুন candle-এর signal check হচ্ছে...";
 
+}
 
-  // =========================================================
-  // FETCH SIGNAL
-  // =========================================================
 
-  async function fetchSignal(silent = false) {
+btn.classList.add("loading");
 
-    if (loading) return;
+btn.textContent=
+"⏳ UPDATING...";
 
-    loading = true;
 
-    if (!silent) {
-      setStatus("Analyzing EURUSD...", "online");
-    }
+try{
 
-    try {
 
-      const url =
-        API_BASE +
-        "/analyze?symbol=" +
-        encodeURIComponent(SYMBOL) +
-        "&timeframe=" +
-        encodeURIComponent(TIMEFRAME) +
-        "&t=" +
-        Date.now();
+/*
+   Cache বন্ধ করা হয়েছে।
+   প্রতিটি request-এ নতুন timestamp থাকবে।
+*/
 
-      const response =
-        await fetch(url, {
-          method: "GET",
-          cache: "no-store"
-        });
+const url=
+ANALYZE_URL+
+"&_="+
+Date.now();
 
-      if (!response.ok) {
 
-        throw new Error(
-          "HTTP " + response.status
-        );
-      }
+const response=
+await fetch(
+url,
+{
+method:"GET",
+cache:"no-store",
+headers:{
+"Accept":"application/json",
+"Cache-Control":"no-cache"
+}
+}
+);
 
-      const data =
-        await response.json();
 
-      if (!data || data.error) {
+if(!response.ok){
 
-        throw new Error(
-          data?.error || "Analysis error"
-        );
-      }
+throw new Error(
+"Server Error: "+
+response.status
+);
 
-      console.log(
-        "Trader Pink AI API:",
-        data
-      );
+}
 
-      renderSignal(data);
 
-      setStatus(
-        "EURUSD 1M • Signal Ready",
-        "online"
-      );
+const data=
+await response.json();
 
-    } catch (error) {
 
-      console.error(error);
+console.log(
+"Trader Pink AI DATA:",
+data
+);
 
-      setStatus(
-        "Connection / Analysis Error",
-        "error"
-      );
 
-      $("reasons").textContent =
-        "Signal পাওয়া যায়নি। কিছুক্ষণ পরে আবার চেষ্টা করা হবে।";
+renderSignal(data);
 
-    } finally {
 
-      loading = false;
-    }
-  }
+statusEl.textContent=
+"● LIVE • Signal updated";
 
 
-  // =========================================================
-  // RENDER SIGNAL
-  // =========================================================
+}catch(error){
 
-  function renderSignal(data) {
+console.error(
+"Signal Error:",
+error
+);
 
-    const signal =
-      data.signal || "WAIT";
 
+errorEl.textContent=
+"⚠️ Signal update হয়নি। Internet/API check করুন।";
 
-    // Worker-এর আসল confidence খোঁজা
-    const confidence =
-      getConfidence(data);
 
+statusEl.textContent=
+"Signal update failed";
 
-    // Signal এবং confidence display
-    setSignal(
-      signal,
-      confidence
-    );
 
+}finally{
 
-    // -------------------------------------------------------
-    // Signal candle
-    // -------------------------------------------------------
+loading=false;
 
-    $("signalCandle").textContent =
-      formatTime(
-        data.signal_for_candle ||
-        data.next_candle_time
-      );
+btn.classList.remove(
+"loading"
+);
 
+btn.textContent=
+"🔍 UPDATE SIGNAL";
 
-    // -------------------------------------------------------
-    // Target time
-    // -------------------------------------------------------
+}
 
-    $("targetTime").textContent =
-      formatTime(
-        data.signal_for_candle ||
-        data.next_candle_time
-      );
+}
 
 
-    // -------------------------------------------------------
-    // Trend
-    // -------------------------------------------------------
+/* ==========================================
+   RENDER SIGNAL
+========================================== */
 
-    $("trend").textContent =
-      data.trend || "--";
+function renderSignal(data){
 
 
-    // -------------------------------------------------------
-    // Candle
-    // -------------------------------------------------------
+const signalData=
+data?.signal ||
+data?.result ||
+data;
 
-    $("candle").textContent =
-      data.candle || "--";
 
+const direction=
+normalizeSignal(
 
-    // -------------------------------------------------------
-    // Strength
-    // -------------------------------------------------------
+signalData?.direction ||
 
-    $("strength").textContent =
-      data.candle_strength ??
-      data.market_strength ??
-      "--";
+signalData?.signal ||
 
+data?.direction
 
-    // -------------------------------------------------------
-    // Support
-    // -------------------------------------------------------
+);
 
-    $("support").textContent =
-      num(data.support);
 
+const confidence=
+getConfidence(data);
 
-    // -------------------------------------------------------
-    // Resistance
-    // -------------------------------------------------------
 
-    $("resistance").textContent =
-      num(data.resistance);
+const signalEl=
+document.getElementById("signal");
 
 
-    // -------------------------------------------------------
-    // EMA
-    // -------------------------------------------------------
+signalEl.textContent=
+direction;
 
-    $("ema9").textContent =
-      num(data.ema9);
 
-    $("ema21").textContent =
-      num(data.ema21);
+signalEl.className=
+"signal "+
+direction.toLowerCase();
 
-    $("ema200").textContent =
-      num(data.ema200);
 
+document.getElementById(
+"confidence"
+).textContent=
+confidence+"%";
 
-    // -------------------------------------------------------
-    // RSI
-    // -------------------------------------------------------
 
-    $("rsi").textContent =
-      num(data.rsi, 2);
+/* SIGNAL CANDLE */
 
+const signalCandle=
 
-    // -------------------------------------------------------
-    // ADX
-    // -------------------------------------------------------
+data?.signalCandle ||
 
-    $("adx").textContent =
-      num(data.adx, 2);
+data?.signal_candle ||
 
+data?.candleTime ||
 
-    // -------------------------------------------------------
-    // ATR
-    // -------------------------------------------------------
+data?.signal_time ||
 
-    $("atr").textContent =
-      num(data.atr, 6);
+signalData?.candleTime ||
 
+signalData?.signalTime;
 
-    // -------------------------------------------------------
-    // Last closed candle
-    // -------------------------------------------------------
 
-    $("closedCandle").textContent =
-      formatTime(
-        data.closed_candle_time
-      );
+document.getElementById(
+"signalCandle"
+).textContent=
+formatTime(signalCandle);
 
 
-    // -------------------------------------------------------
-    // Reasons
-    // -------------------------------------------------------
+/* TARGET CANDLE */
 
-    if (Array.isArray(data.reasons)) {
+const target=
 
-      if (data.reasons.length === 0) {
+data?.targetCandle ||
 
-        $("reasons").textContent =
-          "বর্তমানে শক্তিশালী confluence পাওয়া যায়নি।";
+data?.target_candle ||
 
-      } else {
+data?.nextCandle ||
 
-        $("reasons").innerHTML =
-          data.reasons
-            .map(reason =>
-              "• " +
-              escapeHtml(
-                String(reason)
-              )
-            )
-            .join("<br>");
-      }
+signalData?.targetCandle ||
 
-    } else if (data.reasons) {
+signalData?.nextCandle;
 
-      $("reasons").textContent =
-        String(data.reasons);
 
-    } else {
+document.getElementById(
+"targetCandle"
+).textContent=
+formatTime(target);
 
-      $("reasons").textContent =
-        "Indicator এবং price action অনুযায়ী analysis সম্পন্ন হয়েছে.";
-    }
 
+/* LAST CLOSED CANDLE */
 
-    // -------------------------------------------------------
-    // Remember target candle
-    // -------------------------------------------------------
+const lastClosed=
 
-    if (data.signal_for_timestamp) {
+data?.lastClosedCandle ||
 
-      lastSignalTimestamp =
-        Number(
-          data.signal_for_timestamp
-        );
-    }
-  }
+data?.last_closed_candle ||
 
-
-  // =========================================================
-  // ESCAPE HTML
-  // =========================================================
-
-  function escapeHtml(text) {
-
-    const div =
-      document.createElement("div");
-
-    div.textContent = text;
-
-    return div.innerHTML;
-  }
-
-
-  // =========================================================
-  // MANUAL ANALYZE
-  // =========================================================
-
-  async function manualAnalyze() {
-
-    await fetchSignal(false);
-  }
-
-
-  // =========================================================
-  // MINUTE-ALIGNED SIGNAL SYSTEM
-  // =========================================================
-
-  function scheduleMinuteRefresh() {
-
-    clearTimeout(preTimer);
-    clearTimeout(postTimer);
-
-    const now =
-      Date.now();
-
-    const nextMinute =
-      Math.floor(now / 60000) * 60000 +
-      60000;
-
-
-    // Approximately 2 seconds before
-    const preFetchTime =
-      nextMinute - 2000;
-
-    let preDelay =
-      preFetchTime - now;
-
-    if (preDelay < 0) {
-      preDelay = 0;
-    }
-
-
-    preTimer =
-      setTimeout(async () => {
-
-        await fetchSignal(true);
-
-        schedulePostMinuteRefresh(
-          nextMinute
-        );
-
-      }, preDelay);
-  }
-
-
-  function schedulePostMinuteRefresh(
-    minuteTimestamp
-  ) {
-
-    clearTimeout(postTimer);
-
-    const postFetchTime =
-      minuteTimestamp + 1200;
-
-    let delay =
-      postFetchTime - Date.now();
-
-    if (delay < 0) {
-      delay = 0;
-    }
-
-
-    postTimer =
-      setTimeout(async () => {
-
-        await fetchSignal(true);
-
-        scheduleMinuteRefresh();
-
-      }, delay);
-  }
-
-
-  // =========================================================
-  // START
-  // =========================================================
-
-  window.addEventListener(
-    "load",
-    async () => {
-
-      setStatus(
-        "Connecting to AI...",
-        "online"
-      );
-
-      await fetchSignal(false);
-
-      scheduleMinuteRefresh();
-
-      updateCountdown();
-    }
-  );
-
-
-  // =========================================================
-  // VISIBILITY CHANGE
-  // =========================================================
-
-  document.addEventListener(
-    "visibilitychange",
-    () => {
-
-      if (!document.hidden) {
-
-        fetchSignal(true);
-
-        scheduleMinuteRefresh();
-
-        updateCountdown();
-      }
-    }
-  );
-
-
-  // =========================================================
-  // SERVICE WORKER
-  // =========================================================
-
-  if ("serviceWorker" in navigator) {
-
-    window.addEventListener(
-      "load",
-      () => {
-
-        navigator.serviceWorker
-          .register("./sw.js")
-          .then(() => {
-
-            console.log(
-              "Service Worker registered"
-            );
-
-          })
-          .catch(error => {
-
-            console.log(
-              "Service Worker error:",
-              error
-            );
-          });
-      }
-    );
-  }
-
-</script>
-
-</body>
-</html>
+data?.lastCandle
