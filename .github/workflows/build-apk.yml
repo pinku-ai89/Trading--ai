@@ -1,4 +1,4 @@
-name: Build Trader Pink AI Floating APK v12
+name: Build Trader Pink AI Floating APK v13
 
 on:
   push:
@@ -76,8 +76,8 @@ jobs:
                   applicationId 'com.traderpinkai.app'
                   minSdk 23
                   targetSdk 35
-                  versionCode 12
-                  versionName '12.0'
+                  versionCode 13
+                  versionName '13.0'
               }
           }
           EOF
@@ -121,16 +121,11 @@ jobs:
                       android:exported="true">
 
                       <intent-filter>
-
                           <action android:name="android.intent.action.MAIN"/>
-
-                          <category
-                              android:name="android.intent.category.LAUNCHER"/>
-
+                          <category android:name="android.intent.category.LAUNCHER"/>
                       </intent-filter>
 
                   </activity>
-
 
                   <service
                       android:name=".FloatingService"
@@ -169,55 +164,26 @@ jobs:
           import android.widget.TextView;
           import android.widget.Toast;
 
-
           public class MainActivity extends Activity {
 
               private WebView webView;
               private TextView status;
-
 
               @Override
               protected void onCreate(Bundle savedInstanceState) {
 
                   super.onCreate(savedInstanceState);
 
+                  LinearLayout root = new LinearLayout(this);
+                  root.setOrientation(LinearLayout.VERTICAL);
+                  root.setBackgroundColor(Color.WHITE);
 
-                  LinearLayout root =
-                      new LinearLayout(this);
-
-                  root.setOrientation(
-                      LinearLayout.VERTICAL
-                  );
-
-                  root.setBackgroundColor(
-                      Color.WHITE
-                  );
-
-
-                  TextView title =
-                      new TextView(this);
-
-                  title.setText(
-                      "🤖 Trader Pink AI v12.0"
-                  );
-
+                  TextView title = new TextView(this);
+                  title.setText("🤖 Trader Pink AI v13.0");
                   title.setTextSize(22);
-
-                  title.setTextColor(
-                      Color.BLACK
-                  );
-
-                  title.setGravity(
-                      Gravity.CENTER
-                  );
-
-                  title.setPadding(
-                      10,
-                      18,
-                      10,
-                      10
-                  );
-
+                  title.setTextColor(Color.BLACK);
+                  title.setGravity(Gravity.CENTER);
+                  title.setPadding(10, 18, 10, 10);
 
                   root.addView(
                       title,
@@ -227,16 +193,9 @@ jobs:
                       )
                   );
 
-
-                  Button floatingButton =
-                      new Button(this);
-
-                  floatingButton.setText(
-                      "🟣 1M FLOATING BOT চালু করুন"
-                  );
-
+                  Button floatingButton = new Button(this);
+                  floatingButton.setText("🟣 1M FLOATING BOT চালু করুন");
                   floatingButton.setTextSize(17);
-
 
                   root.addView(
                       floatingButton,
@@ -246,31 +205,12 @@ jobs:
                       )
                   );
 
-
-                  status =
-                      new TextView(this);
-
-                  status.setText(
-                      "Overlay permission Allow করুন।"
-                  );
-
+                  status = new TextView(this);
+                  status.setText("Overlay permission Allow করুন।");
                   status.setTextSize(14);
-
-                  status.setTextColor(
-                      Color.DKGRAY
-                  );
-
-                  status.setGravity(
-                      Gravity.CENTER
-                  );
-
-                  status.setPadding(
-                      10,
-                      4,
-                      10,
-                      10
-                  );
-
+                  status.setTextColor(Color.DKGRAY);
+                  status.setGravity(Gravity.CENTER);
+                  status.setPadding(10, 4, 10, 10);
 
                   root.addView(
                       status,
@@ -280,44 +220,21 @@ jobs:
                       )
                   );
 
+                  webView = new WebView(this);
 
-                  webView =
-                      new WebView(this);
+                  WebSettings settings = webView.getSettings();
 
+                  settings.setJavaScriptEnabled(true);
+                  settings.setDomStorageEnabled(true);
+                  settings.setDatabaseEnabled(true);
+                  settings.setLoadWithOverviewMode(true);
+                  settings.setUseWideViewPort(true);
 
-                  WebSettings settings =
-                      webView.getSettings();
-
-                  settings.setJavaScriptEnabled(
-                      true
-                  );
-
-                  settings.setDomStorageEnabled(
-                      true
-                  );
-
-                  settings.setDatabaseEnabled(
-                      true
-                  );
-
-                  settings.setLoadWithOverviewMode(
-                      true
-                  );
-
-                  settings.setUseWideViewPort(
-                      true
-                  );
-
-
-                  webView.setWebViewClient(
-                      new WebViewClient()
-                  );
-
+                  webView.setWebViewClient(new WebViewClient());
 
                   webView.loadUrl(
                       "https://pinku-ai89.github.io/Trading--ai/"
                   );
-
 
                   root.addView(
                       webView,
@@ -328,85 +245,60 @@ jobs:
                       )
                   );
 
-
                   setContentView(root);
 
+                  floatingButton.setOnClickListener(v -> {
 
-                  floatingButton.setOnClickListener(
-                      v -> {
+                      if (!Settings.canDrawOverlays(this)) {
 
-                          if (
-                              !Settings.canDrawOverlays(
-                                  this
-                              )
-                          ) {
+                          status.setText(
+                              "⚠️ Overlay permission Allow করুন।"
+                          );
 
-                              status.setText(
-                                  "⚠️ Overlay permission Allow করুন।"
+                          try {
+
+                              Intent intent = new Intent(
+                                  Settings.ACTION_MANAGE_OVERLAY_PERMISSION,
+                                  Uri.parse(
+                                      "package:" + getPackageName()
+                                  )
                               );
 
+                              startActivity(intent);
 
-                              try {
+                          } catch (Exception e) {
 
-                                  Intent intent =
-                                      new Intent(
-                                          Settings.ACTION_MANAGE_OVERLAY_PERMISSION,
-                                          Uri.parse(
-                                              "package:" +
-                                              getPackageName()
-                                          )
-                                      );
-
-                                  startActivity(
-                                      intent
-                                  );
-
-                              } catch (Exception e) {
-
-                                  startActivity(
-                                      new Intent(
-                                          Settings.ACTION_MANAGE_OVERLAY_PERMISSION
-                                      )
-                                  );
-                              }
-
-                          } else {
-
-                              startFloatingService();
-
-                              status.setText(
-                                  "✅ 1M Floating Bot চালু আছে"
+                              startActivity(
+                                  new Intent(
+                                      Settings.ACTION_MANAGE_OVERLAY_PERMISSION
+                                  )
                               );
                           }
-                      }
-                  );
-              }
 
+                      } else {
+
+                          startFloatingService();
+
+                          status.setText(
+                              "✅ 1M Floating Bot চালু আছে"
+                          );
+                      }
+                  });
+              }
 
               private void startFloatingService() {
 
                   Intent service =
-                      new Intent(
-                          this,
-                          FloatingService.class
-                      );
+                      new Intent(this, FloatingService.class);
 
+                  if (Build.VERSION.SDK_INT >= 26) {
 
-                  if (
-                      Build.VERSION.SDK_INT >= 26
-                  ) {
-
-                      startForegroundService(
-                          service
-                      );
+                      startForegroundService(service);
 
                   } else {
 
-                      startService(
-                          service
-                      );
+                      startService(service);
                   }
-
 
                   Toast.makeText(
                       this,
@@ -415,20 +307,14 @@ jobs:
                   ).show();
               }
 
-
               @Override
               protected void onResume() {
 
                   super.onResume();
 
-
-                  if (
-                      webView != null
-                  ) {
-
+                  if (webView != null) {
                       webView.onResume();
                   }
-
 
                   if (
                       Settings.canDrawOverlays(this) &&
@@ -441,21 +327,15 @@ jobs:
                   }
               }
 
-
               @Override
               protected void onPause() {
 
-                  if (
-                      webView != null
-                  ) {
-
+                  if (webView != null) {
                       webView.onPause();
                   }
 
-
                   super.onPause();
               }
-
 
               @Override
               public void onBackPressed() {
@@ -479,7 +359,6 @@ jobs:
           cat > app/src/main/java/com/traderpinkai/app/FloatingService.java <<'EOF'
           package com.traderpinkai.app;
 
-
           import android.app.Notification;
           import android.app.NotificationChannel;
           import android.app.NotificationManager;
@@ -498,25 +377,18 @@ jobs:
           import android.widget.LinearLayout;
           import android.widget.TextView;
 
-
           import org.json.JSONObject;
-
 
           import java.io.BufferedReader;
           import java.io.InputStreamReader;
           import java.net.HttpURLConnection;
           import java.net.URL;
 
-
           public class FloatingService extends Service {
 
-
               private WindowManager windowManager;
-
               private LinearLayout floatingView;
-
               private WindowManager.LayoutParams params;
-
 
               private TextView title;
               private TextView market;
@@ -527,37 +399,23 @@ jobs:
               private TextView nextButton;
               private TextView closeButton;
 
-
-              private final Handler handler =
-                  new Handler();
-
+              private final Handler handler = new Handler();
 
               /*
-               * Trader Pink AI LIVE SIGNAL API
+               * নতুন Trader Pink AI Worker
+               *
+               * Root endpoint ব্যবহার করা হচ্ছে।
                */
               private static final String API =
-                  "https://crimson-grass-f881.bijondebnath51.workers.dev/analyze";
+                  "https://crimson-grass-f881.bijondebnath51.workers.dev/";
 
+              private static final String SYMBOL = "EURUSD";
+              private static final String TIMEFRAME = "1m";
 
-              /*
-               * এখন শুধুমাত্র EURUSD 1 MINUTE
-               */
-              private static final String SYMBOL =
-                  "EURUSD";
-
-              private static final String TIMEFRAME =
-                  "1m";
-
+              private boolean scanning = false;
 
               /*
-               * একই সময়ে একাধিক request বন্ধ রাখবে
-               */
-              private boolean scanning =
-                  false;
-
-
-              /*
-               * প্রতি 30 সেকেন্ডে নতুন data check
+               * প্রতি 30 সেকেন্ডে Worker check করবে।
                */
               private final Runnable autoScanner =
                   new Runnable() {
@@ -566,7 +424,6 @@ jobs:
                       public void run() {
 
                           updateSignal(false);
-
 
                           handler.postDelayed(
                               this,
@@ -581,9 +438,7 @@ jobs:
 
                   super.onCreate();
 
-
                   createNotificationChannel();
-
 
                   Notification notification =
                       new Notification.Builder(
@@ -602,49 +457,35 @@ jobs:
                       .setOngoing(true)
                       .build();
 
-
                   startForeground(
                       1001,
                       notification
                   );
 
-
                   showFloatingWindow();
 
-
-                  handler.post(
-                      autoScanner
-                  );
+                  handler.post(autoScanner);
               }
 
 
               private void showFloatingWindow() {
 
-                  if (
-                      !Settings.canDrawOverlays(this)
-                  ) {
+                  if (!Settings.canDrawOverlays(this)) {
 
                       stopSelf();
-
                       return;
                   }
 
-
                   windowManager =
                       (WindowManager)
-                          getSystemService(
-                              WINDOW_SERVICE
-                          );
-
+                          getSystemService(WINDOW_SERVICE);
 
                   floatingView =
                       new LinearLayout(this);
 
-
                   floatingView.setOrientation(
                       LinearLayout.VERTICAL
                   );
-
 
                   floatingView.setPadding(
                       14,
@@ -653,131 +494,54 @@ jobs:
                       10
                   );
 
-
                   floatingView.setBackgroundColor(
                       Color.WHITE
                   );
 
-
-                  title =
-                      new TextView(this);
-
-
-                  title.setText(
-                      "🤖 Trader Pink AI"
-                  );
-
+                  title = new TextView(this);
+                  title.setText("🤖 Trader Pink AI");
                   title.setTextSize(15);
+                  title.setTextColor(Color.BLACK);
 
-                  title.setTextColor(
-                      Color.BLACK
-                  );
-
-
-                  market =
-                      new TextView(this);
-
-
-                  market.setText(
-                      "EURUSD • 1M"
-                  );
-
+                  market = new TextView(this);
+                  market.setText("EURUSD • 1M");
                   market.setTextSize(12);
+                  market.setTextColor(Color.DKGRAY);
 
-                  market.setTextColor(
-                      Color.DKGRAY
-                  );
-
-
-                  signal =
-                      new TextView(this);
-
-
-                  signal.setText(
-                      "⏳ WAIT --%"
-                  );
-
+                  signal = new TextView(this);
+                  signal.setText("⏳ WAIT --%");
                   signal.setTextSize(20);
-
                   signal.setTextColor(
-                      Color.rgb(
-                          220,
-                          140,
-                          20
-                      )
+                      Color.rgb(220, 140, 20)
                   );
 
-
-                  trend =
-                      new TextView(this);
-
-
-                  trend.setText(
-                      "📊 --"
-                  );
-
+                  trend = new TextView(this);
+                  trend.setText("📊 --");
                   trend.setTextSize(12);
+                  trend.setTextColor(Color.DKGRAY);
 
-                  trend.setTextColor(
-                      Color.DKGRAY
-                  );
-
-
-                  candleTime =
-                      new TextView(this);
-
-
-                  candleTime.setText(
-                      "⏱ Candle: --"
-                  );
-
+                  candleTime = new TextView(this);
+                  candleTime.setText("⏱ Closed Candle: --");
                   candleTime.setTextSize(10);
+                  candleTime.setTextColor(Color.GRAY);
 
-                  candleTime.setTextColor(
-                      Color.GRAY
-                  );
-
-
-                  status =
-                      new TextView(this);
-
-
-                  status.setText(
-                      "🔎 1M Signal scanning..."
-                  );
-
+                  status = new TextView(this);
+                  status.setText("🔎 1M Signal scanning...");
                   status.setTextSize(9);
-
-                  status.setTextColor(
-                      Color.GRAY
-                  );
-
+                  status.setTextColor(Color.GRAY);
 
                   LinearLayout buttons =
                       new LinearLayout(this);
-
 
                   buttons.setOrientation(
                       LinearLayout.HORIZONTAL
                   );
 
-
-                  nextButton =
-                      new TextView(this);
-
-
-                  nextButton.setText(
-                      "◯ NEXT SIGNAL"
-                  );
-
+                  nextButton = new TextView(this);
+                  nextButton.setText("◯ NEXT SIGNAL");
                   nextButton.setTextSize(11);
-
                   nextButton.setTextColor(
-                      Color.rgb(
-                          30,
-                          100,
-                          200
-                      )
+                      Color.rgb(30, 100, 200)
                   );
 
                   nextButton.setPadding(
@@ -787,20 +551,10 @@ jobs:
                       2
                   );
 
-
-                  closeButton =
-                      new TextView(this);
-
-
-                  closeButton.setText(
-                      "✕"
-                  );
-
+                  closeButton = new TextView(this);
+                  closeButton.setText("✕");
                   closeButton.setTextSize(15);
-
-                  closeButton.setTextColor(
-                      Color.RED
-                  );
+                  closeButton.setTextColor(Color.RED);
 
                   closeButton.setPadding(
                       12,
@@ -809,13 +563,7 @@ jobs:
                       2
                   );
 
-
-                  LinearLayout.LayoutParams textParams =
-                      new LinearLayout.LayoutParams(
-                          WindowManager.LayoutParams.WRAP_CONTENT,
-                          WindowManager.LayoutParams.WRAP_CONTENT
-                      );
-
+                  TextView.LayoutParams dummy;
 
                   buttons.addView(
                       nextButton,
@@ -826,48 +574,25 @@ jobs:
                       )
                   );
 
-
                   buttons.addView(
                       closeButton,
-                      textParams
+                      new LinearLayout.LayoutParams(
+                          WindowManager.LayoutParams.WRAP_CONTENT,
+                          WindowManager.LayoutParams.WRAP_CONTENT
+                      )
                   );
 
-
-                  floatingView.addView(
-                      title
-                  );
-
-                  floatingView.addView(
-                      market
-                  );
-
-                  floatingView.addView(
-                      signal
-                  );
-
-                  floatingView.addView(
-                      trend
-                  );
-
-                  floatingView.addView(
-                      candleTime
-                  );
-
-                  floatingView.addView(
-                      status
-                  );
-
-                  floatingView.addView(
-                      buttons
-                  );
-
+                  floatingView.addView(title);
+                  floatingView.addView(market);
+                  floatingView.addView(signal);
+                  floatingView.addView(trend);
+                  floatingView.addView(candleTime);
+                  floatingView.addView(status);
+                  floatingView.addView(buttons);
 
                   int type;
 
-
-                  if (
-                      Build.VERSION.SDK_INT >= 26
-                  ) {
+                  if (Build.VERSION.SDK_INT >= 26) {
 
                       type =
                           WindowManager.LayoutParams
@@ -880,7 +605,6 @@ jobs:
                               .TYPE_PHONE;
                   }
 
-
                   params =
                       new WindowManager.LayoutParams(
                           WindowManager.LayoutParams.WRAP_CONTENT,
@@ -890,53 +614,35 @@ jobs:
                           PixelFormat.TRANSLUCENT
                       );
 
-
                   params.gravity =
-                      Gravity.TOP |
-                      Gravity.LEFT;
-
+                      Gravity.TOP | Gravity.LEFT;
 
                   params.x = 12;
-
                   params.y = 160;
-
 
                   windowManager.addView(
                       floatingView,
                       params
                   );
 
-
-                  /*
-                   * NEXT SIGNAL
-                   *
-                   * শুধুমাত্র 1M API call করবে
-                   */
                   nextButton.setOnClickListener(
                       v -> updateSignal(true)
                   );
 
-
-                  /*
-                   * Floating window বন্ধ
-                   */
                   closeButton.setOnClickListener(
                       v -> stopSelf()
                   );
 
-
                   /*
-                   * Floating window drag করার ব্যবস্থা
+                   * Floating window drag
                    */
                   floatingView.setOnTouchListener(
                       new View.OnTouchListener() {
 
                           private int initialX;
                           private int initialY;
-
                           private float initialTouchX;
                           private float initialTouchY;
-
 
                           @Override
                           public boolean onTouch(
@@ -950,11 +656,8 @@ jobs:
 
                                   case MotionEvent.ACTION_DOWN:
 
-                                      initialX =
-                                          params.x;
-
-                                      initialY =
-                                          params.y;
+                                      initialX = params.x;
+                                      initialY = params.y;
 
                                       initialTouchX =
                                           event.getRawX();
@@ -963,7 +666,6 @@ jobs:
                                           event.getRawY();
 
                                       return false;
-
 
                                   case MotionEvent.ACTION_MOVE:
 
@@ -974,14 +676,12 @@ jobs:
                                               - initialTouchX
                                           );
 
-
                                       params.y =
                                           initialY +
                                           (int)(
                                               event.getRawY()
                                               - initialTouchY
                                           );
-
 
                                       try {
 
@@ -991,15 +691,11 @@ jobs:
                                                   params
                                               );
 
-                                      } catch (
-                                          Exception ignored
-                                      ) {
+                                      } catch (Exception ignored) {
                                       }
-
 
                                       return true;
                               }
-
 
                               return false;
                           }
@@ -1010,593 +706,397 @@ jobs:
 
               /*
                * ==================================================
-               * LIVE 1 MINUTE SIGNAL
+               * NEW WORKER JSON
                * ==================================================
+               *
+               * Worker এখন সরাসরি দেয়:
+               *
+               * signal: BUY / SELL / WAIT
+               * confidence: number
+               * trend: BULLISH / BEARISH / SIDEWAYS
+               * closed_candle_time
+               * next_candle_time
+               * signal_id
                */
-              private void updateSignal(
-                  boolean manual
-              ) {
+              private void updateSignal(boolean manual) {
 
-
-                  if (
-                      scanning
-                  ) {
-
+                  if (scanning) {
                       return;
                   }
 
+                  scanning = true;
 
-                  scanning =
-                      true;
+                  handler.post(() -> {
 
+                      if (manual) {
 
-                  handler.post(
-                      () -> {
+                          status.setText(
+                              "🔎 1M NEXT SIGNAL খোঁজা হচ্ছে..."
+                          );
 
-                          if (
-                              manual
-                          ) {
+                      } else {
 
-                              status.setText(
-                                  "🔎 1M NEXT SIGNAL খোঁজা হচ্ছে..."
-                              );
-
-                          } else {
-
-                              status.setText(
-                                  "🔄 1M Live signal scanning..."
-                              );
-                          }
-
-
-                          nextButton.setText(
-                              "⏳ SEARCHING..."
+                          status.setText(
+                              "🔄 1M Live signal scanning..."
                           );
                       }
-                  );
+
+                      nextButton.setText(
+                          "⏳ SEARCHING..."
+                      );
+                  });
 
 
-                  new Thread(
-                      () -> {
+                  new Thread(() -> {
 
-                          HttpURLConnection connection =
-                              null;
+                      HttpURLConnection connection = null;
 
+                      try {
 
-                          try {
-
-
-                              /*
-                               * 1M API request
-                               */
-                              URL url =
-                                  new URL(
-                                      API +
-                                      "?symbol=" +
-                                      SYMBOL +
-                                      "&timeframe=" +
-                                      TIMEFRAME
-                                  );
-
-
-                              connection =
-                                  (HttpURLConnection)
-                                      url.openConnection();
-
-
-                              connection.setRequestMethod(
-                                  "GET"
+                          /*
+                           * Cache-busting parameter
+                           */
+                          String cacheBust =
+                              String.valueOf(
+                                  System.currentTimeMillis()
                               );
 
-
-                              connection.setConnectTimeout(
-                                  10000
+                          URL url =
+                              new URL(
+                                  API +
+                                  "?interval=1min&symbol=EUR%2FUSD&_=" +
+                                  cacheBust
                               );
 
+                          connection =
+                              (HttpURLConnection)
+                                  url.openConnection();
 
-                              connection.setReadTimeout(
-                                  10000
-                              );
+                          connection.setRequestMethod("GET");
 
+                          connection.setConnectTimeout(10000);
+                          connection.setReadTimeout(10000);
 
-                              connection.setRequestProperty(
-                                  "Accept",
-                                  "application/json"
-                              );
+                          connection.setUseCaches(false);
 
+                          connection.setRequestProperty(
+                              "Cache-Control",
+                              "no-cache"
+                          );
 
-                              int responseCode =
-                                  connection.getResponseCode();
+                          connection.setRequestProperty(
+                              "Pragma",
+                              "no-cache"
+                          );
 
+                          connection.setRequestProperty(
+                              "Accept",
+                              "application/json"
+                          );
 
-                              if (
-                                  responseCode < 200 ||
-                                  responseCode >= 300
-                              ) {
+                          int responseCode =
+                              connection.getResponseCode();
 
-                                  showError(
-                                      "⚠️ API Error " +
-                                      responseCode
-                                  );
-
-                                  return;
-                              }
-
-
-                              BufferedReader reader =
-                                  new BufferedReader(
-                                      new InputStreamReader(
-                                          connection
-                                              .getInputStream()
-                                      )
-                                  );
-
-
-                              StringBuilder result =
-                                  new StringBuilder();
-
-
-                              String line;
-
-
-                              while (
-                                  (
-                                      line =
-                                          reader.readLine()
-                                  ) != null
-                              ) {
-
-                                  result.append(
-                                      line
-                                  );
-                              }
-
-
-                              reader.close();
-
-
-                              JSONObject json =
-                                  new JSONObject(
-                                      result.toString()
-                                  );
-
-
-                              /*
-                               * signal.direction
-                               */
-                              String direction =
-                                  getNestedString(
-                                      json,
-                                      "signal",
-                                      "direction",
-                                      "WAIT"
-                                  ).toUpperCase();
-
-
-                              /*
-                               * signal.confidence
-                               */
-                              String confidence =
-                                  getNestedString(
-                                      json,
-                                      "signal",
-                                      "confidence",
-                                      "--"
-                                  );
-
-
-                              confidence =
-                                  confidence.replace(
-                                      "%",
-                                      ""
-                                  );
-
-
-                              /*
-                               * signal.strength
-                               */
-                              String signalStrength =
-                                  getNestedString(
-                                      json,
-                                      "signal",
-                                      "strength",
-                                      "--"
-                                  ).toUpperCase();
-
-
-                              /*
-                               * market.trend
-                               */
-                              String trendValue =
-                                  getNestedString(
-                                      json,
-                                      "market",
-                                      "trend",
-                                      "--"
-                                  ).toUpperCase();
-
-
-                              /*
-                               * market.strength
-                               */
-                              String marketStrength =
-                                  getNestedString(
-                                      json,
-                                      "market",
-                                      "strength",
-                                      "--"
-                                  ).toUpperCase();
-
-
-                              /*
-                               * Candle time
-                               */
-                              String candleValue =
-                                  findFirst(
-                                      json,
-                                      "candle_time",
-                                      "candleTime"
-                                  );
-
-
-                              /*
-                               * Signal time
-                               */
-                              String signalTime =
-                                  findFirst(
-                                      json,
-                                      "signal_time",
-                                      "signalTime"
-                                  );
-
-
-                              if (
-                                  candleValue == null ||
-                                  candleValue.equals("--")
-                              ) {
-
-                                  candleValue =
-                                      "Live";
-                              }
-
-
-                              if (
-                                  signalTime == null ||
-                                  signalTime.equals("--")
-                              ) {
-
-                                  signalTime =
-                                      "Live";
-                              }
-
-
-                              final String d =
-                                  direction;
-
-                              final String c =
-                                  confidence;
-
-                              final String t =
-                                  trendValue;
-
-                              final String ms =
-                                  marketStrength;
-
-                              final String ss =
-                                  signalStrength;
-
-                              final String ct =
-                                  candleValue;
-
-                              final String st =
-                                  signalTime;
-
-
-                              handler.post(
-                                  () -> {
-
-
-                                      /*
-                                       * শুধুমাত্র API-এর
-                                       * BUY/SELL গ্রহণ করবে
-                                       */
-                                      boolean validSignal =
-                                          d.equals("BUY") ||
-                                          d.equals("SELL");
-
-
-                                      if (
-                                          validSignal
-                                      ) {
-
-
-                                          signal.setText(
-                                              getSignalEmoji(d) +
-                                              " " +
-                                              d +
-                                              " " +
-                                              c +
-                                              "%"
-                                          );
-
-
-                                          setSignalColor(
-                                              d
-                                          );
-
-
-                                          trend.setText(
-                                              getTrendEmoji(t) +
-                                              " " +
-                                              t
-                                          );
-
-
-                                          candleTime.setText(
-                                              "⏱ " +
-                                              ct
-                                          );
-
-
-                                          /*
-                                           * Strength এবং
-                                           * market strength
-                                           */
-                                          if (
-                                              !ss.equals("--") &&
-                                              !ms.equals("--")
-                                          ) {
-
-                                              status.setText(
-                                                  "🟢 " +
-                                                  ss +
-                                                  " • " +
-                                                  ms
-                                              );
-
-                                          } else {
-
-                                              status.setText(
-                                                  "🟢 1M LIVE SIGNAL"
-                                              );
-                                          }
-
-
-                                      } else {
-
-
-                                          signal.setText(
-                                              "⏳ WAIT"
-                                          );
-
-
-                                          signal.setTextColor(
-                                              Color.rgb(
-                                                  220,
-                                                  140,
-                                                  20
-                                              )
-                                          );
-
-
-                                          trend.setText(
-                                              getTrendEmoji(t) +
-                                              " " +
-                                              t
-                                          );
-
-
-                                          candleTime.setText(
-                                              "⏱ " +
-                                              ct
-                                          );
-
-
-                                          status.setText(
-                                              "⏳ WAIT • 1M signal নেই"
-                                          );
-                                      }
-
-
-                                      /*
-                                       * Floating display
-                                       * সবসময় 1M থাকবে
-                                       */
-                                      market.setText(
-                                          SYMBOL +
-                                          " • 1M"
-                                      );
-
-
-                                      nextButton.setText(
-                                          "◯ NEXT SIGNAL"
-                                      );
-
-
-                                      scanning =
-                                          false;
-                                  }
-                              );
-
-
-                          } catch (
-                              Exception e
+                          if (
+                              responseCode < 200 ||
+                              responseCode >= 300
                           ) {
-
 
                               showError(
-                                  "⚠️ 1M Signal update হয়নি"
+                                  "⚠️ API Error " +
+                                  responseCode
                               );
 
+                              return;
+                          }
 
-                          } finally {
+                          BufferedReader reader =
+                              new BufferedReader(
+                                  new InputStreamReader(
+                                      connection.getInputStream()
+                                  )
+                              );
 
+                          StringBuilder result =
+                              new StringBuilder();
 
+                          String line;
+
+                          while (
+                              (line = reader.readLine()) != null
+                          ) {
+
+                              result.append(line);
+                          }
+
+                          reader.close();
+
+                          JSONObject json =
+                              new JSONObject(
+                                  result.toString()
+                              );
+
+                          /*
+                           * NEW JSON:
+                           *
+                           * "signal": "SELL"
+                           */
+                          String direction =
+                              json.optString(
+                                  "signal",
+                                  "WAIT"
+                              ).toUpperCase();
+
+                          /*
+                           * "confidence": 85
+                           */
+                          String confidence =
+                              json.has("confidence")
+                                  ? String.valueOf(
+                                      json.optInt(
+                                          "confidence",
+                                          0
+                                      )
+                                  )
+                                  : "--";
+
+                          /*
+                           * "trend": "BEARISH"
+                           */
+                          String trendValue =
+                              json.optString(
+                                  "trend",
+                                  "SIDEWAYS"
+                              ).toUpperCase();
+
+                          /*
+                           * Closed candle time
+                           */
+                          String closedCandle =
+                              json.optString(
+                                  "closed_candle_time",
+                                  "--"
+                              );
+
+                          /*
+                           * Next candle time
+                           */
+                          String nextCandle =
+                              json.optString(
+                                  "next_candle_time",
+                                  "--"
+                              );
+
+                          /*
+                           * Signal ID
+                           */
+                          String signalId =
+                              json.optString(
+                                  "signal_id",
+                                  "--"
+                              );
+
+                          /*
+                           * Score
+                           */
+                          String buyScore =
+                              String.valueOf(
+                                  json.optInt(
+                                      "buy_score",
+                                      0
+                                  )
+                              );
+
+                          String sellScore =
+                              String.valueOf(
+                                  json.optInt(
+                                      "sell_score",
+                                      0
+                                  )
+                              );
+
+                          final String d = direction;
+                          final String c = confidence;
+                          final String t = trendValue;
+                          final String cc = closedCandle;
+                          final String nc = nextCandle;
+                          final String sid = signalId;
+                          final String bs = buyScore;
+                          final String ss = sellScore;
+
+                          handler.post(() -> {
+
+                              /*
+                               * Valid final signal
+                               */
                               if (
-                                  connection != null
+                                  d.equals("BUY") ||
+                                  d.equals("SELL")
                               ) {
 
-                                  connection.disconnect();
+                                  signal.setText(
+                                      getSignalEmoji(d) +
+                                      " " +
+                                      d +
+                                      " " +
+                                      c +
+                                      "%"
+                                  );
+
+                                  setSignalColor(d);
+
+                              } else {
+
+                                  signal.setText(
+                                      "⏳ WAIT " +
+                                      c +
+                                      "%"
+                                  );
+
+                                  signal.setTextColor(
+                                      Color.rgb(
+                                          220,
+                                          140,
+                                          20
+                                      )
+                                  );
                               }
 
 
-                              scanning =
-                                  false;
-                          }
-
-
-                      }
-                  ).start();
-              }
-
-
-              /*
-               * Error
-               */
-              private void showError(
-                  String message
-              ) {
-
-
-                  handler.post(
-                      () -> {
-
-
-                          if (
-                              status != null
-                          ) {
-
-                              status.setText(
-                                  message
+                              /*
+                               * Trend
+                               */
+                              trend.setText(
+                                  getTrendEmoji(t) +
+                                  " " +
+                                  t
                               );
-                          }
 
 
-                          if (
-                              nextButton != null
-                          ) {
+                              /*
+                               * Closed candle
+                               */
+                              candleTime.setText(
+                                  "⏱ Closed: " +
+                                  formatTime(cc) +
+                                  "\n" +
+                                  "➡ Next: " +
+                                  formatTime(nc)
+                              );
+
+
+                              /*
+                               * Status
+                               */
+                              status.setText(
+                                  "🆔 " +
+                                  sid +
+                                  " • Score " +
+                                  bs +
+                                  "/" +
+                                  ss
+                              );
+
+
+                              /*
+                               * Always 1M
+                               */
+                              market.setText(
+                                  "EURUSD • 1M"
+                              );
+
 
                               nextButton.setText(
                                   "◯ NEXT SIGNAL"
                               );
+
+                              scanning = false;
+                          });
+
+
+                      } catch (Exception e) {
+
+                          showError(
+                              "⚠️ 1M Signal update হয়নি"
+                          );
+
+                      } finally {
+
+                          if (connection != null) {
+                              connection.disconnect();
                           }
 
-
-                          scanning =
-                              false;
+                          scanning = false;
                       }
-                  );
+
+                  }).start();
               }
 
 
               /*
-               * Nested JSON value
+               * ISO time কে সহজ display format-এ দেখাবে।
                */
-              private String getNestedString(
-                  JSONObject object,
-                  String parent,
-                  String key,
-                  String fallback
-              ) {
+              private String formatTime(String value) {
 
+                  if (
+                      value == null ||
+                      value.equals("--") ||
+                      value.length() < 16
+                  ) {
+
+                      return value;
+                  }
 
                   try {
 
+                      String date =
+                          value.substring(
+                              0,
+                              10
+                          );
 
-                      if (
-                          object.has(parent) &&
-                          object.get(parent)
-                              instanceof JSONObject
-                      ) {
+                      String time =
+                          value.substring(
+                              11,
+                              16
+                          );
 
+                      return date +
+                          " " +
+                          time +
+                          " UTC";
 
-                          JSONObject child =
-                              object.getJSONObject(
-                                  parent
-                              );
+                  } catch (Exception e) {
 
-
-                          if (
-                              child.has(key)
-                          ) {
-
-                              return String.valueOf(
-                                  child.get(key)
-                              );
-                          }
-                      }
-
-
-                  } catch (
-                      Exception ignored
-                  ) {
+                      return value;
                   }
-
-
-                  return fallback;
               }
 
 
-              /*
-               * Find candle/signal time
-               */
-              private String findFirst(
-                  JSONObject json,
-                  String... keys
-              ) {
+              private void showError(String message) {
 
+                  handler.post(() -> {
 
-                  for (
-                      String key :
-                      keys
-                  ) {
+                      if (status != null) {
 
-
-                      try {
-
-
-                          if (
-                              json.has(key)
-                          ) {
-
-
-                              Object value =
-                                  json.get(key);
-
-
-                              if (
-                                  value != null &&
-                                  !String.valueOf(
-                                      value
-                                  ).equals("null")
-                              ) {
-
-
-                                  return String.valueOf(
-                                      value
-                                  );
-                              }
-                          }
-
-
-                      } catch (
-                          Exception ignored
-                      ) {
+                          status.setText(message);
                       }
-                  }
 
+                      if (nextButton != null) {
 
-                  return "--";
+                          nextButton.setText(
+                              "◯ NEXT SIGNAL"
+                          );
+                      }
+
+                      scanning = false;
+                  });
               }
 
 
-              /*
-               * Signal emoji
-               */
               private String getSignalEmoji(
                   String direction
               ) {
-
 
                   if (
                       direction.equals("BUY")
@@ -1605,7 +1105,6 @@ jobs:
                       return "🟢";
                   }
 
-
                   if (
                       direction.equals("SELL")
                   ) {
@@ -1613,53 +1112,41 @@ jobs:
                       return "🔴";
                   }
 
-
                   return "⏳";
               }
 
 
-              /*
-               * Trend emoji
-               */
               private String getTrendEmoji(
                   String value
               ) {
 
-
                   if (
-                      value.contains("UP") ||
-                      value.contains("BULL")
+                      value.contains("BULL") ||
+                      value.contains("UP")
                   ) {
 
                       return "📈";
                   }
 
-
                   if (
-                      value.contains("DOWN") ||
-                      value.contains("BEAR")
+                      value.contains("BEAR") ||
+                      value.contains("DOWN")
                   ) {
 
                       return "📉";
                   }
 
-
                   return "📊";
               }
 
 
-              /*
-               * Signal color
-               */
               private void setSignalColor(
                   String direction
               ) {
 
-
                   if (
                       direction.equals("BUY")
                   ) {
-
 
                       signal.setTextColor(
                           Color.rgb(
@@ -1669,19 +1156,15 @@ jobs:
                           )
                       );
 
-
                   } else if (
                       direction.equals("SELL")
                   ) {
-
 
                       signal.setTextColor(
                           Color.RED
                       );
 
-
                   } else {
-
 
                       signal.setTextColor(
                           Color.rgb(
@@ -1694,16 +1177,11 @@ jobs:
               }
 
 
-              /*
-               * Notification
-               */
               private void createNotificationChannel() {
-
 
                   if (
                       Build.VERSION.SDK_INT >= 26
                   ) {
-
 
                       NotificationChannel channel =
                           new NotificationChannel(
@@ -1713,16 +1191,12 @@ jobs:
                                   .IMPORTANCE_LOW
                           );
 
-
                       NotificationManager manager =
                           getSystemService(
                               NotificationManager.class
                           );
 
-
-                      if (
-                          manager != null
-                      ) {
+                      if (manager != null) {
 
                           manager.createNotificationChannel(
                               channel
@@ -1735,17 +1209,14 @@ jobs:
               @Override
               public void onDestroy() {
 
-
                   handler.removeCallbacks(
                       autoScanner
                   );
-
 
                   if (
                       floatingView != null &&
                       windowManager != null
                   ) {
-
 
                       try {
 
@@ -1753,19 +1224,12 @@ jobs:
                               floatingView
                           );
 
-                      } catch (
-                          Exception ignored
-                      ) {
+                      } catch (Exception ignored) {
                       }
                   }
 
-
-                  floatingView =
-                      null;
-
-                  windowManager =
-                      null;
-
+                  floatingView = null;
+                  windowManager = null;
 
                   super.onDestroy();
               }
@@ -1790,5 +1254,5 @@ jobs:
       - name: Upload APK
         uses: actions/upload-artifact@v4
         with:
-          name: Trader-Pink-AI-Floating-v12
+          name: Trader-Pink-AI-Floating-v13
           path: app/build/outputs/apk/debug/app-debug.apk
