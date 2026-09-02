@@ -217,27 +217,16 @@ body{
 
 <div class="app">
 
-  <!-- HEADER -->
   <div class="header">
-
-    <h1>
-      Trader Pink AI 📈
-    </h1>
-
-    <p>
-      EUR/USD Smart Signal Engine
-    </p>
-
+    <h1>Trader Pink AI 📈</h1>
+    <p>EUR/USD Smart 1 Minute Signal Engine</p>
   </div>
 
-
-  <!-- CONTROL CARD -->
   <div class="card">
 
     <div class="market-row">
 
-      <button class="market"
-              type="button">
+      <button class="market" type="button">
         EUR/USD
       </button>
 
@@ -247,441 +236,198 @@ body{
         1 MIN
       </button>
 
-      <button class="tf"
-              id="tf5m"
-              type="button">
-        5 MIN
-      </button>
-
     </div>
-
 
     <div class="count-title">
       নতুন Candle শুরু হতে বাকি
     </div>
 
-
-    <div class="countdown"
-         id="countdown">
+    <div class="countdown" id="countdown">
       00:00
     </div>
-
 
     <button class="update"
             id="updateBtn"
             type="button">
-
       🔍 UPDATE SIGNAL
-
     </button>
 
   </div>
 
+  <div id="errorBox" class="error"></div>
 
-  <!-- ERROR -->
-  <div id="errorBox"
-       class="error">
-  </div>
-
-
-  <!-- SIGNAL CARD -->
   <div class="card">
 
     <div class="signal-title">
       NEXT CANDLE SIGNAL
     </div>
 
-
-    <div class="signal"
-         id="signal">
-
+    <div class="signal" id="signal">
       WAIT
-
     </div>
 
-
-    <div class="confidence"
-         id="confidence">
-
+    <div class="confidence" id="confidence">
       0%
-
     </div>
 
-
-    <div class="status"
-         id="status">
-
+    <div class="status" id="status">
       Signal Ready
-
     </div>
 
   </div>
 
-
-  <!-- SIGNAL INFORMATION -->
   <div class="card">
 
     <div class="section-title">
       📊 Signal Information
     </div>
 
-
     <div class="grid">
 
       <div class="item">
-
-        <div class="label">
-          SIGNAL CANDLE
-        </div>
-
-        <div class="value"
-             id="signalCandle">
-          --
-        </div>
-
+        <div class="label">SIGNAL CANDLE</div>
+        <div class="value" id="signalCandle">--</div>
       </div>
 
-
       <div class="item">
-
-        <div class="label">
-          NEXT CANDLE
-        </div>
-
-        <div class="value"
-             id="nextCandle">
-          --
-        </div>
-
+        <div class="label">NEXT CANDLE</div>
+        <div class="value" id="nextCandle">--</div>
       </div>
 
-
       <div class="item">
-
-        <div class="label">
-          LAST CLOSED
-        </div>
-
-        <div class="value"
-             id="lastClosed">
-          --
-        </div>
-
+        <div class="label">LAST CLOSED</div>
+        <div class="value" id="lastClosed">--</div>
       </div>
 
-
       <div class="item">
-
-        <div class="label">
-          PRICE
-        </div>
-
-        <div class="value"
-             id="price">
-          --
-        </div>
-
+        <div class="label">PRICE</div>
+        <div class="value" id="price">--</div>
       </div>
 
-
       <div class="item">
-
-        <div class="label">
-          TREND
-        </div>
-
-        <div class="value"
-             id="trend">
-          --
-        </div>
-
+        <div class="label">TREND</div>
+        <div class="value" id="trend">--</div>
       </div>
 
-
       <div class="item">
-
-        <div class="label">
-          CANDLE
-        </div>
-
-        <div class="value"
-             id="candle">
-          --
-        </div>
-
+        <div class="label">CANDLE</div>
+        <div class="value" id="candle">--</div>
       </div>
 
-
       <div class="item">
-
-        <div class="label">
-          STRENGTH
-        </div>
-
-        <div class="value"
-             id="strength">
-          --
-        </div>
-
+        <div class="label">STRENGTH</div>
+        <div class="value" id="strength">--</div>
       </div>
 
-
       <div class="item">
-
-        <div class="label">
-          ADX
-        </div>
-
-        <div class="value"
-             id="adx">
-          --
-        </div>
-
+        <div class="label">ADX</div>
+        <div class="value" id="adx">--</div>
       </div>
 
     </div>
 
   </div>
 
-
-  <!-- INDICATOR CARD -->
   <div class="card">
 
     <div class="section-title">
       📈 Indicator Data
     </div>
 
-
     <div class="grid">
 
       <div class="item">
-
-        <div class="label">
-          EMA 9
-        </div>
-
-        <div class="value"
-             id="ema9">
-          --
-        </div>
-
+        <div class="label">EMA 9</div>
+        <div class="value" id="ema9">--</div>
       </div>
 
-
       <div class="item">
-
-        <div class="label">
-          EMA 21
-        </div>
-
-        <div class="value"
-             id="ema21">
-          --
-        </div>
-
+        <div class="label">EMA 21</div>
+        <div class="value" id="ema21">--</div>
       </div>
 
-
       <div class="item">
-
-        <div class="label">
-          EMA 50
-        </div>
-
-        <div class="value"
-             id="ema50">
-          --
-        </div>
-
+        <div class="label">EMA 50</div>
+        <div class="value" id="ema50">--</div>
       </div>
 
-
       <div class="item">
-
-        <div class="label">
-          EMA 200
-        </div>
-
-        <div class="value"
-             id="ema200">
-          --
-        </div>
-
+        <div class="label">EMA 200</div>
+        <div class="value" id="ema200">--</div>
       </div>
 
-
       <div class="item">
-
-        <div class="label">
-          RSI
-        </div>
-
-        <div class="value"
-             id="rsi">
-          --
-        </div>
-
+        <div class="label">RSI</div>
+        <div class="value" id="rsi">--</div>
       </div>
 
-
       <div class="item">
-
-        <div class="label">
-          MACD
-        </div>
-
-        <div class="value"
-             id="macd">
-          --
-        </div>
-
+        <div class="label">MACD</div>
+        <div class="value" id="macd">--</div>
       </div>
 
-
       <div class="item">
-
-        <div class="label">
-          STOCH K
-        </div>
-
-        <div class="value"
-             id="stochK">
-          --
-        </div>
-
+        <div class="label">MACD SIGNAL</div>
+        <div class="value" id="macdSignal">--</div>
       </div>
 
-
       <div class="item">
-
-        <div class="label">
-          STOCH D
-        </div>
-
-        <div class="value"
-             id="stochD">
-          --
-        </div>
-
+        <div class="label">ATR</div>
+        <div class="value" id="atr">--</div>
       </div>
 
     </div>
 
   </div>
 
-
-  <!-- SUPPORT RESISTANCE -->
   <div class="card">
 
     <div class="section-title">
       🎯 Support / Resistance
     </div>
 
-
     <div class="grid">
 
       <div class="item">
-
-        <div class="label">
-          SUPPORT
-        </div>
-
-        <div class="value"
-             id="support">
-          --
-        </div>
-
+        <div class="label">SUPPORT</div>
+        <div class="value" id="support">--</div>
       </div>
 
-
       <div class="item">
-
-        <div class="label">
-          RESISTANCE
-        </div>
-
-        <div class="value"
-             id="resistance">
-          --
-        </div>
-
+        <div class="label">RESISTANCE</div>
+        <div class="value" id="resistance">--</div>
       </div>
 
-
       <div class="item">
-
-        <div class="label">
-          BUY SCORE
-        </div>
-
-        <div class="value"
-             id="buyScore">
-          --
-        </div>
-
+        <div class="label">BUY SCORE</div>
+        <div class="value" id="buyScore">--</div>
       </div>
 
-
       <div class="item">
-
-        <div class="label">
-          SELL SCORE
-        </div>
-
-        <div class="value"
-             id="sellScore">
-          --
-        </div>
-
+        <div class="label">SELL SCORE</div>
+        <div class="value" id="sellScore">--</div>
       </div>
 
-
       <div class="item">
-
-        <div class="label">
-          SCORE DIFFERENCE
-        </div>
-
-        <div class="value"
-             id="difference">
-          --
-        </div>
-
-      </div>
-
-
-      <div class="item">
-
-        <div class="label">
-          ATR
-        </div>
-
-        <div class="value"
-             id="atr">
-          --
-        </div>
-
+        <div class="label">SCORE DIFFERENCE</div>
+        <div class="value" id="difference">--</div>
       </div>
 
     </div>
 
   </div>
 
-
-  <!-- REASONS -->
   <div class="card">
 
     <div class="section-title">
       🧠 Analysis Reasons
     </div>
 
-
     <div id="reasons">
       Waiting for analysis...
     </div>
 
   </div>
-
 
   <div class="footer">
     Confidence = indicator confluence score, guaranteed profit নয়
@@ -694,35 +440,24 @@ body{
 
 /* ==========================================================
    TRADER PINK AI
-   CLOUDFLARE WORKER CONNECTION
+   1 MINUTE ONLY
    ========================================================== */
 
 const API_BASE =
 "https://crimson-grass-f881.bijondebnath51.workers.dev";
 
 
-/* ==========================================================
-   STATE
-   ========================================================== */
-
-let currentInterval = "1min";
-
 let nextCandleEpoch = 0;
-
 let lastLoadedCandle = "";
 
 
 /* ==========================================================
-   API URL
+   API
    ========================================================== */
 
 function getApiUrl(){
 
-  return (
-    API_BASE +
-    "/?interval=" +
-    encodeURIComponent(currentInterval)
-  );
+  return API_BASE + "/";
 
 }
 
@@ -749,15 +484,9 @@ document.getElementById("updateBtn");
 const countdownEl =
 document.getElementById("countdown");
 
-const tf1m =
-document.getElementById("tf1m");
-
-const tf5m =
-document.getElementById("tf5m");
-
 
 /* ==========================================================
-   TEXT HELPER
+   TEXT
    ========================================================== */
 
 function setText(id,value){
@@ -765,8 +494,7 @@ function setText(id,value){
   const el =
     document.getElementById(id);
 
-  if(!el)
-    return;
+  if(!el) return;
 
   if(
     value === null ||
@@ -776,8 +504,7 @@ function setText(id,value){
 
     el.textContent = "--";
 
-  }
-  else{
+  }else{
 
     el.textContent = value;
 
@@ -787,7 +514,7 @@ function setText(id,value){
 
 
 /* ==========================================================
-   NUMBER FORMAT
+   NUMBER
    ========================================================== */
 
 function number(value,digits=5){
@@ -802,11 +529,10 @@ function number(value,digits=5){
 
   }
 
-  const n =
-    Number(value);
+  const n = Number(value);
 
   if(!Number.isFinite(n))
-    return String(value);
+    return "--";
 
   return n.toFixed(digits);
 
@@ -822,25 +548,21 @@ function formatTime(value){
   if(!value)
     return "--";
 
-  const d =
-    new Date(value);
+  const d = new Date(value);
 
   if(isNaN(d.getTime()))
-    return String(value);
+    return "--";
 
   return d.toLocaleString(
     "en-GB",
     {
       timeZone:"Asia/Dhaka",
-
       day:"2-digit",
       month:"2-digit",
       year:"numeric",
-
       hour:"2-digit",
       minute:"2-digit",
       second:"2-digit",
-
       hour12:false
     }
   );
@@ -858,22 +580,17 @@ function updateSignalStyle(signal){
     String(signal || "WAIT")
       .toUpperCase();
 
-
   if(signal === "BUY"){
 
     signalEl.style.color =
       "#35e58c";
 
-  }
-
-  else if(signal === "SELL"){
+  }else if(signal === "SELL"){
 
     signalEl.style.color =
       "#ff5c7c";
 
-  }
-
-  else{
+  }else{
 
     signalEl.style.color =
       "#ffd166";
@@ -910,15 +627,12 @@ function hideError(){
 
 
 /* ==========================================================
-   DISPLAY DATA
+   DISPLAY
    ========================================================== */
 
 function displayData(data){
 
-  if(
-    !data ||
-    data.ok !== true
-  ){
+  if(!data || data.ok !== true){
 
     showError(
       data?.error ||
@@ -929,13 +643,10 @@ function displayData(data){
 
   }
 
-
   hideError();
 
 
-  /* ----------------------------------------------------------
-     SIGNAL
-     ---------------------------------------------------------- */
+  /* SIGNAL */
 
   const signal =
     String(
@@ -952,10 +663,8 @@ function displayData(data){
   signalEl.textContent =
     signal;
 
-
   confidenceEl.textContent =
     confidence + "%";
-
 
   updateSignalStyle(signal);
 
@@ -965,9 +674,7 @@ function displayData(data){
     statusEl.textContent =
       "NO TRADE • WAIT";
 
-  }
-
-  else{
+  }else{
 
     statusEl.textContent =
       "Signal Ready • Next Candle";
@@ -975,9 +682,7 @@ function displayData(data){
   }
 
 
-  /* ----------------------------------------------------------
-     CANDLE TIME
-     ---------------------------------------------------------- */
+  /* TIME */
 
   setText(
     "signalCandle",
@@ -986,14 +691,12 @@ function displayData(data){
     )
   );
 
-
   setText(
     "nextCandle",
     formatTime(
       data.next_candle_time
     )
   );
-
 
   setText(
     "lastClosed",
@@ -1003,9 +706,7 @@ function displayData(data){
   );
 
 
-  /* ----------------------------------------------------------
-     PRICE
-     ---------------------------------------------------------- */
+  /* PRICE */
 
   setText(
     "price",
@@ -1016,9 +717,7 @@ function displayData(data){
   );
 
 
-  /* ----------------------------------------------------------
-     TREND
-     ---------------------------------------------------------- */
+  /* TREND */
 
   setText(
     "trend",
@@ -1026,196 +725,115 @@ function displayData(data){
   );
 
 
-  /* ----------------------------------------------------------
-     CANDLE TYPE
-     ---------------------------------------------------------- */
+  /* CANDLE */
 
-  let candle =
-    data.candle;
+  const candle =
+    data.candle || {};
 
+  let candleText =
+    "NEUTRAL";
 
-  if(
-    typeof candle === "object" &&
-    candle !== null
-  ){
+  if(candle.direction === "UP")
+    candleText = "UP";
 
-    candle =
-      candle.type ||
-      candle.direction ||
-      candle.name ||
-      "--";
-
-  }
-
+  if(candle.direction === "DOWN")
+    candleText = "DOWN";
 
   setText(
     "candle",
-    candle
+    candleText
   );
 
 
-  /* ----------------------------------------------------------
-     CANDLE STRENGTH
-     ---------------------------------------------------------- */
+  /* STRENGTH */
 
-  let strength =
-    data.candle_strength;
-
-
-  if(
-    typeof strength === "number"
-  ){
-
-    strength =
-      strength.toFixed(0) + "%";
-
-  }
-
+  const strength =
+    data.candle?.body_percent;
 
   setText(
     "strength",
-    strength
+    Number.isFinite(Number(strength))
+      ? Number(strength).toFixed(0) + "%"
+      : "--"
   );
 
 
-  /* ----------------------------------------------------------
-     ADX
-     ---------------------------------------------------------- */
+  /* INDICATORS */
 
-  setText(
-    "adx",
-    number(
-      data.adx,
-      2
-    )
-  );
+  const ind =
+    data.indicators || {};
 
-
-  /* ----------------------------------------------------------
-     EMA
-     ---------------------------------------------------------- */
 
   setText(
     "ema9",
-    number(
-      data.ema9,
-      6
-    )
+    number(ind.ema9,6)
   );
-
 
   setText(
     "ema21",
-    number(
-      data.ema21,
-      6
-    )
+    number(ind.ema21,6)
   );
-
 
   setText(
     "ema50",
-    number(
-      data.ema50,
-      6
-    )
+    number(ind.ema50,6)
   );
-
 
   setText(
     "ema200",
-    number(
-      data.ema200,
-      6
-    )
+    number(ind.ema200,6)
   );
-
-
-  /* ----------------------------------------------------------
-     RSI
-     ---------------------------------------------------------- */
 
   setText(
     "rsi",
-    number(
-      data.rsi,
-      2
-    )
+    number(ind.rsi,2)
   );
-
-
-  /* ----------------------------------------------------------
-     MACD
-     ---------------------------------------------------------- */
 
   setText(
     "macd",
-    number(
-      data.macd,
-      6
-    )
+    number(ind.macd,6)
   );
-
-
-  /* ----------------------------------------------------------
-     STOCHASTIC
-     ---------------------------------------------------------- */
 
   setText(
-    "stochK",
-    number(
-      data.stochastic_k,
-      2
-    )
+    "macdSignal",
+    number(ind.macd_signal,6)
   );
-
 
   setText(
-    "stochD",
-    number(
-      data.stochastic_d,
-      2
-    )
+    "atr",
+    number(ind.atr,6)
+  );
+
+  setText(
+    "adx",
+    number(ind.adx,2)
   );
 
 
-  /* ----------------------------------------------------------
-     SUPPORT / RESISTANCE
-     ---------------------------------------------------------- */
+  /* SUPPORT / RESISTANCE */
 
   setText(
     "support",
-    number(
-      data.support,
-      6
-    )
+    number(data.support,6)
   );
-
 
   setText(
     "resistance",
-    number(
-      data.resistance,
-      6
-    )
+    number(data.resistance,6)
   );
 
 
-  /* ----------------------------------------------------------
-     SCORES
-     ---------------------------------------------------------- */
+  /* SCORE */
 
   setText(
     "buyScore",
     data.buy_score
   );
 
-
   setText(
     "sellScore",
     data.sell_score
   );
-
 
   setText(
     "difference",
@@ -1223,42 +841,24 @@ function displayData(data){
   );
 
 
-  /* ----------------------------------------------------------
-     ATR
-     ---------------------------------------------------------- */
-
-  setText(
-    "atr",
-    number(
-      data.atr,
-      6
-    )
-  );
-
-
-  /* ----------------------------------------------------------
-     REASONS
-     ---------------------------------------------------------- */
+  /* REASONS */
 
   const reasonsEl =
     document.getElementById("reasons");
-
 
   reasonsEl.innerHTML = "";
 
 
   if(
     Array.isArray(data.reasons) &&
-    data.reasons.length > 0
+    data.reasons.length
   ){
 
     data.reasons.forEach(
       reason => {
 
         const div =
-          document.createElement(
-            "div"
-          );
+          document.createElement("div");
 
         div.className =
           "reason";
@@ -1266,16 +866,12 @@ function displayData(data){
         div.textContent =
           "• " + reason;
 
-        reasonsEl.appendChild(
-          div
-        );
+        reasonsEl.appendChild(div);
 
       }
     );
 
-  }
-
-  else{
+  }else{
 
     reasonsEl.textContent =
       "No additional confirmation.";
@@ -1283,59 +879,25 @@ function displayData(data){
   }
 
 
-  /* ----------------------------------------------------------
-     NEXT CANDLE
-     ---------------------------------------------------------- */
+  /* COUNTDOWN */
 
   if(data.next_candle){
 
-    const next =
-      String(
-        data.next_candle
-      ).toUpperCase();
+    nextCandleEpoch =
+      Number(data.next_candle);
 
+  }else if(data.next_candle_time){
 
-    if(next === "UP"){
-
-      statusEl.textContent =
-        "NEXT CANDLE → UP";
-
-    }
-
-    else if(next === "DOWN"){
-
-      statusEl.textContent =
-        "NEXT CANDLE → DOWN";
-
-    }
-
-    else{
-
-      statusEl.textContent =
-        "NEXT CANDLE → NO TRADE";
-
-    }
-
-  }
-
-
-  /* ----------------------------------------------------------
-     COUNTDOWN
-     ---------------------------------------------------------- */
-
-  if(data.next_candle_time){
-
-    const nextDate =
+    const d =
       new Date(
         data.next_candle_time
       );
 
-
-    if(!isNaN(nextDate.getTime())){
+    if(!isNaN(d.getTime())){
 
       nextCandleEpoch =
         Math.floor(
-          nextDate.getTime() / 1000
+          d.getTime() / 1000
         );
 
     }
@@ -1343,9 +905,7 @@ function displayData(data){
   }
 
 
-  /* ----------------------------------------------------------
-     LAST CANDLE MEMORY
-     ---------------------------------------------------------- */
+  /* MEMORY */
 
   lastLoadedCandle =
     data.closed_candle_time || "";
@@ -1362,14 +922,11 @@ async function updateSignal(){
   if(updateBtn.disabled)
     return;
 
-
   updateBtn.disabled =
     true;
 
-
   updateBtn.textContent =
     "🔄 ANALYZING...";
-
 
   statusEl.textContent =
     "Market analysis চলছে...";
@@ -1377,18 +934,14 @@ async function updateSignal(){
 
   try{
 
-    const url =
-      getApiUrl();
-
-
     const response =
       await fetch(
-        url,
+        getApiUrl() +
+        "?_=" +
+        Date.now(),
         {
           method:"GET",
-
           cache:"no-store",
-
           headers:{
             "Accept":
               "application/json"
@@ -1411,28 +964,15 @@ async function updateSignal(){
       await response.json();
 
 
-    if(!data.ok){
-
-      throw new Error(
-        data.error ||
-        "Worker returned error"
-      );
-
-    }
-
-
     displayData(data);
 
 
-  }
-
-  catch(error){
+  }catch(error){
 
     console.error(
       "Signal update error:",
       error
     );
-
 
     showError(
       "Signal update failed: " +
@@ -1442,17 +982,14 @@ async function updateSignal(){
       )
     );
 
-
     statusEl.textContent =
       "Connection error";
 
-  }
 
-  finally{
+  }finally{
 
     updateBtn.disabled =
       false;
-
 
     updateBtn.textContent =
       "🔍 UPDATE SIGNAL";
@@ -1460,77 +997,6 @@ async function updateSignal(){
   }
 
 }
-
-
-/* ==========================================================
-   TIMEFRAME
-   ========================================================== */
-
-function selectTimeframe(interval){
-
-  currentInterval =
-    interval;
-
-
-  if(interval === "1min"){
-
-    tf1m.classList.add(
-      "active"
-    );
-
-    tf5m.classList.remove(
-      "active"
-    );
-
-  }
-
-  else{
-
-    tf5m.classList.add(
-      "active"
-    );
-
-    tf1m.classList.remove(
-      "active"
-    );
-
-  }
-
-
-  /*
-     New timeframe selected.
-     Immediately request the correct Worker endpoint.
-  */
-
-  nextCandleEpoch = 0;
-
-  updateSignal();
-
-}
-
-
-tf1m.addEventListener(
-  "click",
-  function(){
-
-    selectTimeframe(
-      "1min"
-    );
-
-  }
-);
-
-
-tf5m.addEventListener(
-  "click",
-  function(){
-
-    selectTimeframe(
-      "5min"
-    );
-
-  }
-);
 
 
 /* ==========================================================
@@ -1546,6 +1012,8 @@ updateBtn.addEventListener(
 /* ==========================================================
    COUNTDOWN
    ========================================================== */
+
+let lastAutoUpdate = 0;
 
 function updateCountdown(){
 
@@ -1578,33 +1046,27 @@ function updateCountdown(){
       remaining / 60
     );
 
-
   const seconds =
     remaining % 60;
 
 
   countdownEl.textContent =
-    String(minutes)
-      .padStart(2,"0")
-    + ":" +
-    String(seconds)
-      .padStart(2,"0");
+    String(minutes).padStart(2,"0") +
+    ":" +
+    String(seconds).padStart(2,"0");
 
 
-  /*
-     Candle ended.
-     Wait 2.5 seconds so the Worker
-     can use the newly closed candle.
-  */
+  /* NEW CANDLE */
 
-  if(remaining === 0){
+  if(
+    remaining === 0 &&
+    now - lastAutoUpdate > 5
+  ){
+
+    lastAutoUpdate = now;
 
     setTimeout(
-      function(){
-
-        updateSignal();
-
-      },
+      updateSignal,
       2500
     );
 
@@ -1624,7 +1086,7 @@ setInterval(
 
 
 /* ==========================================================
-   AUTO SIGNAL REFRESH
+   AUTO REFRESH
    ========================================================== */
 
 setInterval(
@@ -1638,7 +1100,7 @@ setInterval(
 
 
 /* ==========================================================
-   INITIAL LOAD
+   INITIAL
    ========================================================== */
 
 updateSignal();
