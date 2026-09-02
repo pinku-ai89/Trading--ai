@@ -11,7 +11,6 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-
       - name: Checkout
         uses: actions/checkout@v4
 
@@ -30,11 +29,12 @@ jobs:
           sdkmanager "platforms;android-35" "build-tools;35.0.0"
 
       - name: Create Android Project
+        shell: bash
         run: |
+          set -e
 
           mkdir -p app/src/main/java/com/traderpinkai/app
           mkdir -p app/src/main/res/values
-          mkdir -p app/src/main/res/mipmap-hdpi
 
           cat > settings.gradle <<'EOF'
 pluginManagement {
@@ -80,9 +80,6 @@ android {
         versionName '14.0'
     }
 }
-
-dependencies {
-}
 EOF
 
           cat > app/src/main/res/values/strings.xml <<'EOF'
@@ -95,7 +92,6 @@ EOF
 <resources>
     <style name="AppTheme" parent="android:style/Theme.Material.Light.NoActionBar">
         <item name="android:fontFamily">sans</item>
-        <item name="android:windowActionModeOverlay">true</item>
         <item name="android:colorAccent">#ff4f9a</item>
     </style>
 </resources>
@@ -112,8 +108,7 @@ EOF
     <application
         android:allowBackup="true"
         android:label="Trader Pink AI"
-        android:theme="@style/AppTheme"
-        android:usesCleartextTraffic="true">
+        android:theme="@style/AppTheme">
 
         <activity
             android:name=".MainActivity"
@@ -220,14 +215,9 @@ public class FloatingService extends Service {
     private static final String API =
             "https://crimson-grass-f881.bijondebnath51.workers.dev/";
 
-    private static final String SYMBOL = "EURUSD";
-    private static final String TIMEFRAME = "1m";
-
     private WindowManager windowManager;
     private LinearLayout box;
 
-    private TextView titleText;
-    private TextView marketText;
     private TextView signalText;
     private TextView confidenceText;
     private TextView trendText;
@@ -258,15 +248,13 @@ public class FloatingService extends Service {
         handler.post(updater);
     }
 
-    private Notification createNotification() {
-
-        String channelId = "trader_pink_ai";
+    private void createNotificationChannel() {
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
 
             NotificationChannel channel =
                     new NotificationChannel(
-                            channelId,
+                            "trader_pink_ai",
                             "Trader Pink AI",
                             NotificationManager.IMPORTANCE_LOW
                     );
@@ -278,10 +266,16 @@ public class FloatingService extends Service {
                 manager.createNotificationChannel(channel);
             }
         }
+    }
+
+    private Notification createNotification() {
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
 
-            return new Notification.Builder(this, channelId)
+            return new Notification.Builder(
+                    this,
+                    "trader_pink_ai"
+            )
                     .setContentTitle("Trader Pink AI")
                     .setContentText("Floating signal is running")
                     .setSmallIcon(android.R.drawable.ic_dialog_info)
@@ -295,10 +289,6 @@ public class FloatingService extends Service {
                     .setSmallIcon(android.R.drawable.ic_dialog_info)
                     .build();
         }
-    }
-
-    private void createNotificationChannel() {
-        // Notification channel is created in createNotification().
     }
 
     private void createFloatingWindow() {
@@ -319,59 +309,32 @@ public class FloatingService extends Service {
         box.setPadding(18, 14, 18, 14);
         box.setBackgroundColor(Color.rgb(20, 20, 30));
 
-        titleText = makeText(
-                "🤖 Trader Pink AI",
-                18,
-                true
-        );
+        TextView titleText =
+                makeText("🤖 Trader Pink AI", 18, true);
 
-        marketText = makeText(
-                "EURUSD • 1M",
-                15,
-                true
-        );
+        TextView marketText =
+                makeText("EURUSD • 1M", 15, true);
 
-        signalText = makeText(
-                "WAIT",
-                26,
-                true
-        );
+        signalText =
+                makeText("WAIT", 26, true);
 
-        confidenceText = makeText(
-                "Confidence: --%",
-                16,
-                true
-        );
+        confidenceText =
+                makeText("Confidence: --%", 16, true);
 
-        trendText = makeText(
-                "Trend: --",
-                14,
-                false
-        );
+        trendText =
+                makeText("Trend: --", 14, false);
 
-        candleText = makeText(
-                "Closed: --",
-                12,
-                false
-        );
+        candleText =
+                makeText("Closed: --", 12, false);
 
-        nextCandleText = makeText(
-                "Next: --",
-                12,
-                false
-        );
+        nextCandleText =
+                makeText("Next: --", 12, false);
 
-        scoreText = makeText(
-                "Score B:0 / S:0",
-                12,
-                false
-        );
+        scoreText =
+                makeText("Score B:0 / S:0", 12, false);
 
-        statusText = makeText(
-                "Updating...",
-                11,
-                false
-        );
+        statusText =
+                makeText("Updating...", 11, false);
 
         Button nextButton = new Button(this);
         nextButton.setText("NEXT SIGNAL");
@@ -412,9 +375,11 @@ public class FloatingService extends Service {
         int type;
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            type = WindowManager.LayoutParams.TYPE_APPLICATION_OVERLAY;
+            type =
+                    WindowManager.LayoutParams.TYPE_APPLICATION_OVERLAY;
         } else {
-            type = WindowManager.LayoutParams.TYPE_PHONE;
+            type =
+                    WindowManager.LayoutParams.TYPE_PHONE;
         }
 
         final WindowManager.LayoutParams params =
@@ -454,8 +419,11 @@ public class FloatingService extends Service {
                                 initialX = params.x;
                                 initialY = params.y;
 
-                                initialTouchX = event.getRawX();
-                                initialTouchY = event.getRawY();
+                                initialTouchX =
+                                        event.getRawX();
+
+                                initialTouchY =
+                                        event.getRawY();
 
                                 return true;
 
@@ -519,7 +487,9 @@ public class FloatingService extends Service {
 
     private void loadSignal() {
 
-        statusText.setText("Updating...");
+        if (statusText != null) {
+            statusText.setText("Updating...");
+        }
 
         new Thread(
                 new Runnable() {
@@ -531,25 +501,23 @@ public class FloatingService extends Service {
 
                         try {
 
-                            String urlString =
+                            String requestUrl =
                                     API
-                                            + "?interval=1min"
-                                            + "&symbol=EUR%2FUSD"
-                                            + "&_="
-                                            + System.currentTimeMillis();
+                                    + "?interval=1min"
+                                    + "&symbol=EUR%2FUSD"
+                                    + "&_="
+                                    + System.currentTimeMillis();
 
                             URL url =
-                                    new URL(urlString);
+                                    new URL(requestUrl);
 
                             connection =
                                     (HttpURLConnection)
                                             url.openConnection();
 
                             connection.setRequestMethod("GET");
-
                             connection.setConnectTimeout(10000);
                             connection.setReadTimeout(10000);
-
                             connection.setUseCaches(false);
 
                             connection.setRequestProperty(
@@ -580,7 +548,8 @@ public class FloatingService extends Service {
 
                                 if (stream == null) {
                                     throw new Exception(
-                                            "HTTP " + responseCode
+                                            "HTTP "
+                                                    + responseCode
                                     );
                                 }
                             }
@@ -607,7 +576,7 @@ public class FloatingService extends Service {
 
                             reader.close();
 
-                            final JSONObject json =
+                            JSONObject json =
                                     new JSONObject(
                                             result.toString()
                                     );
@@ -711,14 +680,17 @@ public class FloatingService extends Service {
                                                             + signalId
                                             );
 
+                                            String updateTime =
+                                                    new SimpleDateFormat(
+                                                            "HH:mm:ss",
+                                                            Locale.US
+                                                    ).format(
+                                                            new Date()
+                                                    );
+
                                             statusText.setText(
                                                     "Live • Updated "
-                                                            + new SimpleDateFormat(
-                                                                    "HH:mm:ss",
-                                                                    Locale.US
-                                                            ).format(
-                                                                    new Date()
-                                                            )
+                                                            + updateTime
                                             );
                                         }
                                     }
@@ -777,7 +749,8 @@ public class FloatingService extends Service {
                     TimeZone.getTimeZone("UTC")
             );
 
-            Date date = input.parse(iso);
+            Date date =
+                    input.parse(iso);
 
             if (date == null) {
                 return iso;
@@ -825,21 +798,17 @@ public class FloatingService extends Service {
 }
 EOF
 
+      - name: Create Gradle Wrapper
+        run: |
+          curl -L \
+            https://services.gradle.org/distributions/gradle-8.7-bin.zip \
+            -o gradle.zip
+
+          unzip -q gradle.zip
+
       - name: Build APK
         run: |
-          chmod +x gradlew 2>/dev/null || true
-
-          if [ ! -f gradlew ]; then
-            curl -L \
-              https://services.gradle.org/distributions/gradle-8.7-bin.zip \
-              -o gradle.zip
-
-            unzip -q gradle.zip
-
-            export PATH="$PWD/gradle-8.7/bin:$PATH"
-          fi
-
-          gradle assembleDebug --no-daemon
+          ./gradle-8.7/bin/gradle assembleDebug --no-daemon
 
       - name: Upload APK
         uses: actions/upload-artifact@v4
