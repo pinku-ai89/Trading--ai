@@ -28,473 +28,907 @@ jobs:
 
           cat > settings.gradle <<'EOF'
           pluginManagement {
-            repositories {
-              google()
-              mavenCentral()
-              gradlePluginPortal()
-            }
+              repositories {
+                  google()
+                  mavenCentral()
+                  gradlePluginPortal()
+              }
           }
 
           dependencyResolutionManagement {
-            repositoriesMode.set(RepositoriesMode.FAIL_ON_PROJECT_REPOS)
-            repositories {
-              google()
-              mavenCentral()
-            }
+              repositoriesMode.set(RepositoriesMode.FAIL_ON_PROJECT_REPOS)
+              repositories {
+                  google()
+                  mavenCentral()
+              }
           }
 
           rootProject.name = "TraderPinkAI"
-          include ":app"
+          include(":app")
           EOF
 
           cat > build.gradle <<'EOF'
           plugins {
-            id 'com.android.application' version '8.6.1' apply false
+              id 'com.android.application' version '8.6.1' apply false
           }
           EOF
 
           cat > app/build.gradle <<'EOF'
           plugins {
-            id 'com.android.application'
+              id 'com.android.application'
           }
 
           android {
-            namespace 'com.traderpink.ai'
-            compileSdk 35
+              namespace 'com.traderpink.ai'
+              compileSdk 35
 
-            defaultConfig {
-              applicationId 'com.traderpink.ai'
-              minSdk 23
-              targetSdk 35
-              versionCode 15
-              versionName '1.0.15'
-            }
+              defaultConfig {
+                  applicationId 'com.traderpink.ai'
+                  minSdk 23
+                  targetSdk 35
+                  versionCode 16
+                  versionName "1.0.16"
+              }
           }
           EOF
 
           cat > app/src/main/res/values/styles.xml <<'EOF'
           <resources>
-            <style name="AppTheme"
-              parent="android:style/Theme.Material.Light.NoActionBar">
-              <item name="android:fontFamily">sans</item>
-              <item name="android:windowActionModeOverlay">true</item>
-            </style>
+              <style name="AppTheme" parent="android:style/Theme.Material.Light.NoActionBar">
+                  <item name="android:fontFamily">sans</item>
+                  <item name="android:windowLightStatusBar">true</item>
+                  <item name="android:statusBarColor">#0B1020</item>
+                  <item name="android:navigationBarColor">#0B1020</item>
+              </style>
           </resources>
           EOF
 
           cat > app/src/main/AndroidManifest.xml <<'EOF'
           <manifest xmlns:android="http://schemas.android.com/apk/res/android">
 
-            <uses-permission android:name="android.permission.INTERNET"/>
-            <uses-permission android:name="android.permission.SYSTEM_ALERT_WINDOW"/>
-            <uses-permission android:name="android.permission.FOREGROUND_SERVICE"/>
-            <uses-permission android:name="android.permission.FOREGROUND_SERVICE_SPECIAL_USE"/>
+              <uses-permission android:name="android.permission.INTERNET"/>
+              <uses-permission android:name="android.permission.SYSTEM_ALERT_WINDOW"/>
+              <uses-permission android:name="android.permission.FOREGROUND_SERVICE"/>
+              <uses-permission android:name="android.permission.FOREGROUND_SERVICE_SPECIAL_USE"/>
 
-            <application
-              android:theme="@style/AppTheme"
-              android:label="Trader Pink AI"
-              android:allowBackup="false"
-              android:supportsRtl="true">
+              <application
+                  android:theme="@style/AppTheme"
+                  android:label="Trader Pink AI"
+                  android:allowBackup="false"
+                  android:supportsRtl="true">
 
-              <activity
-                android:name=".MainActivity"
-                android:exported="true">
+                  <activity
+                      android:name=".MainActivity"
+                      android:exported="true">
 
-                <intent-filter>
-                  <action android:name="android.intent.action.MAIN"/>
-                  <category android:name="android.intent.category.LAUNCHER"/>
-                </intent-filter>
+                      <intent-filter>
+                          <action android:name="android.intent.action.MAIN"/>
+                          <category android:name="android.intent.category.LAUNCHER"/>
+                      </intent-filter>
 
-              </activity>
+                  </activity>
 
-              <service
-                android:name=".FloatingService"
-                android:exported="false"
-                android:foregroundServiceType="specialUse">
+                  <service
+                      android:name=".FloatingService"
+                      android:exported="false"
+                      android:foregroundServiceType="specialUse">
 
-                <property
-                  android:name="android.app.PROPERTY_SPECIAL_USE_FGS_SUBTYPE"
-                  android:value="market signal floating overlay"/>
+                      <property
+                          android:name="android.app.PROPERTY_SPECIAL_USE_FGS_SUBTYPE"
+                          android:value="Trading signal floating overlay"/>
 
-              </service>
+                  </service>
 
-            </application>
-
+              </application>
           </manifest>
           EOF
 
-      - name: Create MainActivity
-        shell: bash
-        run: |
           cat > app/src/main/java/com/traderpink/ai/MainActivity.java <<'EOF'
           package com.traderpink.ai;
 
           import android.app.Activity;
-          import android.content.Intent;
-          import android.net.Uri;
           import android.os.Bundle;
-          import android.provider.Settings;
+          import android.os.Handler;
+          import android.content.Intent;
           import android.graphics.Color;
+          import android.graphics.Typeface;
+          import android.net.Uri;
+          import android.provider.Settings;
+          import android.view.Gravity;
           import android.view.View;
-          import android.widget.*;
+          import android.widget.Button;
+          import android.widget.LinearLayout;
+          import android.widget.ScrollView;
+          import android.widget.TextView;
 
           import org.json.JSONObject;
+
+          import java.io.BufferedReader;
+          import java.io.InputStreamReader;
+          import java.net.HttpURLConnection;
+          import java.net.URL;
+          import java.text.SimpleDateFormat;
+          import java.util.Date;
+          import java.util.Locale;
+          import java.util.TimeZone;
 
           public class MainActivity extends Activity {
 
-            final String API =
-              "https://crimson-grass-f881.bijondebnath51.workers.dev/";
+              private static final String API =
+                  "https://crimson-grass-f881.bijondebnath51.workers.dev/";
 
-            TextView signal;
-            TextView info;
+              private LinearLayout box;
+              private TextView status;
+              private Handler handler = new Handler();
 
-            @Override
-            protected void onCreate(Bundle b) {
-              super.onCreate(b);
+              private final Runnable autoUpdate = new Runnable() {
+                  @Override
+                  public void run() {
+                      loadSignal();
+                      handler.postDelayed(this, 30000);
+                  }
+              };
 
-              LinearLayout root = new LinearLayout(this);
-              root.setOrientation(LinearLayout.VERTICAL);
-              root.setPadding(25,30,25,25);
-
-              TextView title = new TextView(this);
-              title.setText("🤖 Trader Pink AI 📈");
-              title.setTextSize(25);
-              title.setTextColor(Color.BLACK);
-
-              TextView market = new TextView(this);
-              market.setText("EURUSD • 1 MIN");
-              market.setTextSize(18);
-
-              signal = new TextView(this);
-              signal.setText("WAIT");
-              signal.setTextSize(38);
-              signal.setPadding(0,20,0,20);
-
-              info = new TextView(this);
-              info.setText("Loading...");
-              info.setTextSize(16);
-
-              Button next = new Button(this);
-              next.setText("NEXT SIGNAL");
-
-              Button floating = new Button(this);
-              floating.setText("START FLOATING BOT");
-
-              root.addView(title);
-              root.addView(market);
-              root.addView(signal);
-              root.addView(info);
-              root.addView(next);
-              root.addView(floating);
-
-              setContentView(root);
-
-              next.setOnClickListener(v -> load());
-              floating.setOnClickListener(v -> startFloating());
-
-              load();
-            }
-
-            void load() {
-              new Thread(() -> {
-                try {
-                  java.net.URL u = new java.net.URL(API);
-                  java.net.HttpURLConnection c =
-                    (java.net.HttpURLConnection) u.openConnection();
-
-                  c.setConnectTimeout(10000);
-                  c.setReadTimeout(10000);
-
-                  java.io.BufferedReader r =
-                    new java.io.BufferedReader(
-                      new java.io.InputStreamReader(c.getInputStream()));
-
-                  StringBuilder s = new StringBuilder();
-                  String line;
-
-                  while ((line = r.readLine()) != null)
-                    s.append(line);
-
-                  JSONObject j = new JSONObject(s.toString());
-
-                  String sig = j.optString("signal","WAIT");
-                  int conf = j.optInt("confidence",0);
-                  String candle =
-                    j.optString("closed_candle_time","");
-
-                  runOnUiThread(() -> {
-                    signal.setText(sig + "  " + conf + "%");
-                    info.setText(
-                      "Signal Candle: " + candle +
-                      "\nNext Candle: 1 MIN"
-                    );
-                  });
-
-                  c.disconnect();
-
-                } catch (Exception e) {
-                  runOnUiThread(() ->
-                    info.setText("Connection error"));
-                }
-              }).start();
-            }
-
-            void startFloating() {
-              if (!Settings.canDrawOverlays(this)) {
-                Intent i = new Intent(
-                  Settings.ACTION_MANAGE_OVERLAY_PERMISSION,
-                  Uri.parse("package:" + getPackageName())
-                );
-                startActivity(i);
-                return;
+              @Override
+              protected void onCreate(Bundle b) {
+                  super.onCreate(b);
+                  buildUI();
+                  loadSignal();
               }
 
-              Intent i =
-                new Intent(this, FloatingService.class);
+              @Override
+              protected void onResume() {
+                  super.onResume();
+                  handler.removeCallbacks(autoUpdate);
+                  handler.postDelayed(autoUpdate, 30000);
+              }
 
-              if (android.os.Build.VERSION.SDK_INT >= 26)
-                startForegroundService(i);
-              else
-                startService(i);
-            }
+              @Override
+              protected void onPause() {
+                  super.onPause();
+                  handler.removeCallbacks(autoUpdate);
+              }
+
+              private TextView tv(String text, int size) {
+                  TextView t = new TextView(this);
+                  t.setText(text);
+                  t.setTextSize(size);
+                  t.setTextColor(Color.WHITE);
+                  t.setPadding(16, 10, 16, 10);
+                  return t;
+              }
+
+              private void add(String text) {
+                  TextView t = tv(text, 15);
+                  t.setBackgroundColor(Color.rgb(20, 28, 48));
+                  box.addView(t);
+              }
+
+              private void title(String text) {
+                  TextView t = tv(text, 17);
+                  t.setTypeface(Typeface.DEFAULT, Typeface.BOLD);
+                  t.setTextColor(Color.CYAN);
+                  box.addView(t);
+              }
+
+              private void buildUI() {
+
+                  ScrollView scroll = new ScrollView(this);
+                  scroll.setBackgroundColor(Color.rgb(8, 13, 28));
+
+                  box = new LinearLayout(this);
+                  box.setOrientation(LinearLayout.VERTICAL);
+                  box.setPadding(12, 18, 12, 30);
+
+                  TextView head = tv("🤖 Trader Pink AI 📈", 25);
+                  head.setGravity(Gravity.CENTER);
+                  head.setTypeface(Typeface.DEFAULT, Typeface.BOLD);
+                  box.addView(head);
+
+                  TextView market = tv("EURUSD • 1 MIN", 16);
+                  market.setGravity(Gravity.CENTER);
+                  market.setTextColor(Color.CYAN);
+                  box.addView(market);
+
+                  status = tv("লোড হচ্ছে...", 15);
+                  status.setGravity(Gravity.CENTER);
+                  box.addView(status);
+
+                  add("");
+                  title("📊 NEXT CANDLE SIGNAL");
+                  add("Signal: অপেক্ষা...");
+                  add("Confidence: --");
+                  add("Signal Candle: --");
+                  add("Next Candle: --");
+                  add("Price: --");
+                  add("Trend: --");
+                  add("Candle Direction: --");
+                  add("Buy Score: --");
+                  add("Sell Score: --");
+                  add("Score Difference: --");
+
+                  title("📈 INDICATORS");
+                  add("EMA 9: --");
+                  add("EMA 21: --");
+                  add("EMA 50: --");
+                  add("EMA 200: --");
+                  add("RSI: --");
+                  add("MACD: --");
+                  add("MACD Signal: --");
+
+                  add("");
+                  title("⏱️ ENGINE STATUS");
+                  add("Closed Candle Only: YES");
+                  add("Data Source: Twelve Data");
+                  add("Auto Update: 30 Seconds");
+
+                  add("");
+
+                  Button next = new Button(this);
+                  next.setText("🔍 NEXT SIGNAL");
+                  next.setTextSize(16);
+                  next.setOnClickListener(v -> loadSignal());
+                  box.addView(next);
+
+                  Button floating = new Button(this);
+                  floating.setText("🤖 START FLOATING BOT");
+                  floating.setTextSize(16);
+                  floating.setOnClickListener(v -> startFloating());
+                  box.addView(floating);
+
+                  scroll.addView(box);
+                  setContentView(scroll);
+              }
+
+              private String bdTime(String iso) {
+                  try {
+                      SimpleDateFormat input =
+                          new SimpleDateFormat(
+                              "yyyy-MM-dd'T'HH:mm:ss.SSS'Z'",
+                              Locale.US
+                          );
+
+                      input.setTimeZone(TimeZone.getTimeZone("UTC"));
+
+                      Date d = input.parse(iso);
+
+                      SimpleDateFormat output =
+                          new SimpleDateFormat(
+                              "dd/MM/yyyy hh:mm:ss a",
+                              Locale.US
+                          );
+
+                      output.setTimeZone(
+                          TimeZone.getTimeZone("Asia/Dhaka")
+                      );
+
+                      return output.format(d);
+
+                  } catch (Exception e) {
+                      return iso;
+                  }
+              }
+
+              private String value(JSONObject o, String key) {
+                  try {
+                      return String.valueOf(o.opt(key));
+                  } catch (Exception e) {
+                      return "--";
+                  }
+              }
+
+              private String trend(double e9, double e21, double e50) {
+
+                  if (e9 > e21 && e21 > e50)
+                      return "BULLISH";
+
+                  if (e9 < e21 && e21 < e50)
+                      return "BEARISH";
+
+                  return "SIDEWAYS";
+              }
+
+              private void loadSignal() {
+
+                  status.setText("🔄 Market Analysis চলছে...");
+
+                  new Thread(() -> {
+
+                      try {
+
+                          URL url = new URL(API);
+
+                          HttpURLConnection c =
+                              (HttpURLConnection) url.openConnection();
+
+                          c.setRequestMethod("GET");
+                          c.setConnectTimeout(10000);
+                          c.setReadTimeout(10000);
+
+                          BufferedReader r =
+                              new BufferedReader(
+                                  new InputStreamReader(
+                                      c.getInputStream()
+                                  )
+                              );
+
+                          StringBuilder s = new StringBuilder();
+                          String line;
+
+                          while ((line = r.readLine()) != null)
+                              s.append(line);
+
+                          r.close();
+
+                          JSONObject j = new JSONObject(s.toString());
+
+                          String signal = value(j, "signal");
+                          String confidence = value(j, "confidence");
+
+                          JSONObject candle =
+                              j.optJSONObject("candle");
+
+                          JSONObject ind =
+                              j.optJSONObject("indicators");
+
+                          String candleTime =
+                              value(j, "closed_candle_time");
+
+                          String nextTime =
+                              value(j, "next_candle_time");
+
+                          String price =
+                              value(j, "price");
+
+                          String direction =
+                              candle != null
+                                  ? value(candle, "direction")
+                                  : "--";
+
+                          String ema9 =
+                              ind != null ? value(ind, "ema9") : "--";
+
+                          String ema21 =
+                              ind != null ? value(ind, "ema21") : "--";
+
+                          String ema50 =
+                              ind != null ? value(ind, "ema50") : "--";
+
+                          String ema200 =
+                              ind != null ? value(ind, "ema200") : "--";
+
+                          String rsi =
+                              ind != null ? value(ind, "rsi") : "--";
+
+                          String macd =
+                              ind != null ? value(ind, "macd") : "--";
+
+                          String macdSignal =
+                              ind != null
+                                  ? value(ind, "macd_signal")
+                                  : "--";
+
+                          double d9 =
+                              ind != null
+                                  ? ind.optDouble("ema9", 0)
+                                  : 0;
+
+                          double d21 =
+                              ind != null
+                                  ? ind.optDouble("ema21", 0)
+                                  : 0;
+
+                          double d50 =
+                              ind != null
+                                  ? ind.optDouble("ema50", 0)
+                                  : 0;
+
+                          String trend =
+                              trend(d9, d21, d50);
+
+                          String buyScore =
+                              value(j, "buy_score");
+
+                          String sellScore =
+                              value(j, "sell_score");
+
+                          String difference =
+                              value(j, "score_difference");
+
+                          final String result =
+                              "SIGNAL: " + signal +
+                              "\\nCONFIDENCE: " + confidence + "%" +
+                              "\\n\\nSIGNAL CANDLE: " +
+                              bdTime(candleTime) +
+                              "\\nNEXT CANDLE: " +
+                              bdTime(nextTime) +
+                              "\\n\\nPRICE: " + price +
+                              "\\nTREND: " + trend +
+                              "\\nCANDLE: " + direction +
+                              "\\nBUY SCORE: " + buyScore +
+                              "\\nSELL SCORE: " + sellScore +
+                              "\\nSCORE DIFFERENCE: " + difference +
+                              "\\n\\nEMA 9: " + ema9 +
+                              "\\nEMA 21: " + ema21 +
+                              "\\nEMA 50: " + ema50 +
+                              "\\nEMA 200: " + ema200 +
+                              "\\nRSI: " + rsi +
+                              "\\nMACD: " + macd +
+                              "\\nMACD SIGNAL: " + macdSignal;
+
+                          runOnUiThread(() -> {
+
+                              status.setText(
+                                  result
+                              );
+
+                          });
+
+                      } catch (Exception e) {
+
+                          runOnUiThread(() ->
+                              status.setText(
+                                  "❌ Signal Error\\n" +
+                                  e.getMessage()
+                              )
+                          );
+                      }
+
+                  }).start();
+              }
+
+              private void startFloating() {
+
+                  if (!Settings.canDrawOverlays(this)) {
+
+                      Intent i = new Intent(
+                          Settings.ACTION_MANAGE_OVERLAY_PERMISSION,
+                          Uri.parse(
+                              "package:" + getPackageName()
+                          )
+                      );
+
+                      startActivity(i);
+                      return;
+                  }
+
+                  Intent service =
+                      new Intent(
+                          this,
+                          FloatingService.class
+                      );
+
+                  startForegroundService(service);
+              }
           }
           EOF
 
-      - name: Create FloatingService
-        shell: bash
-        run: |
           cat > app/src/main/java/com/traderpink/ai/FloatingService.java <<'EOF'
           package com.traderpink.ai;
 
-          import android.app.*;
-          import android.content.*;
-          import android.graphics.*;
-          import android.os.*;
-          import android.view.*;
-          import android.widget.*;
+          import android.app.Service;
+          import android.app.Notification;
+          import android.app.NotificationChannel;
+          import android.app.NotificationManager;
+          import android.content.Intent;
+          import android.graphics.Color;
+          import android.graphics.PixelFormat;
+          import android.os.Build;
+          import android.os.Handler;
+          import android.os.IBinder;
+          import android.provider.Settings;
+          import android.view.Gravity;
+          import android.view.MotionEvent;
+          import android.view.View;
+          import android.view.WindowManager;
+          import android.widget.LinearLayout;
+          import android.widget.TextView;
 
           import org.json.JSONObject;
 
+          import java.io.BufferedReader;
+          import java.io.InputStreamReader;
+          import java.net.HttpURLConnection;
+          import java.net.URL;
+          import java.text.SimpleDateFormat;
+          import java.util.Date;
+          import java.util.Locale;
+          import java.util.TimeZone;
+
           public class FloatingService extends Service {
 
-            final String API =
-              "https://crimson-grass-f881.bijondebnath51.workers.dev/";
+              private static final String API =
+                  "https://crimson-grass-f881.bijondebnath51.workers.dev/";
 
-            WindowManager wm;
-            WindowManager.LayoutParams params;
-            LinearLayout box;
-            TextView text;
+              private WindowManager wm;
+              private LinearLayout box;
+              private TextView text;
 
-            Handler handler =
-              new Handler(Looper.getMainLooper());
+              private Handler handler = new Handler();
 
-            Runnable refresh = new Runnable() {
+              private final Runnable update =
+                  new Runnable() {
+                      @Override
+                      public void run() {
+                          load();
+                          handler.postDelayed(this, 30000);
+                      }
+                  };
+
               @Override
-              public void run() {
-                load();
-                handler.postDelayed(this,30000);
+              public void onCreate() {
+                  super.onCreate();
+
+                  createNotification();
+
+                  if (!Settings.canDrawOverlays(this))
+                      return;
+
+                  wm =
+                      (WindowManager)
+                          getSystemService(WINDOW_SERVICE);
+
+                  box = new LinearLayout(this);
+                  box.setOrientation(
+                      LinearLayout.VERTICAL
+                  );
+                  box.setPadding(16, 12, 16, 12);
+                  box.setBackgroundColor(
+                      Color.rgb(12, 18, 35)
+                  );
+
+                  TextView title =
+                      new TextView(this);
+
+                  title.setText(
+                      "🤖 Trader Pink AI"
+                  );
+
+                  title.setTextColor(Color.CYAN);
+                  title.setTextSize(16);
+
+                  text =
+                      new TextView(this);
+
+                  text.setTextColor(Color.WHITE);
+                  text.setTextSize(13);
+                  text.setPadding(0, 8, 0, 0);
+
+                  TextView close =
+                      new TextView(this);
+
+                  close.setText("✕");
+                  close.setTextColor(Color.WHITE);
+                  close.setTextSize(18);
+                  close.setGravity(Gravity.RIGHT);
+
+                  close.setOnClickListener(
+                      v -> stopSelf()
+                  );
+
+                  box.addView(close);
+                  box.addView(title);
+                  box.addView(text);
+
+                  int type =
+                      Build.VERSION.SDK_INT >= 26
+                          ? WindowManager.LayoutParams.TYPE_APPLICATION_OVERLAY
+                          : WindowManager.LayoutParams.TYPE_PHONE;
+
+                  WindowManager.LayoutParams p =
+                      new WindowManager.LayoutParams(
+                          310,
+                          WindowManager.LayoutParams.WRAP_CONTENT,
+                          type,
+                          WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE,
+                          PixelFormat.TRANSLUCENT
+                      );
+
+                  p.gravity =
+                      Gravity.TOP | Gravity.RIGHT;
+
+                  p.x = 10;
+                  p.y = 150;
+
+                  wm.addView(box, p);
+
+                  box.setOnTouchListener(
+                      new View.OnTouchListener() {
+
+                          float downX;
+                          float downY;
+                          int oldX;
+                          int oldY;
+
+                          @Override
+                          public boolean onTouch(
+                              View v,
+                              MotionEvent e
+                          ) {
+
+                              if (e.getAction() ==
+                                  MotionEvent.ACTION_DOWN) {
+
+                                  downX = e.getRawX();
+                                  downY = e.getRawY();
+
+                                  oldX = p.x;
+                                  oldY = p.y;
+
+                                  return true;
+                              }
+
+                              if (e.getAction() ==
+                                  MotionEvent.ACTION_MOVE) {
+
+                                  p.x =
+                                      oldX +
+                                      (int)(
+                                          downX -
+                                          e.getRawX()
+                                      );
+
+                                  p.y =
+                                      oldY +
+                                      (int)(
+                                          e.getRawY() -
+                                          downY
+                                      );
+
+                                  wm.updateViewLayout(
+                                      box,
+                                      p
+                                  );
+
+                                  return true;
+                              }
+
+                              return false;
+                          }
+                      }
+                  );
+
+                  handler.post(update);
               }
-            };
 
-            @Override
-            public void onCreate() {
-              super.onCreate();
+              private String bdTime(String iso) {
 
-              createChannel();
+                  try {
 
-              Notification n =
-                new Notification.Builder(this,"pink")
-                  .setContentTitle("Trader Pink AI")
-                  .setContentText("EURUSD • 1M")
-                  .setSmallIcon(android.R.drawable.ic_dialog_info)
-                  .build();
+                      SimpleDateFormat input =
+                          new SimpleDateFormat(
+                              "yyyy-MM-dd'T'HH:mm:ss.SSS'Z'",
+                              Locale.US
+                          );
 
-              startForeground(10,n);
+                      input.setTimeZone(
+                          TimeZone.getTimeZone("UTC")
+                      );
 
-              showOverlay();
-              handler.post(refresh);
-            }
+                      Date d =
+                          input.parse(iso);
 
-            void showOverlay() {
-              wm = (WindowManager)
-                getSystemService(WINDOW_SERVICE);
+                      SimpleDateFormat output =
+                          new SimpleDateFormat(
+                              "dd/MM hh:mm a",
+                              Locale.US
+                          );
 
-              box = new LinearLayout(this);
-              box.setOrientation(LinearLayout.VERTICAL);
-              box.setPadding(18,12,18,12);
-              box.setBackgroundColor(Color.WHITE);
+                      output.setTimeZone(
+                          TimeZone.getTimeZone(
+                              "Asia/Dhaka"
+                          )
+                      );
 
-              text = new TextView(this);
-              text.setText(
-                "🤖 Trader Pink AI\n" +
-                "EURUSD • 1M\nLoading..."
-              );
-              text.setTextSize(17);
-              text.setTextColor(Color.BLACK);
+                      return output.format(d);
 
-              Button close = new Button(this);
-              close.setText("X");
-              close.setOnClickListener(v -> stopSelf());
+                  } catch (Exception e) {
 
-              box.addView(text);
-              box.addView(close);
-
-              int type =
-                Build.VERSION.SDK_INT >= 26
-                ? WindowManager.LayoutParams.TYPE_APPLICATION_OVERLAY
-                : WindowManager.LayoutParams.TYPE_PHONE;
-
-              params = new WindowManager.LayoutParams(
-                340,
-                WindowManager.LayoutParams.WRAP_CONTENT,
-                type,
-                WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE,
-                PixelFormat.TRANSLUCENT
-              );
-
-              params.gravity =
-                Gravity.TOP | Gravity.RIGHT;
-
-              params.x = 15;
-              params.y = 120;
-
-              wm.addView(box,params);
-
-              box.setOnTouchListener(
-                new View.OnTouchListener() {
-
-                  float downX,downY;
-                  int startX,startY;
-
-                  @Override
-                  public boolean onTouch(
-                    View v, MotionEvent e) {
-
-                    if(e.getAction()==MotionEvent.ACTION_DOWN) {
-                      downX=e.getRawX();
-                      downY=e.getRawY();
-                      startX=params.x;
-                      startY=params.y;
-                      return true;
-                    }
-
-                    if(e.getAction()==MotionEvent.ACTION_MOVE) {
-                      params.x =
-                        startX + (int)(downX-e.getRawX());
-                      params.y =
-                        startY + (int)(e.getRawY()-downY);
-
-                      wm.updateViewLayout(box,params);
-                      return true;
-                    }
-
-                    return true;
+                      return iso;
                   }
-                }
-              );
-            }
-
-            void load() {
-              new Thread(() -> {
-                try {
-                  java.net.URL u =
-                    new java.net.URL(API);
-
-                  java.net.HttpURLConnection c =
-                    (java.net.HttpURLConnection)
-                    u.openConnection();
-
-                  c.setConnectTimeout(10000);
-                  c.setReadTimeout(10000);
-
-                  java.io.BufferedReader r =
-                    new java.io.BufferedReader(
-                      new java.io.InputStreamReader(
-                        c.getInputStream()));
-
-                  StringBuilder s =
-                    new StringBuilder();
-
-                  String line;
-
-                  while((line=r.readLine())!=null)
-                    s.append(line);
-
-                  JSONObject j =
-                    new JSONObject(s.toString());
-
-                  String sig =
-                    j.optString("signal","WAIT");
-
-                  int conf =
-                    j.optInt("confidence",0);
-
-                  String candle =
-                    j.optString(
-                      "closed_candle_time","");
-
-                  JSONObject co =
-                    j.optJSONObject("candle");
-
-                  String dir =
-                    co == null ? "" :
-                    co.optString("direction","");
-
-                  handler.post(() ->
-                    text.setText(
-                      "🤖 Trader Pink AI\n" +
-                      "EURUSD • 1M\n\n" +
-                      sig + "  " + conf + "%\n" +
-                      "Candle: " + candle + "\n" +
-                      "Direction: " + dir
-                    )
-                  );
-
-                  c.disconnect();
-
-                } catch(Exception e) {
-                  handler.post(() ->
-                    text.setText(
-                      "🤖 Trader Pink AI\n" +
-                      "Connection error"
-                    )
-                  );
-                }
-              }).start();
-            }
-
-            void createChannel() {
-              if(Build.VERSION.SDK_INT >= 26) {
-                NotificationChannel ch =
-                  new NotificationChannel(
-                    "pink",
-                    "Trader Pink AI",
-                    NotificationManager.IMPORTANCE_LOW
-                  );
-
-                getSystemService(
-                  NotificationManager.class
-                ).createNotificationChannel(ch);
-              }
-            }
-
-            @Override
-            public void onDestroy() {
-              handler.removeCallbacks(refresh);
-
-              if(wm != null && box != null) {
-                try {
-                  wm.removeView(box);
-                } catch(Exception ignored) {}
               }
 
-              super.onDestroy();
-            }
+              private void load() {
 
-            @Override
-            public IBinder onBind(Intent intent) {
-              return null;
-            }
+                  new Thread(() -> {
+
+                      try {
+
+                          URL url =
+                              new URL(API);
+
+                          HttpURLConnection c =
+                              (HttpURLConnection)
+                                  url.openConnection();
+
+                          c.setRequestMethod("GET");
+                          c.setConnectTimeout(10000);
+                          c.setReadTimeout(10000);
+
+                          BufferedReader r =
+                              new BufferedReader(
+                                  new InputStreamReader(
+                                      c.getInputStream()
+                                  )
+                              );
+
+                          StringBuilder s =
+                              new StringBuilder();
+
+                          String line;
+
+                          while (
+                              (line = r.readLine())
+                              != null
+                          )
+                              s.append(line);
+
+                          r.close();
+
+                          JSONObject j =
+                              new JSONObject(
+                                  s.toString()
+                              );
+
+                          String signal =
+                              j.optString(
+                                  "signal",
+                                  "WAIT"
+                              );
+
+                          String confidence =
+                              j.optString(
+                                  "confidence",
+                                  "--"
+                              );
+
+                          String candle =
+                              j.optString(
+                                  "closed_candle_time",
+                                  "--"
+                              );
+
+                          String next =
+                              j.optString(
+                                  "next_candle_time",
+                                  "--"
+                              );
+
+                          String price =
+                              j.optString(
+                                  "price",
+                                  "--"
+                              );
+
+                          JSONObject candleObj =
+                              j.optJSONObject(
+                                  "candle"
+                              );
+
+                          String direction =
+                              candleObj != null
+                                  ? candleObj.optString(
+                                      "direction",
+                                      "--"
+                                  )
+                                  : "--";
+
+                          String result =
+                              "EURUSD • 1 MIN" +
+                              "\\n" +
+                              "━━━━━━━━━━━━" +
+                              "\\n" +
+                              signal +
+                              "  " +
+                              confidence +
+                              "%" +
+                              "\\n\\n" +
+                              "Candle: " +
+                              bdTime(candle) +
+                              "\\n" +
+                              "Next: " +
+                              bdTime(next) +
+                              "\\n" +
+                              "Price: " +
+                              price +
+                              "\\n" +
+                              "Direction: " +
+                              direction;
+
+                          if (text != null) {
+
+                              text.post(
+                                  () ->
+                                      text.setText(
+                                          result
+                                      )
+                              );
+                          }
+
+                      } catch (Exception e) {
+
+                          if (text != null) {
+
+                              text.post(
+                                  () ->
+                                      text.setText(
+                                          "⚠️ Connection Error"
+                                      )
+                              );
+                          }
+                      }
+
+                  }).start();
+              }
+
+              private void createNotification() {
+
+                  String channelId =
+                      "trader_pink_ai";
+
+                  if (Build.VERSION.SDK_INT >= 26) {
+
+                      NotificationChannel ch =
+                          new NotificationChannel(
+                              channelId,
+                              "Trader Pink AI",
+                              NotificationManager.IMPORTANCE_LOW
+                          );
+
+                      NotificationManager nm =
+                          getSystemService(
+                              NotificationManager.class
+                          );
+
+                      nm.createNotificationChannel(ch);
+                  }
+
+                  Notification.Builder b =
+                      Build.VERSION.SDK_INT >= 26
+                          ? new Notification.Builder(
+                              this,
+                              channelId
+                          )
+                          : new Notification.Builder(this);
+
+                  b.setContentTitle(
+                      "Trader Pink AI"
+                  );
+
+                  b.setContentText(
+                      "EURUSD Signal Engine Running"
+                  );
+
+                  b.setSmallIcon(
+                      android.R.drawable.ic_dialog_info
+                  );
+
+                  startForeground(
+                      1001,
+                      b.build()
+                  );
+              }
+
+              @Override
+              public void onDestroy() {
+
+                  handler.removeCallbacks(update);
+
+                  if (wm != null &&
+                      box != null) {
+
+                      try {
+                          wm.removeView(box);
+                      } catch (Exception ignored) {}
+                  }
+
+                  super.onDestroy();
+              }
+
+              @Override
+              public IBinder onBind(Intent intent) {
+                  return null;
+              }
           }
           EOF
 
@@ -503,15 +937,14 @@ jobs:
         run: |
           wget -q https://services.gradle.org/distributions/gradle-8.7-bin.zip
           unzip -q gradle-8.7-bin.zip
-          echo "$PWD/gradle-8.7/bin" >> "$GITHUB_PATH"
+          echo "$PWD/gradle-8.7/bin" >> $GITHUB_PATH
 
       - name: Build APK
-        shell: bash
         run: |
           gradle assembleDebug --no-daemon --stacktrace
 
       - name: Upload APK
         uses: actions/upload-artifact@v4
         with:
-          name: Trader-Pink-AI-Floating-v15
+          name: Trader-Pink-AI-Floating-v16
           path: app/build/outputs/apk/debug/app-debug.apk
