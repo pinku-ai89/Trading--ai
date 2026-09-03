@@ -2,72 +2,168 @@
 <html lang="bn">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width,initial-scale=1">
-<meta name="theme-color" content="#0b1020">
+<meta name="viewport"
+      content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
+
+<meta name="theme-color" content="#080d18">
 <title>Trader Pink AI 📈</title>
 
 <style>
-*{box-sizing:border-box}
+*{
+  box-sizing:border-box;
+}
+
 body{
-margin:0;background:#080d18;color:#fff;
-font-family:Arial,sans-serif;text-align:center
+  margin:0;
+  background:#080d18;
+  color:#fff;
+  font-family:Arial,sans-serif;
+  text-align:center;
 }
-.app{max-width:500px;margin:auto;padding:15px}
-h1{margin:8px 0;font-size:26px}
-.sub{color:#9da9bd;margin-bottom:15px}
+
+.app{
+  max-width:500px;
+  margin:auto;
+  padding:15px;
+}
+
+h1{
+  margin:8px 0;
+  font-size:26px;
+}
+
+.sub{
+  color:#9da9bd;
+  margin-bottom:15px;
+}
+
 .card{
-background:#111a2b;border-radius:18px;
-padding:18px;margin:12px 0;
-box-shadow:0 5px 20px #0005
+  background:#111a2b;
+  border-radius:18px;
+  padding:18px;
+  margin:12px 0;
+  box-shadow:0 5px 20px #0005;
 }
+
 .signal{
-font-size:42px;font-weight:bold;margin:12px
+  font-size:42px;
+  font-weight:bold;
+  margin:12px;
 }
-.buy{color:#00e676}
-.sell{color:#ff5252}
-.wait{color:#ffd740}
-.conf{font-size:24px;font-weight:bold}
+
+.buy{
+  color:#00e676;
+}
+
+.sell{
+  color:#ff5252;
+}
+
+.wait{
+  color:#ffd740;
+}
+
+.conf{
+  font-size:24px;
+  font-weight:bold;
+}
+
 .row{
-display:flex;justify-content:space-between;
-padding:9px 0;border-bottom:1px solid #263249
+  display:flex;
+  justify-content:space-between;
+  padding:9px 0;
+  border-bottom:1px solid #263249;
 }
-.label{color:#91a0b8}
+
+.label{
+  color:#91a0b8;
+}
+
 button{
-border:0;border-radius:12px;
-padding:13px 20px;margin:5px;
-font-size:16px;font-weight:bold;
-background:#263653;color:white
+  border:0;
+  border-radius:12px;
+  padding:13px 20px;
+  margin:5px;
+  font-size:16px;
+  font-weight:bold;
+  background:#263653;
+  color:white;
 }
+
 .next{
-font-size:20px;padding:18px 35px;
-border-radius:50%;margin:15px
+  font-size:20px;
+  padding:18px 35px;
+  border-radius:50%;
+  margin:15px;
 }
+
 .reason{
-text-align:left;background:#0b1322;
-padding:12px;border-radius:12px;
-margin-top:10px
+  text-align:left;
+  background:#0b1322;
+  padding:12px;
+  border-radius:12px;
+  margin-top:10px;
+}
+
+.sr-good{
+  font-weight:bold;
+}
+
+.error{
+  color:#ff5252;
 }
 </style>
 </head>
 
 <body>
+
 <div class="app">
 
 <h1>🤖 Trader Pink AI 📈</h1>
-<div class="sub">EUR/USD Smart 1 Minute Signal Engine</div>
+
+<div class="sub">
+EUR/USD Smart 1 Minute Signal Engine
+</div>
+
+
+<!-- ===================================================== -->
+<!-- MAIN SIGNAL -->
+<!-- ===================================================== -->
 
 <div class="card">
+
 <div>EURUSD • 1 MIN</div>
+
 <div id="count">--:--</div>
 
-<button onclick="update()">🔍 UPDATE SIGNAL</button>
+<button onclick="update(true)">
+🔍 UPDATE SIGNAL
+</button>
 
-<div id="signal" class="signal wait">WAIT</div>
-<div id="confidence" class="conf">--%</div>
-<div id="status">Analysis loading...</div>
-
-<button class="next" onclick="update()">◯<br>NEXT<br>SIGNAL</button>
+<div id="signal" class="signal wait">
+WAIT
 </div>
+
+<div id="confidence" class="conf">
+--%
+</div>
+
+<div id="status">
+Analysis loading...
+</div>
+
+<button class="next" onclick="update(true)">
+◯<br>
+NEXT<br>
+SIGNAL
+</button>
+
+</div>
+
+
+<!-- ===================================================== -->
+<!-- MARKET DATA -->
+<!-- ===================================================== -->
 
 <div class="card">
 
@@ -113,132 +209,532 @@ margin-top:10px
 
 </div>
 
+
+<!-- ===================================================== -->
+<!-- SUPPORT / RESISTANCE -->
+<!-- ===================================================== -->
+
 <div class="card">
+
+<h3>📍 Support / Resistance</h3>
+
+<div id="srStatus">
+Analysis active
+</div>
+
+</div>
+
+
+<!-- ===================================================== -->
+<!-- INDICATORS -->
+<!-- ===================================================== -->
+
+<div class="card">
+
 <h3>📊 Indicators</h3>
 
-<div class="row"><span class="label">EMA 9</span><span id="e9">--</span></div>
-<div class="row"><span class="label">EMA 21</span><span id="e21">--</span></div>
-<div class="row"><span class="label">EMA 50</span><span id="e50">--</span></div>
-<div class="row"><span class="label">EMA 200</span><span id="e200">--</span></div>
-<div class="row"><span class="label">RSI</span><span id="rsi">--</span></div>
-<div class="row"><span class="label">MACD</span><span id="macd">--</span></div>
-<div class="row"><span class="label">MACD Signal</span><span id="ms">--</span></div>
+<div class="row">
+<span class="label">EMA 9</span>
+<span id="e9">--</span>
+</div>
+
+<div class="row">
+<span class="label">EMA 21</span>
+<span id="e21">--</span>
+</div>
+
+<div class="row">
+<span class="label">EMA 50</span>
+<span id="e50">--</span>
+</div>
+
+<div class="row">
+<span class="label">EMA 200</span>
+<span id="e200">--</span>
+</div>
+
+<div class="row">
+<span class="label">RSI</span>
+<span id="rsi">--</span>
+</div>
+
+<div class="row">
+<span class="label">MACD</span>
+<span id="macd">--</span>
+</div>
+
+<div class="row">
+<span class="label">MACD Signal</span>
+<span id="ms">--</span>
+</div>
 
 </div>
+
+
+<!-- ===================================================== -->
+<!-- RULE -->
+<!-- ===================================================== -->
 
 <div class="card">
-<h3>📍 Support / Resistance</h3>
-<div class="row">
-<span class="label">Support</span>
-<span>Analysis active</span>
-</div>
-<div class="row">
-<span class="label">Resistance</span>
-<span>Analysis active</span>
-</div>
-</div>
 
-<div class="card">
 <h3>🛡️ Signal Rule</h3>
+
 <div class="reason">
-শুধু সম্পূর্ণ বন্ধ হওয়া candle দিয়ে analysis করা হয়।<br>
-দুর্বল confirmation হলে WAIT থাকবে।
-</div>
+
+শুধু সম্পূর্ণ বন্ধ হওয়া 1 মিনিটের candle দিয়ে analysis করা হয়।
+
+<br><br>
+
+পরবর্তী 1 মিনিটের candle-এর জন্য signal তৈরি করা হয়।
+
+<br><br>
+
+Confirmation দুর্বল হলে WAIT থাকবে।
+
 </div>
 
 </div>
+
+</div>
+
 
 <script>
-const API="https://crimson-grass-f881.bijondebnath51.workers.dev/";
 
-let nextTime=0;
+// ============================================================
+// WORKER API
+// ============================================================
 
-function $(id){return document.getElementById(id)}
+const API =
+"https://crimson-grass-f881.bijondebnath51.workers.dev/";
+
+
+// ============================================================
+// GLOBAL
+// ============================================================
+
+let nextTime = 0;
+
+let lastSignalId = "";
+
+let loading = false;
+
+
+// ============================================================
+// ELEMENT
+// ============================================================
+
+function $(id){
+  return document.getElementById(id);
+}
+
+
+// ============================================================
+// DHAKA TIME
+// ============================================================
 
 function time(t){
-if(!t)return"--";
-return new Date(t).toLocaleTimeString("en-GB",{
-timeZone:"Asia/Dhaka",
-hour:"2-digit",minute:"2-digit",second:"2-digit"
-})
+
+  if(!t) return "--";
+
+  return new Date(t).toLocaleTimeString(
+    "en-GB",
+    {
+      timeZone:"Asia/Dhaka",
+      hour:"2-digit",
+      minute:"2-digit",
+      second:"2-digit"
+    }
+  );
 }
+
+
+// ============================================================
+// NUMBER
+// ============================================================
 
 function num(x){
-return x==null||!Number.isFinite(Number(x))
-?"--":Number(x).toFixed(5)
+
+  if(
+    x == null ||
+    !Number.isFinite(Number(x))
+  ){
+    return "--";
+  }
+
+  return Number(x).toFixed(5);
 }
 
-function update(){
-$("status").textContent="Analyzing...";
-fetch(API+"?t="+Date.now(),{cache:"no-store"})
-.then(r=>r.json())
-.then(d=>{
-if(!d.ok)throw Error(d.error||"No data");
 
-let s=d.signal||"WAIT";
-let el=$("signal");
+// ============================================================
+// UPDATE SIGNAL
+// ============================================================
 
-el.textContent=s;
-el.className="signal "+
-(s==="BUY"?"buy":s==="SELL"?"sell":"wait");
+async function update(manual=false){
 
-$("confidence").textContent=
-(d.confidence??"--")+"%";
+  if(loading && !manual){
+    return;
+  }
 
-$("status").textContent=
-s==="BUY"?"🟢 BUY confirmation":
-s==="SELL"?"🔴 SELL confirmation":
-"🟡 WAIT • Strong setup নেই";
+  loading = true;
 
-$("closed").textContent=time(d.closed_candle_time);
-$("next").textContent=time(d.next_candle_time);
-$("price").textContent=num(d.price);
+  if(manual){
+    $("status").textContent =
+      "Analyzing...";
+  }
 
-$("trend").textContent=
-d.candle?.direction==="UP"?"📈 UPTREND":
-d.candle?.direction==="DOWN"?"📉 DOWNTREND":"SIDEWAYS";
+  try{
 
-$("candle").textContent=
-d.candle?.direction+
-" • "+
-(d.candle?.body_percent??"--")+"%";
+    const response =
+      await fetch(
+        API + "?t=" + Date.now(),
+        {
+          cache:"no-store",
+          headers:{
+            "Cache-Control":"no-cache"
+          }
+        }
+      );
 
-$("buy").textContent=d.buy_score??"--";
-$("sell").textContent=d.sell_score??"--";
-$("diff").textContent=d.score_difference??"--";
+    const d =
+      await response.json();
 
-let i=d.indicators||{};
-$("e9").textContent=num(i.ema9);
-$("e21").textContent=num(i.ema21);
-$("e50").textContent=num(i.ema50);
-$("e200").textContent=num(i.ema200);
-$("rsi").textContent=i.rsi==null?"--":Number(i.rsi).toFixed(2);
-$("macd").textContent=num(i.macd);
-$("ms").textContent=num(i.macd_signal);
 
-nextTime=Number(d.next_candle||0)*1000;
+    if(!d.ok){
 
-})
-.catch(e=>{
-$("status").textContent="⚠ "+e.message;
-})
+      throw new Error(
+        d.error || "No data"
+      );
+    }
+
+
+    // ========================================================
+    // SIGNAL
+    // ========================================================
+
+    const s =
+      d.signal || "WAIT";
+
+    const el =
+      $("signal");
+
+
+    el.textContent =
+      s;
+
+
+    el.className =
+      "signal " +
+      (
+        s === "BUY"
+          ? "buy"
+          : s === "SELL"
+            ? "sell"
+            : "wait"
+      );
+
+
+    // ========================================================
+    // CONFIDENCE
+    // ========================================================
+
+    $("confidence").textContent =
+      (d.confidence ?? "--") + "%";
+
+
+    // ========================================================
+    // STATUS
+    // ========================================================
+
+    if(s === "BUY"){
+
+      $("status").textContent =
+        "🟢 BUY confirmation";
+
+    }
+    else if(s === "SELL"){
+
+      $("status").textContent =
+        "🔴 SELL confirmation";
+
+    }
+    else{
+
+      $("status").textContent =
+        "🟡 WAIT • Strong setup নেই";
+    }
+
+
+    // ========================================================
+    // CANDLE
+    // ========================================================
+
+    $("closed").textContent =
+      time(d.closed_candle_time);
+
+
+    $("next").textContent =
+      time(d.next_candle_time);
+
+
+    $("price").textContent =
+      num(d.price);
+
+
+    // ========================================================
+    // TREND
+    // ========================================================
+
+    if(d.trend){
+
+      $("trend").textContent =
+        d.trend;
+    }
+    else{
+
+      $("trend").textContent =
+        d.candle?.direction === "UP"
+          ? "📈 UPTREND"
+          : d.candle?.direction === "DOWN"
+            ? "📉 DOWNTREND"
+            : "SIDEWAYS";
+    }
+
+
+    // ========================================================
+    // CANDLE DIRECTION
+    // ========================================================
+
+    $("candle").textContent =
+      (
+        d.candle?.direction || "--"
+      )
+      +
+      " • "
+      +
+      (
+        d.candle?.body_percent ?? "--"
+      )
+      +
+      "%";
+
+
+    // ========================================================
+    // SCORE
+    // ========================================================
+
+    $("buy").textContent =
+      d.buy_score ?? "--";
+
+
+    $("sell").textContent =
+      d.sell_score ?? "--";
+
+
+    $("diff").textContent =
+      d.score_difference ?? "--";
+
+
+    // ========================================================
+    // INDICATORS
+    // ========================================================
+
+    const i =
+      d.indicators || {};
+
+
+    $("e9").textContent =
+      num(i.ema9);
+
+
+    $("e21").textContent =
+      num(i.ema21);
+
+
+    $("e50").textContent =
+      num(i.ema50);
+
+
+    $("e200").textContent =
+      num(i.ema200);
+
+
+    $("rsi").textContent =
+      i.rsi == null
+        ? "--"
+        : Number(i.rsi).toFixed(2);
+
+
+    $("macd").textContent =
+      num(i.macd);
+
+
+    $("ms").textContent =
+      num(i.macd_signal);
+
+
+    // ========================================================
+    // SUPPORT / RESISTANCE
+    // ========================================================
+
+    let sr = "";
+
+
+    if(d.support_status === "GOOD_SUPPORT"){
+
+      sr +=
+        '<div class="sr-good">🟢 ভালো SUPPORT আছে</div>';
+    }
+
+
+    if(d.resistance_status === "GOOD_RESISTANCE"){
+
+      if(sr){
+        sr += "<br>";
+      }
+
+      sr +=
+        '<div class="sr-good">🔴 ভালো RESISTANCE আছে</div>';
+    }
+
+
+    if(!sr){
+
+      sr =
+        '<span class="label">কাছাকাছি গুরুত্বপূর্ণ Support / Resistance নেই</span>';
+    }
+
+
+    $("srStatus").innerHTML =
+      sr;
+
+
+    // ========================================================
+    // NEXT CANDLE TIME
+    // ========================================================
+
+    nextTime =
+      Number(d.next_candle || 0) * 1000;
+
+
+    // ========================================================
+    // SIGNAL ID
+    // ========================================================
+
+    lastSignalId =
+      d.signal_id || "";
+
+
+  }
+  catch(e){
+
+    $("status").innerHTML =
+      '<span class="error">⚠ ' +
+      e.message +
+      '</span>';
+  }
+  finally{
+
+    loading = false;
+  }
 }
+
+
+// ============================================================
+// COUNTDOWN
+// ============================================================
 
 function countdown(){
-if(!nextTime)return;
-let n=Math.max(0,Math.floor((nextTime-Date.now())/1000));
-let m=Math.floor(n/60);
-let s=n%60;
-$("count").textContent=
-String(m).padStart(2,"0")+":"+
-String(s).padStart(2,"0");
 
-if(n<=2)update();
+  if(!nextTime){
+
+    $("count").textContent =
+      "--:--";
+
+    return;
+  }
+
+
+  const now =
+    Date.now();
+
+
+  let n =
+    Math.max(
+      0,
+      Math.floor(
+        (nextTime - now) / 1000
+      )
+    );
+
+
+  const m =
+    Math.floor(n / 60);
+
+
+  const s =
+    n % 60;
+
+
+  $("count").textContent =
+    String(m).padStart(2,"0")
+    +
+    ":"
+    +
+    String(s).padStart(2,"0");
+
+
+  // ==========================================================
+  // IMPORTANT
+  // New candle begins.
+  // Immediately request new signal.
+  // ==========================================================
+
+  if(n === 0){
+
+    update(true);
+
+    return;
+  }
+
+
+  // ==========================================================
+  // Refresh shortly before next candle
+  // ==========================================================
+
+  if(n <= 2){
+
+    update();
+  }
 }
 
-update();
-setInterval(update,30000);
-setInterval(countdown,1000);
+
+// ============================================================
+// START
+// ============================================================
+
+update(true);
+
+
+// ============================================================
+// COUNTDOWN EVERY SECOND
+// ============================================================
+
+setInterval(
+  countdown,
+  1000
+);
+
+
+// ============================================================
+// BACKUP REFRESH
+// Every 10 seconds, not 30 seconds
+// ============================================================
+
+setInterval(
+  () => update(),
+  10000
+);
+
 </script>
 
 </body>
