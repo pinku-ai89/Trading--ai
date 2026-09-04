@@ -1,128 +1,321 @@
-name: Build Trader Pink AI APK
+<!DOCTYPE html>
+<html lang="bn">
+<head>
+  <meta charset="UTF-8">
 
-on:
-  workflow_dispatch:
-  push:
-    paths:
-      - ".github/workflows/build-apk.yml"
+  <meta name="viewport"
+        content="width=device-width,initial-scale=1.0,
+        maximum-scale=1.0,user-scalable=no">
 
-jobs:
-  build:
-    runs-on: ubuntu-latest
+  <meta name="theme-color" content="#0b1020">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-capable" content="yes">
 
-    steps:
-      - uses: actions/checkout@v4
+  <link rel="manifest" href="./manifest.json">
 
-      - name: Setup Java
-        uses: actions/setup-java@v5
-        with:
-          distribution: temurin
-          java-version: "17"
+  <title>Trader Pink AI 🤖📈</title>
 
-      - name: Create Android Project
-        run: |
-          mkdir -p app/src/main/java/com/traderpink/ai
+  <style>
+    * {
+      box-sizing: border-box;
+    }
 
-          cat > settings.gradle <<'EOF'
-          pluginManagement {
-              repositories {
-                  google()
-                  mavenCentral()
-                  gradlePluginPortal()
-              }
-          }
-          dependencyResolutionManagement {
-              repositoriesMode.set(RepositoriesMode.FAIL_ON_PROJECT_REPOS)
-              repositories {
-                  google()
-                  mavenCentral()
-              }
-          }
-          rootProject.name="TraderPinkAI"
-          include ":app"
-          EOF
+    body {
+      margin: 0;
+      padding: 20px;
+      min-height: 100vh;
+      background: #0b1020;
+      color: white;
+      font-family: Arial, sans-serif;
+    }
 
-          cat > build.gradle <<'EOF'
-          plugins {
-              id 'com.android.application' version '8.6.1' apply false
-          }
-          EOF
+    .app {
+      max-width: 500px;
+      margin: auto;
+    }
 
-          cat > app/build.gradle <<'EOF'
-          plugins {
-              id 'com.android.application'
-          }
+    .logo {
+      width: 90px;
+      height: 90px;
+      border-radius: 22px;
+      display: block;
+      margin: 10px auto 15px;
+      object-fit: cover;
+    }
 
-          android {
-              namespace 'com.traderpink.ai'
-              compileSdk 35
+    h1 {
+      text-align: center;
+      margin: 5px 0;
+      font-size: 26px;
+    }
 
-              defaultConfig {
-                  applicationId 'com.traderpink.ai'
-                  minSdk 23
-                  targetSdk 35
-                  versionCode 1
-                  versionName "1.0"
-              }
-          }
-          EOF
+    .subtitle {
+      text-align: center;
+      color: #aaa;
+      margin-bottom: 20px;
+    }
 
-          cat > app/src/main/AndroidManifest.xml <<'EOF'
-          <manifest xmlns:android="http://schemas.android.com/apk/res/android">
+    .card {
+      background: #151c32;
+      border-radius: 18px;
+      padding: 20px;
+      margin-bottom: 15px;
+      box-shadow: 0 5px 20px rgba(0,0,0,.25);
+    }
 
-              <uses-permission android:name="android.permission.INTERNET"/>
-              <uses-permission android:name="android.permission.SYSTEM_ALERT_WINDOW"/>
-              <uses-permission android:name="android.permission.FOREGROUND_SERVICE"/>
-              <uses-permission android:name="android.permission.FOREGROUND_SERVICE_SPECIAL_USE"/>
+    .market {
+      text-align: center;
+      font-size: 20px;
+      font-weight: bold;
+    }
 
-              <application
-                  android:theme="@style/AppTheme"
-                  android:label="Trader Pink AI">
+    .signal {
+      text-align: center;
+      font-size: 48px;
+      font-weight: bold;
+      margin: 20px 0 5px;
+    }
 
-                  <activity
-                      android:name=".MainActivity"
-                      android:exported="true">
-                      <intent-filter>
-                          <action android:name="android.intent.action.MAIN"/>
-                          <category android:name="android.intent.category.LAUNCHER"/>
-                      </intent-filter>
-                  </activity>
+    .confidence {
+      text-align: center;
+      font-size: 20px;
+      margin-bottom: 20px;
+    }
 
-                  <service
-                      android:name=".FloatingService"
-                      android:foregroundServiceType="specialUse"
-                      android:exported="false"/>
-              </application>
-          </manifest>
-          EOF
+    .row {
+      display: flex;
+      justify-content: space-between;
+      gap: 10px;
+      padding: 10px 0;
+      border-bottom: 1px solid #29314a;
+    }
 
-          mkdir -p app/src/main/res/values
+    .row:last-child {
+      border-bottom: 0;
+    }
 
-          cat > app/src/main/res/values/styles.xml <<'EOF'
-          <resources>
-              <style name="AppTheme"
-                  parent="android:style/Theme.Material.Light.NoActionBar">
-                  <item name="android:fontFamily">sans</item>
-                  <item name="android:colorAccent">#ff4f9a</item>
-                  <item name="android:navigationBarColor">#0b1020</item>
-                  <item name="android:statusBarColor">#0b1020</item>
-              </style>
-          </resources>
-          EOF
+    .label {
+      color: #9da6bd;
+    }
 
-      - name: Create Gradle
-        run: |
-          wget -q https://services.gradle.org/distributions/gradle-8.7-bin.zip
-          unzip -q gradle-8.7-bin.zip
-          export PATH="$PWD/gradle-8.7/bin:$PATH"
-          gradle wrapper --gradle-version 8.7
+    .value {
+      font-weight: bold;
+      text-align: right;
+    }
 
-      - name: Build APK
-        run: |
-          ./gradlew assembleDebug --no-daemon
+    button {
+      width: 100%;
+      border: 0;
+      border-radius: 14px;
+      padding: 15px;
+      margin-top: 10px;
+      background: #ff4f9a;
+      color: white;
+      font-size: 17px;
+      font-weight: bold;
+    }
 
-      - name: Upload APK
-        uses: actions/upload-artifact@v4
-        with:
-          name: Trader-Pink-AI-APK
-          path: app/build/outputs/apk/debug/app-debug.apk
+    button:active {
+      transform: scale(.98);
+    }
+
+    .note {
+      text-align: center;
+      color: #888;
+      font-size: 12px;
+      line-height: 1.5;
+      margin-top: 15px;
+    }
+
+    .error {
+      color: #ff7777;
+      text-align: center;
+    }
+  </style>
+</head>
+
+<body>
+
+<div class="app">
+
+  <img
+    class="logo"
+    src="./CompressJPEG.Online_img(512x512).jpg"
+    alt="Trader Pink AI">
+
+  <h1>🤖 Trader Pink AI 📈</h1>
+
+  <div class="subtitle">
+    EURUSD Smart 1 Minute Signal Engine
+  </div>
+
+  <div class="card">
+
+    <div class="market">
+      EURUSD • 1 MIN
+    </div>
+
+    <div id="signal" class="signal">
+      WAIT
+    </div>
+
+    <div id="confidence" class="confidence">
+      Confidence: 0%
+    </div>
+
+    <div class="row">
+      <span class="label">Trend</span>
+      <span id="trend" class="value">--</span>
+    </div>
+
+    <div class="row">
+      <span class="label">Candle</span>
+      <span id="candle" class="value">--</span>
+    </div>
+
+    <div class="row">
+      <span class="label">Signal Candle</span>
+      <span id="closedTime" class="value">--</span>
+    </div>
+
+    <div class="row">
+      <span class="label">Next Candle</span>
+      <span id="nextTime" class="value">--</span>
+    </div>
+
+    <div class="row">
+      <span class="label">Support</span>
+      <span id="support" class="value">--</span>
+    </div>
+
+    <div class="row">
+      <span class="label">Resistance</span>
+      <span id="resistance" class="value">--</span>
+    </div>
+
+    <button onclick="loadSignal()">
+      🔄 UPDATE SIGNAL
+    </button>
+
+  </div>
+
+  <div class="note">
+    Signal is based on the latest fully closed candle
+    and is intended for the next 1-minute candle.
+    <br>
+    Confidence is an analysis score, not a guarantee of profit.
+  </div>
+
+</div>
+
+<script>
+
+const API =
+  "https://crimson-grass-f881.bijondebnath51.workers.dev/";
+
+function setText(id, value) {
+  document.getElementById(id).textContent = value;
+}
+
+async function loadSignal() {
+
+  try {
+
+    setText("signal", "...");
+    setText("confidence", "Analyzing...");
+
+    const response = await fetch(
+      API + "?t=" + Date.now(),
+      {
+        cache: "no-store"
+      }
+    );
+
+    if (!response.ok) {
+      throw new Error("Server error");
+    }
+
+    const data = await response.json();
+
+    const candle = data.candle || {};
+
+    setText(
+      "signal",
+      data.signal || "WAIT"
+    );
+
+    setText(
+      "confidence",
+      "Confidence: " +
+      (data.confidence || 0) +
+      "%"
+    );
+
+    setText(
+      "trend",
+      data.trend || "--"
+    );
+
+    setText(
+      "candle",
+      candle.direction || "--"
+    );
+
+    setText(
+      "closedTime",
+      data.closed_candle_time || "--"
+    );
+
+    setText(
+      "nextTime",
+      data.next_candle_time || "--"
+    );
+
+    setText(
+      "support",
+      data.support || "--"
+    );
+
+    setText(
+      "resistance",
+      data.resistance || "--"
+    );
+
+  } catch (error) {
+
+    setText("signal", "WAIT");
+    setText(
+      "confidence",
+      "Connection Error"
+    );
+
+    setText("trend", "--");
+    setText("candle", "--");
+
+    console.log(error);
+  }
+}
+
+loadSignal();
+
+setInterval(
+  loadSignal,
+  10000
+);
+
+if ("serviceWorker" in navigator) {
+  window.addEventListener("load", () => {
+    navigator.serviceWorker.register("./sw.js")
+      .catch(error => {
+        console.log(
+          "Service Worker Error:",
+          error
+        );
+      });
+  });
+}
+
+</script>
+
+</body>
+</html>
