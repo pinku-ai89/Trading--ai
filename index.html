@@ -1,91 +1,128 @@
-<!DOCTYPE html>
-<html lang="bn">
-<head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Trader Pink AI 🤖📈</title>
-<style>
-*{box-sizing:border-box}body{
-margin:0;background:#0b1020;color:#fff;font-family:Arial;
-display:flex;justify-content:center;padding:15px
-}.app{width:100%;max-width:360px;background:#151b2e;
-padding:18px;border-radius:20px;text-align:center}
-h2{margin:5px}.market{opacity:.8;margin-bottom:12px}
-.signal{font-size:38px;font-weight:bold;margin:15px}
-.info{margin:9px 0}.box{
-background:#202941;padding:10px;border-radius:12px;margin:8px 0
-}
-button{width:100%;padding:13px;border:0;border-radius:12px;
-background:#ff4f9a;color:white;font-size:16px;font-weight:bold}
-</style>
-</head>
+name: Build Trader Pink AI APK
 
-<body>
-<div class="app">
-<h2>🤖 Trader Pink AI 📈</h2>
-<div class="market">EURUSD • 1 MIN</div>
+on:
+  workflow_dispatch:
+  push:
+    paths:
+      - ".github/workflows/build-apk.yml"
 
-<div>পরের Candle শুরু হতে</div>
-<div id="count" class="signal">--:--</div>
+jobs:
+  build:
+    runs-on: ubuntu-latest
 
-<div class="box">
-<div>NEXT CANDLE SIGNAL</div>
-<div id="signal" class="signal">WAIT</div>
-<div>Confidence: <b id="confidence">0%</b></div>
-</div>
+    steps:
+      - uses: actions/checkout@v4
 
-<div class="box">
-<div>Trend: <b id="trend">--</b></div>
-<div>Candle: <b id="direction">--</b></div>
-<div>Body: <b id="body">--</b></div>
-</div>
+      - name: Setup Java
+        uses: actions/setup-java@v5
+        with:
+          distribution: temurin
+          java-version: "17"
 
-<div class="box">
-<div>Signal Candle</div>
-<div id="closed">--</div>
-<div>Next Candle</div>
-<div id="next">--</div>
-</div>
+      - name: Create Android Project
+        run: |
+          mkdir -p app/src/main/java/com/traderpink/ai
 
-<button onclick="load()">🔄 UPDATE SIGNAL</button>
-</div>
+          cat > settings.gradle <<'EOF'
+          pluginManagement {
+              repositories {
+                  google()
+                  mavenCentral()
+                  gradlePluginPortal()
+              }
+          }
+          dependencyResolutionManagement {
+              repositoriesMode.set(RepositoriesMode.FAIL_ON_PROJECT_REPOS)
+              repositories {
+                  google()
+                  mavenCentral()
+              }
+          }
+          rootProject.name="TraderPinkAI"
+          include ":app"
+          EOF
 
-<script>
-const API="https://crimson-grass-f881.bijondebnath51.workers.dev/";
+          cat > build.gradle <<'EOF'
+          plugins {
+              id 'com.android.application' version '8.6.1' apply false
+          }
+          EOF
 
-async function load(){
- try{
-  let r=await fetch(API+"?t="+Date.now());
-  let d=await r.json();
+          cat > app/build.gradle <<'EOF'
+          plugins {
+              id 'com.android.application'
+          }
 
-  signal.textContent=d.signal||"WAIT";
-  confidence.textContent=(d.confidence||0)+"%";
-  trend.textContent=d.trend||"--";
-  direction.textContent=d.candle?.direction||"--";
-  body.textContent=(d.candle?.body_percent||0)+"%";
-  closed.textContent=format(d.closed_candle_time);
-  next.textContent=format(d.next_candle_time);
- }catch(e){
-  signal.textContent="WAIT";
- }
-}
+          android {
+              namespace 'com.traderpink.ai'
+              compileSdk 35
 
-function format(x){
- if(!x)return"--";
- return new Date(x).toLocaleString("en-GB",{
-  timeZone:"Asia/Dhaka",hour12:false
- });
-}
+              defaultConfig {
+                  applicationId 'com.traderpink.ai'
+                  minSdk 23
+                  targetSdk 35
+                  versionCode 1
+                  versionName "1.0"
+              }
+          }
+          EOF
 
-function timer(){
- let n=new Date();
- let s=60-n.getSeconds();
- count.textContent="00:"+String(s).padStart(2,"0");
- if(s===60||s===1)load();
-}
-load();
-setInterval(timer,1000);
-setInterval(load,10000);
-</script>
-</body>
-</html>
+          cat > app/src/main/AndroidManifest.xml <<'EOF'
+          <manifest xmlns:android="http://schemas.android.com/apk/res/android">
+
+              <uses-permission android:name="android.permission.INTERNET"/>
+              <uses-permission android:name="android.permission.SYSTEM_ALERT_WINDOW"/>
+              <uses-permission android:name="android.permission.FOREGROUND_SERVICE"/>
+              <uses-permission android:name="android.permission.FOREGROUND_SERVICE_SPECIAL_USE"/>
+
+              <application
+                  android:theme="@style/AppTheme"
+                  android:label="Trader Pink AI">
+
+                  <activity
+                      android:name=".MainActivity"
+                      android:exported="true">
+                      <intent-filter>
+                          <action android:name="android.intent.action.MAIN"/>
+                          <category android:name="android.intent.category.LAUNCHER"/>
+                      </intent-filter>
+                  </activity>
+
+                  <service
+                      android:name=".FloatingService"
+                      android:foregroundServiceType="specialUse"
+                      android:exported="false"/>
+              </application>
+          </manifest>
+          EOF
+
+          mkdir -p app/src/main/res/values
+
+          cat > app/src/main/res/values/styles.xml <<'EOF'
+          <resources>
+              <style name="AppTheme"
+                  parent="android:style/Theme.Material.Light.NoActionBar">
+                  <item name="android:fontFamily">sans</item>
+                  <item name="android:colorAccent">#ff4f9a</item>
+                  <item name="android:navigationBarColor">#0b1020</item>
+                  <item name="android:statusBarColor">#0b1020</item>
+              </style>
+          </resources>
+          EOF
+
+      - name: Create Gradle
+        run: |
+          wget -q https://services.gradle.org/distributions/gradle-8.7-bin.zip
+          unzip -q gradle-8.7-bin.zip
+          export PATH="$PWD/gradle-8.7/bin:$PATH"
+          gradle wrapper --gradle-version 8.7
+
+      - name: Build APK
+        run: |
+          ./gradlew assembleDebug --no-daemon
+
+      - name: Upload APK
+        uses: actions/upload-artifact@v4
+        with:
+          name: Trader-Pink-AI-APK
+          path: app/build/outputs/apk/debug/app-debug.apk
