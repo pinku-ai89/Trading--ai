@@ -1,16 +1,39 @@
-plugins {
-    id 'com.android.application' version '8.7.3'
-}
+name: Build Trader Pink AI APK
 
-android {
-    namespace 'com.traderpink.ai'
-    compileSdk 35
+on:
+  workflow_dispatch:
+  push:
+    paths:
+      - "app/**"
+      - "settings.gradle"
+      - "build.gradle"
+      - ".github/workflows/build-apk.yml"
 
-    defaultConfig {
-        applicationId 'com.traderpink.ai'
-        minSdk 23
-        targetSdk 35
-        versionCode 1
-        versionName "1.0"
-    }
-}
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup JDK
+        uses: actions/setup-java@v5
+        with:
+          distribution: temurin
+          java-version: "17"
+
+      - name: Setup Android
+        uses: android-actions/setup-android@v3
+
+      - name: Setup Gradle
+        uses: gradle/actions/setup-gradle@v4
+
+      - name: Build APK
+        run: gradle assembleDebug
+
+      - name: Upload APK
+        uses: actions/upload-artifact@v4
+        with:
+          name: Trader-Pink-AI-APK
+          path: app/build/outputs/apk/debug/app-debug.apk
