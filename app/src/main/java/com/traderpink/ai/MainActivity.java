@@ -1,131 +1,472 @@
 package com.traderpink.ai;
 
-import android.app.*;
-import android.os.*;
-import android.content.*;
+import android.app.Activity;
+import android.os.Bundle;
+import android.os.Handler;
+import android.content.Intent;
 import android.graphics.Color;
 import android.net.Uri;
 import android.provider.Settings;
-import android.view.*;
-import android.widget.*;
-import org.json.*;
-import java.io.*;
-import java.net.*;
-import java.util.concurrent.*;
+import android.view.Gravity;
+import android.widget.Button;
+import android.widget.LinearLayout;
+import android.widget.TextView;
+
+import org.json.JSONObject;
+
+import java.io.BufferedReader;
+import java.io.InputStreamReader;
+import java.net.HttpURLConnection;
+import java.net.URL;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 public class MainActivity extends Activity {
 
-    static final String API =
-        "https://crimson-grass-f881.bijondebnath51.workers.dev/";
+    private static final String API =
+            "https://crimson-grass-f881.bijondebnath51.workers.dev/";
 
-    TextView signal,info;
-    ExecutorService pool=Executors.newSingleThreadExecutor();
+    private TextView signal;
+    private TextView confidence;
+    private TextView info;
 
-    TextView t(String s,int z){
-        TextView v=new TextView(this);
-        v.setText(s);
-        v.setTextColor(Color.WHITE);
-        v.setTextSize(z);
-        v.setPadding(0,8,0,8);
+    private final ExecutorService pool =
+            Executors.newSingleThreadExecutor();
+
+    private final Handler handler =
+            new Handler();
+
+    private boolean destroyed = false;
+
+    private final Runnable autoUpdate = new Runnable() {
+        @Override
+        public void run() {
+
+            if (destroyed) {
+                return;
+            }
+
+            loadSignal();
+
+            handler.postDelayed(this, 10000);
+        }
+    };
+
+    private TextView makeText(
+            String text,
+            float size,
+            int color
+    ) {
+
+        TextView v = new TextView(this);
+
+        v.setText(text);
+        v.setTextSize(size);
+        v.setTextColor(color);
+        v.setPadding(0, 8, 0, 8);
+
         return v;
     }
 
-    @Override public void onCreate(Bundle b){
-        super.onCreate(b);
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
 
-        LinearLayout l=new LinearLayout(this);
-        l.setOrientation(LinearLayout.VERTICAL);
-        l.setPadding(20,20,20,20);
-        l.setBackgroundColor(Color.rgb(11,16,32));
+        super.onCreate(savedInstanceState);
 
-        l.addView(t("🤖 Trader Pink AI 📈",24));
-        l.addView(t("EURUSD • 1 MIN",17));
+        LinearLayout root =
+                new LinearLayout(this);
 
-        signal=t("WAIT",40);
-        l.addView(signal);
+        root.setOrientation(
+                LinearLayout.VERTICAL
+        );
 
-        info=t("Loading...",16);
-        l.addView(info);
+        root.setGravity(Gravity.CENTER_HORIZONTAL);
 
-        Button update=new Button(this);
-        update.setText("🔄 UPDATE SIGNAL");
-        update.setOnClickListener(v->load());
-        l.addView(update);
+        root.setPadding(
+                20,
+                20,
+                20,
+                20
+        );
 
-        Button floating=new Button(this);
-        floating.setText("🤖 START FLOATING BOT");
-        floating.setOnClickListener(v->startFloat());
-        l.addView(floating);
+        root.setBackgroundColor(
+                Color.rgb(11, 16, 32)
+        );
 
-        setContentView(l);
-        load();
+        TextView title =
+                makeText(
+                        "🤖 Trader Pink AI 📈",
+                        26,
+                        Color.WHITE
+                );
 
-        new Handler().postDelayed(new Runnable(){
-            public void run(){
-                load();
-                new Handler().postDelayed(this,10000);
-            }
-        },10000);
+        title.setGravity(Gravity.CENTER);
+
+        root.addView(title);
+
+        TextView subtitle =
+                makeText(
+                        "EURUSD Smart 1 Minute Signal Engine",
+                        16,
+                        Color.LTGRAY
+                );
+
+        subtitle.setGravity(Gravity.CENTER);
+
+        root.addView(subtitle);
+
+        TextView market =
+                makeText(
+                        "EURUSD • 1 MIN",
+                        19,
+                        Color.WHITE
+                );
+
+        market.setGravity(Gravity.CENTER);
+
+        root.addView(market);
+
+        signal =
+                makeText(
+                        "WAIT",
+                        48,
+                        Color.WHITE
+                );
+
+        signal.setGravity(Gravity.CENTER);
+
+        root.addView(signal);
+
+        confidence =
+                makeText(
+                        "Confidence: 0%",
+                        20,
+                        Color.WHITE
+                );
+
+        confidence.setGravity(Gravity.CENTER);
+
+        root.addView(confidence);
+
+        info =
+                makeText(
+                        "Loading...",
+                        15,
+                        Color.WHITE
+                );
+
+        root.addView(info);
+
+        Button update =
+                new Button(this);
+
+        update.setText(
+                "🔄 UPDATE SIGNAL"
+        );
+
+        update.setOnClickListener(
+                v -> loadSignal()
+        );
+
+        root.addView(update);
+
+        Button floating =
+                new Button(this);
+
+        floating.setText(
+                "🤖 START FLOATING BOT"
+        );
+
+        floating.setOnClickListener(
+                v -> startFloatingBot()
+        );
+
+        root.addView(floating);
+
+        setContentView(root);
+
+        loadSignal();
+
+        handler.postDelayed(
+                autoUpdate,
+                10000
+        );
     }
 
-    void load(){
-        pool.execute(()->{
-            try{
-                URL u=new URL(API+"?t="+System.currentTimeMillis());
-                HttpURLConnection c=(HttpURLConnection)u.openConnection();
-                c.setConnectTimeout(10000);
-                c.setReadTimeout(10000);
+    private void loadSignal() {
 
-                BufferedReader r=new BufferedReader(
-                    new InputStreamReader(c.getInputStream()));
+        pool.execute(() -> {
 
-                StringBuilder s=new StringBuilder();
-                String x;
-                while((x=r.readLine())!=null)s.append(x);
+            HttpURLConnection connection = null;
 
-                JSONObject j=new JSONObject(s.toString());
-                JSONObject cd=j.optJSONObject("candle");
+            try {
 
-                String infoText=
-                    "Confidence: "+j.optInt("confidence",0)+"%\n"+
-                    "Trend: "+j.optString("trend","--")+"\n"+
-                    "Candle: "+(cd==null?"--":
-                    cd.optString("direction","--"))+
-                    "  Body: "+(cd==null?0:
-                    cd.optDouble("body_percent",0))+"%\n\n"+
-                    "Signal Candle:\n"+
-                    j.optString("closed_candle_time","--")+
-                    "\n\nNext Candle:\n"+
-                    j.optString("next_candle_time","--");
+                URL url =
+                        new URL(
+                                API +
+                                "?t=" +
+                                System.currentTimeMillis()
+                        );
 
-                runOnUiThread(()->{
-                    signal.setText(j.optString("signal","WAIT"));
-                    info.setText(infoText);
+                connection =
+                        (HttpURLConnection)
+                                url.openConnection();
+
+                connection.setRequestMethod("GET");
+
+                connection.setConnectTimeout(10000);
+
+                connection.setReadTimeout(10000);
+
+                connection.setUseCaches(false);
+
+                BufferedReader reader =
+                        new BufferedReader(
+                                new InputStreamReader(
+                                        connection.getInputStream()
+                                )
+                        );
+
+                StringBuilder response =
+                        new StringBuilder();
+
+                String line;
+
+                while (
+                        (line = reader.readLine())
+                                != null
+                ) {
+
+                    response.append(line);
+                }
+
+                reader.close();
+
+                JSONObject data =
+                        new JSONObject(
+                                response.toString()
+                        );
+
+                String finalSignal =
+                        data.optString(
+                                "signal",
+                                "WAIT"
+                        );
+
+                int finalConfidence =
+                        data.optInt(
+                                "confidence",
+                                0
+                        );
+
+                String trend =
+                        data.optString(
+                                "trend",
+                                "--"
+                        );
+
+                String closedTime =
+                        data.optString(
+                                "closed_candle_time",
+                                "--"
+                        );
+
+                String nextTime =
+                        data.optString(
+                                "next_candle_time",
+                                "--"
+                        );
+
+                String analysisMode =
+                        data.optString(
+                                "analysis_mode",
+                                "--"
+                        );
+
+                String reason =
+                        data.optString(
+                                "decision_reason",
+                                ""
+                        );
+
+                JSONObject candle =
+                        data.optJSONObject(
+                                "candle"
+                        );
+
+                String candleDirection =
+                        "--";
+
+                if (candle != null) {
+
+                    candleDirection =
+                            candle.optString(
+                                    "direction",
+                                    "--"
+                            );
+                }
+
+                String finalText =
+                        "Trend: " +
+                        trend +
+
+                        "\nCandle: " +
+                        candleDirection +
+
+                        "\n\nSignal Candle:\n" +
+                        closedTime +
+
+                        "\n\nNext Candle:\n" +
+                        nextTime +
+
+                        "\n\nAnalysis:\n" +
+                        analysisMode;
+
+                if (!reason.isEmpty()) {
+
+                    finalText +=
+                            "\n\nReason:\n" +
+                            reason;
+                }
+
+                runOnUiThread(() -> {
+
+                    signal.setText(
+                            finalSignal
+                    );
+
+                    confidence.setText(
+                            "Confidence: " +
+                            finalConfidence +
+                            "%"
+                    );
+
+                    info.setText(
+                            finalText
+                    );
+
+                    if (
+                            finalSignal.equalsIgnoreCase(
+                                    "BUY"
+                            )
+                    ) {
+
+                        signal.setTextColor(
+                                Color.rgb(
+                                        50,
+                                        220,
+                                        120
+                                )
+                        );
+
+                    } else if (
+                            finalSignal.equalsIgnoreCase(
+                                    "SELL"
+                            )
+                    ) {
+
+                        signal.setTextColor(
+                                Color.rgb(
+                                        255,
+                                        80,
+                                        100
+                                )
+                        );
+
+                    } else {
+
+                        signal.setTextColor(
+                                Color.WHITE
+                        );
+                    }
                 });
 
-            }catch(Exception e){
-                runOnUiThread(()->{
-                    signal.setText("WAIT");
-                    info.setText("Connection error");
+            } catch (Exception e) {
+
+                runOnUiThread(() -> {
+
+                    signal.setText(
+                            "WAIT"
+                    );
+
+                    confidence.setText(
+                            "Connection Error"
+                    );
+
+                    info.setText(
+                            "Worker connection failed.\n" +
+                            "Please check internet connection."
+                    );
+
+                    signal.setTextColor(
+                            Color.WHITE
+                    );
                 });
+
+            } finally {
+
+                if (connection != null) {
+
+                    connection.disconnect();
+                }
             }
         });
     }
 
-    void startFloat(){
-        if(Build.VERSION.SDK_INT>=23 &&
-           !Settings.canDrawOverlays(this)){
-            startActivity(new Intent(
-                Settings.ACTION_MANAGE_OVERLAY_PERMISSION,
-                Uri.parse("package:"+getPackageName())));
+    private void startFloatingBot() {
+
+        if (
+                android.os.Build.VERSION.SDK_INT >= 23 &&
+                !Settings.canDrawOverlays(this)
+        ) {
+
+            Intent intent =
+                    new Intent(
+                            Settings.ACTION_MANAGE_OVERLAY_PERMISSION,
+                            Uri.parse(
+                                    "package:" +
+                                    getPackageName()
+                            )
+                    );
+
+            startActivity(intent);
+
             return;
         }
 
-        startService(new Intent(this,FloatingService.class));
+        Intent serviceIntent =
+                new Intent(
+                        this,
+                        FloatingService.class
+                );
+
+        if (
+                android.os.Build.VERSION.SDK_INT >= 26
+        ) {
+
+            startForegroundService(
+                    serviceIntent
+            );
+
+        } else {
+
+            startService(
+                    serviceIntent
+            );
+        }
     }
 
-    @Override protected void onDestroy(){
+    @Override
+    protected void onDestroy() {
+
+        destroyed = true;
+
+        handler.removeCallbacks(
+                autoUpdate
+        );
+
         pool.shutdownNow();
+
         super.onDestroy();
     }
 }
