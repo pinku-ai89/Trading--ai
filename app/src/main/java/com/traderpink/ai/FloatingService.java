@@ -5,7 +5,6 @@ import android.content.*;
 import android.graphics.Color;
 import android.graphics.PixelFormat;
 import android.os.*;
-import android.provider.Settings;
 import android.view.*;
 import android.widget.*;
 
@@ -23,6 +22,13 @@ public class FloatingService extends Service {
     private View floatingView;
     private TextView signalView;
     private TextView infoView;
+
+    private WindowManager.LayoutParams windowParams;
+
+    private float downRawX;
+    private float downRawY;
+    private int startX;
+    private int startY;
 
     private final Handler handler =
             new Handler(Looper.getMainLooper());
@@ -62,8 +68,7 @@ public class FloatingService extends Service {
 
         updateSignal();
 
-        handler.removeCallbacks(
-                updater);
+        handler.removeCallbacks(updater);
 
         handler.postDelayed(
                 updater,
@@ -86,7 +91,7 @@ public class FloatingService extends Service {
 
         main.setPadding(
                 18,
-                14,
+                12,
                 18,
                 14);
 
@@ -95,6 +100,19 @@ public class FloatingService extends Service {
                         20,
                         25,
                         45));
+
+        /*
+         * TOP BAR
+         * Title + small X button
+         */
+        LinearLayout topBar =
+                new LinearLayout(this);
+
+        topBar.setOrientation(
+                LinearLayout.HORIZONTAL);
+
+        topBar.setGravity(
+                Gravity.CENTER_VERTICAL);
 
         TextView title =
                 new TextView(this);
@@ -105,13 +123,60 @@ public class FloatingService extends Service {
         title.setTextColor(
                 Color.WHITE);
 
-        title.setTextSize(18);
+        title.setTextSize(17);
 
         title.setGravity(
+                Gravity.CENTER_VERTICAL);
+
+        topBar.addView(
+                title,
+                new LinearLayout.LayoutParams(
+                        0,
+                        LinearLayout.LayoutParams
+                                .WRAP_CONTENT,
+                        1));
+
+        TextView close =
+                new TextView(this);
+
+        close.setText("×");
+
+        close.setTextColor(
+                Color.WHITE);
+
+        close.setTextSize(28);
+
+        close.setGravity(
                 Gravity.CENTER);
 
-        main.addView(title);
+        close.setPadding(
+                10,
+                0,
+                4,
+                0);
 
+        close.setOnClickListener(
+                v -> {
+
+                    handler.removeCallbacks(
+                            updater);
+
+                    stopSelf();
+                });
+
+        topBar.addView(
+                close,
+                new LinearLayout.LayoutParams(
+                        LinearLayout.LayoutParams
+                                .WRAP_CONTENT,
+                        LinearLayout.LayoutParams
+                                .WRAP_CONTENT));
+
+        main.addView(topBar);
+
+        /*
+         * MARKET
+         */
         TextView market =
                 new TextView(this);
 
@@ -126,8 +191,36 @@ public class FloatingService extends Service {
         market.setGravity(
                 Gravity.CENTER);
 
+        market.setPadding(
+                0,
+                3,
+                0,
+                3);
+
         main.addView(market);
 
+        /*
+         * SIGNAL LABEL
+         */
+        TextView signalLabel =
+                new TextView(this);
+
+        signalLabel.setText(
+                "SIGNAL");
+
+        signalLabel.setTextColor(
+                Color.LTGRAY);
+
+        signalLabel.setTextSize(12);
+
+        signalLabel.setGravity(
+                Gravity.CENTER);
+
+        main.addView(signalLabel);
+
+        /*
+         * FINAL 1M SIGNAL
+         */
         signalView =
                 new TextView(this);
 
@@ -144,38 +237,51 @@ public class FloatingService extends Service {
 
         signalView.setPadding(
                 0,
-                10,
+                5,
                 0,
                 5);
 
         main.addView(signalView);
 
+        /*
+         * INFO
+         */
         infoView =
                 new TextView(this);
 
         infoView.setText(
-                "Loading...");
+                "Confidence: --%\n" +
+                "Candle: --");
 
         infoView.setTextColor(
                 Color.WHITE);
 
         infoView.setTextSize(13);
 
+        infoView.setGravity(
+                Gravity.CENTER);
+
         main.addView(infoView);
 
-        Button close =
+        /*
+         * NEXT SIGNAL BUTTON
+         */
+        Button next =
                 new Button(this);
 
-        close.setText(
-                "✕ CLOSE");
+        next.setText(
+                "NEXT SIGNAL");
 
-        close.setOnClickListener(
-                v -> stopSelf());
+        next.setOnClickListener(
+                v -> updateSignal());
 
-        main.addView(close);
+        main.addView(next);
 
         floatingView = main;
 
+        /*
+         * WINDOW MANAGER
+         */
         windowManager =
                 (WindowManager)
                         getSystemService(
@@ -197,7 +303,7 @@ public class FloatingService extends Service {
                             .TYPE_PHONE;
         }
 
-        WindowManager.LayoutParams params =
+        windowParams =
                 new WindowManager.LayoutParams(
                         340,
                         WindowManager.LayoutParams
@@ -209,18 +315,102 @@ public class FloatingService extends Service {
                                 .FLAG_LAYOUT_NO_LIMITS,
                         PixelFormat.TRANSLUCENT);
 
-        params.gravity =
+        windowParams.gravity =
                 Gravity.TOP |
                 Gravity.RIGHT;
 
-        params.x = 10;
-        params.y = 120;
+        windowParams.x = 10;
+        windowParams.y = 120;
+
+        /*
+         * DRAG / MOVE
+         */
+        View.OnTouchListener dragListener =
+                new View.OnTouchListener() {
+
+            @Override
+            public boolean onTouch(
+                    View v,
+                    MotionEvent event) {
+
+                switch (event.getAction()) {
+
+                    case MotionEvent.ACTION_DOWN:
+
+                        downRawX =
+                                event.getRawX();
+
+                        downRawY =
+                                event.getRawY();
+
+                        startX =
+                                windowParams.x;
+
+                        startY =
+                                windowParams.y;
+
+                        return true;
+
+                    case MotionEvent.ACTION_MOVE:
+
+                        int dx =
+                                (int)
+                                (event.getRawX()
+                                - downRawX);
+
+                        int dy =
+                                (int)
+                                (event.getRawY()
+                                - downRawY);
+
+                        /*
+                         * Because the window is anchored
+                         * to TOP + RIGHT, X movement
+                         * is inverted.
+                         */
+                        windowParams.x =
+                                startX - dx;
+
+                        windowParams.y =
+                                startY + dy;
+
+                        if (
+                                windowManager != null &&
+                                floatingView != null) {
+
+                            try {
+
+                                windowManager.updateViewLayout(
+                                        floatingView,
+                                        windowParams);
+
+                            } catch (Exception ignored) {
+                            }
+                        }
+
+                        return true;
+
+                    case MotionEvent.ACTION_UP:
+
+                        return true;
+                }
+
+                return false;
+            }
+        };
+
+        /*
+         * পুরো Floating panel ধরে
+         * drag করা যাবে।
+         */
+        main.setOnTouchListener(
+                dragListener);
 
         try {
 
             windowManager.addView(
                     floatingView,
-                    params);
+                    windowParams);
 
         } catch (Exception e) {
 
@@ -262,7 +452,8 @@ public class FloatingService extends Service {
                 BufferedReader reader =
                         new BufferedReader(
                                 new InputStreamReader(
-                                        connection.getInputStream()));
+                                        connection
+                                                .getInputStream()));
 
                 StringBuilder result =
                         new StringBuilder();
@@ -282,6 +473,12 @@ public class FloatingService extends Service {
                         new JSONObject(
                                 result.toString());
 
+                /*
+                 * FINAL SIGNAL
+                 *
+                 * Worker-এর final signal-ই
+                 * Floating Bot দেখাবে।
+                 */
                 String finalSignal =
                         data.optString(
                                 "signal",
@@ -291,11 +488,6 @@ public class FloatingService extends Service {
                         data.optInt(
                                 "confidence",
                                 0);
-
-                String trend =
-                        data.optString(
-                                "trend",
-                                "--");
 
                 String closedTime =
                         data.optString(
@@ -307,45 +499,31 @@ public class FloatingService extends Service {
                                 "next_candle_time",
                                 "--");
 
+                String trend =
+                        data.optString(
+                                "trend",
+                                "--");
+
                 String reason =
                         data.optString(
                                 "decision_reason",
                                 "");
 
-                JSONObject candle =
-                        data.optJSONObject(
-                                "candle");
-
-                String candleDirection =
-                        "--";
-
-                if (candle != null) {
-
-                    candleDirection =
-                            candle.optString(
-                                    "direction",
-                                    "--");
-                }
-
                 String text =
                         "Confidence: " +
                         confidence +
-                        "%\n" +
-
-                        "Trend: " +
-                        trend +
-                        "\n" +
+                        "%\n\n" +
 
                         "Candle: " +
-                        candleDirection +
-                        "\n\n" +
-
-                        "Signal Candle:\n" +
                         closedTime +
                         "\n\n" +
 
-                        "Next Candle:\n" +
-                        nextTime;
+                        "Next: " +
+                        nextTime +
+                        "\n\n" +
+
+                        "Trend: " +
+                        trend;
 
                 if (!reason.isEmpty()) {
 
@@ -354,14 +532,17 @@ public class FloatingService extends Service {
                             reason;
                 }
 
-                final String finalText =
+                final String displayText =
                         text;
 
                 new Handler(
                         Looper.getMainLooper())
                         .post(() -> {
 
-                    if (signalView == null) {
+                    if (
+                            signalView == null ||
+                            infoView == null) {
+
                         return;
                     }
 
@@ -369,7 +550,7 @@ public class FloatingService extends Service {
                             finalSignal);
 
                     infoView.setText(
-                            finalText);
+                            displayText);
 
                     if (
                             finalSignal.equalsIgnoreCase(
@@ -404,7 +585,10 @@ public class FloatingService extends Service {
                         Looper.getMainLooper())
                         .post(() -> {
 
-                    if (signalView == null) {
+                    if (
+                            signalView == null ||
+                            infoView == null) {
+
                         return;
                     }
 
@@ -415,12 +599,14 @@ public class FloatingService extends Service {
                             Color.WHITE);
 
                     infoView.setText(
+                            "Confidence: --%\n" +
                             "Connection Error");
                 });
 
             } finally {
 
                 if (connection != null) {
+
                     connection.disconnect();
                 }
             }
