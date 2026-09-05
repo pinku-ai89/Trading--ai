@@ -4,9 +4,10 @@ on:
   workflow_dispatch:
   push:
     paths:
-      - "app/**"
+      - ".github/workflows/build-apk.yml"
+      - "app/src/main/java/**"
       - "AndroidManifest.xml"
-      - ".github/workflows/**"
+      - "app/build.gradle"
       - "settings.gradle"
 
 jobs:
@@ -18,29 +19,63 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
-      - name: Setup JDK
+      - name: Setup Java
         uses: actions/setup-java@v5
         with:
           distribution: temurin
           java-version: "17"
 
-      - name: Setup Android
-        uses: android-actions/setup-android@v3
-
-      - name: Setup Gradle
-        uses: gradle/actions/setup-gradle@v4
-        with:
-          gradle-version: "8.9"
-
-      - name: Prepare Android Project
+      - name: Create Android Project
+        shell: bash
         run: |
+          mkdir -p app/src/main/java/com/traderpink/ai
           mkdir -p app/src/main/res/values
 
-          cp AndroidManifest.xml \
-             app/src/main/AndroidManifest.xml
+          cat > settings.gradle <<'EOF'
+          pluginManagement {
+              repositories {
+                  google()
+                  mavenCentral()
+                  gradlePluginPortal()
+              }
+          }
 
-          cp .github/workflows/build.gradle \
-             build.gradle
+          dependencyResolutionManagement {
+              repositoriesMode.set(RepositoriesMode.FAIL_ON_PROJECT_REPOS)
+              repositories {
+                  google()
+                  mavenCentral()
+              }
+          }
+
+          rootProject.name = "TraderPinkAI"
+          include(":app")
+          EOF
+
+          cat > build.gradle <<'EOF'
+          plugins {
+              id 'com.android.application' version '8.6.1' apply false
+          }
+          EOF
+
+          cat > app/build.gradle <<'EOF'
+          plugins {
+              id 'com.android.application'
+          }
+
+          android {
+              namespace 'com.traderpink.ai'
+              compileSdk 35
+
+              defaultConfig {
+                  applicationId 'com.traderpink.ai'
+                  minSdk 23
+                  targetSdk 35
+                  versionCode 17
+                  versionName "1.0.17"
+              }
+          }
+          EOF
 
           cat > app/src/main/res/values/styles.xml <<'EOF'
           <?xml version="1.0" encoding="utf-8"?>
@@ -60,6 +95,9 @@ jobs:
           </resources>
           EOF
 
+          cp AndroidManifest.xml \
+             app/src/main/AndroidManifest.xml
+
       - name: Verify Android Files
         run: |
           echo "Checking Android files..."
@@ -67,18 +105,22 @@ jobs:
           test -f app/src/main/AndroidManifest.xml
           test -f app/src/main/java/com/traderpink/ai/MainActivity.java
           test -f app/src/main/java/com/traderpink/ai/FloatingService.java
-          test -f app/build.gradle
-          test -f build.gradle
-          test -f settings.gradle
 
-          echo "All Android source files are ready."
+          echo "All Android files are ready."
+
+      - name: Install Gradle
+        shell: bash
+        run: |
+          wget -q https://services.gradle.org/distributions/gradle-8.7-bin.zip
+          unzip -q gradle-8.7-bin.zip
+          echo "$PWD/gradle-8.7/bin" >> $GITHUB_PATH
 
       - name: Build APK
         run: |
-          gradle assembleDebug
+          gradle assembleDebug --no-daemon --stacktrace
 
       - name: Upload APK
         uses: actions/upload-artifact@v4
         with:
-          name: Trader-Pink-AI-APK
+          name: Trader-Pink-AI-Floating-v17
           path: app/build/outputs/apk/debug/app-debug.apk
