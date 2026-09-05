@@ -41,10 +41,7 @@ public class MainActivity extends Activity {
     private final Runnable autoUpdate = new Runnable() {
         @Override
         public void run() {
-
-            if (destroyed) {
-                return;
-            }
+            if (destroyed) return;
 
             loadSignal();
 
@@ -55,8 +52,7 @@ public class MainActivity extends Activity {
     private TextView makeText(
             String text,
             float size,
-            int color
-    ) {
+            int color) {
 
         TextView v = new TextView(this);
 
@@ -70,90 +66,76 @@ public class MainActivity extends Activity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-
         super.onCreate(savedInstanceState);
 
         LinearLayout root =
                 new LinearLayout(this);
 
         root.setOrientation(
-                LinearLayout.VERTICAL
-        );
+                LinearLayout.VERTICAL);
 
-        root.setGravity(Gravity.CENTER_HORIZONTAL);
+        root.setGravity(
+                Gravity.CENTER_HORIZONTAL);
 
         root.setPadding(
                 20,
                 20,
                 20,
-                20
-        );
+                20);
 
         root.setBackgroundColor(
-                Color.rgb(11, 16, 32)
-        );
+                Color.rgb(11, 16, 32));
 
         TextView title =
                 makeText(
                         "🤖 Trader Pink AI 📈",
                         26,
-                        Color.WHITE
-                );
+                        Color.WHITE);
 
         title.setGravity(Gravity.CENTER);
-
         root.addView(title);
 
         TextView subtitle =
                 makeText(
                         "EURUSD Smart 1 Minute Signal Engine",
                         16,
-                        Color.LTGRAY
-                );
+                        Color.LTGRAY);
 
         subtitle.setGravity(Gravity.CENTER);
-
         root.addView(subtitle);
 
         TextView market =
                 makeText(
                         "EURUSD • 1 MIN",
                         19,
-                        Color.WHITE
-                );
+                        Color.WHITE);
 
         market.setGravity(Gravity.CENTER);
-
         root.addView(market);
 
         signal =
                 makeText(
                         "WAIT",
                         48,
-                        Color.WHITE
-                );
+                        Color.WHITE);
 
         signal.setGravity(Gravity.CENTER);
-
         root.addView(signal);
 
         confidence =
                 makeText(
                         "Confidence: 0%",
                         20,
-                        Color.WHITE
-                );
+                        Color.WHITE);
 
         confidence.setGravity(Gravity.CENTER);
-
         root.addView(confidence);
 
         info =
                 makeText(
                         "Loading...",
                         15,
-                        Color.WHITE
-                );
+                        Color.WHITE);
 
         root.addView(info);
 
@@ -161,12 +143,10 @@ public class MainActivity extends Activity {
                 new Button(this);
 
         update.setText(
-                "🔄 UPDATE SIGNAL"
-        );
+                "🔄 UPDATE SIGNAL");
 
         update.setOnClickListener(
-                v -> loadSignal()
-        );
+                v -> loadSignal());
 
         root.addView(update);
 
@@ -174,12 +154,10 @@ public class MainActivity extends Activity {
                 new Button(this);
 
         floating.setText(
-                "🤖 START FLOATING BOT"
-        );
+                "🤖 START FLOATING BOT");
 
         floating.setOnClickListener(
-                v -> startFloatingBot()
-        );
+                v -> startFloatingBot());
 
         root.addView(floating);
 
@@ -189,8 +167,7 @@ public class MainActivity extends Activity {
 
         handler.postDelayed(
                 autoUpdate,
-                10000
-        );
+                10000);
     }
 
     private void loadSignal() {
@@ -205,8 +182,7 @@ public class MainActivity extends Activity {
                         new URL(
                                 API +
                                 "?t=" +
-                                System.currentTimeMillis()
-                        );
+                                System.currentTimeMillis());
 
                 connection =
                         (HttpURLConnection)
@@ -214,18 +190,18 @@ public class MainActivity extends Activity {
 
                 connection.setRequestMethod("GET");
 
-                connection.setConnectTimeout(10000);
+                connection.setConnectTimeout(
+                        10000);
 
-                connection.setReadTimeout(10000);
+                connection.setReadTimeout(
+                        10000);
 
                 connection.setUseCaches(false);
 
                 BufferedReader reader =
                         new BufferedReader(
                                 new InputStreamReader(
-                                        connection.getInputStream()
-                                )
-                        );
+                                        connection.getInputStream()));
 
                 StringBuilder response =
                         new StringBuilder();
@@ -234,8 +210,7 @@ public class MainActivity extends Activity {
 
                 while (
                         (line = reader.readLine())
-                                != null
-                ) {
+                                != null) {
 
                     response.append(line);
                 }
@@ -244,55 +219,46 @@ public class MainActivity extends Activity {
 
                 JSONObject data =
                         new JSONObject(
-                                response.toString()
-                        );
+                                response.toString());
 
                 String finalSignal =
                         data.optString(
                                 "signal",
-                                "WAIT"
-                        );
+                                "WAIT");
 
                 int finalConfidence =
                         data.optInt(
                                 "confidence",
-                                0
-                        );
+                                0);
 
                 String trend =
                         data.optString(
                                 "trend",
-                                "--"
-                        );
+                                "--");
 
                 String closedTime =
                         data.optString(
                                 "closed_candle_time",
-                                "--"
-                        );
+                                "--");
 
                 String nextTime =
                         data.optString(
                                 "next_candle_time",
-                                "--"
-                        );
+                                "--");
 
                 String analysisMode =
                         data.optString(
                                 "analysis_mode",
-                                "--"
-                        );
+                                "--");
 
                 String reason =
                         data.optString(
                                 "decision_reason",
-                                ""
-                        );
+                                "");
 
                 JSONObject candle =
                         data.optJSONObject(
-                                "candle"
-                        );
+                                "candle");
 
                 String candleDirection =
                         "--";
@@ -302,8 +268,7 @@ public class MainActivity extends Activity {
                     candleDirection =
                             candle.optString(
                                     "direction",
-                                    "--"
-                            );
+                                    "--");
                 }
 
                 String finalText =
@@ -329,55 +294,45 @@ public class MainActivity extends Activity {
                             reason;
                 }
 
+                final String displayText =
+                        finalText;
+
                 runOnUiThread(() -> {
 
                     signal.setText(
-                            finalSignal
-                    );
+                            finalSignal);
 
                     confidence.setText(
                             "Confidence: " +
                             finalConfidence +
-                            "%"
-                    );
+                            "%");
 
                     info.setText(
-                            finalText
-                    );
+                            displayText);
 
-                    if (
-                            finalSignal.equalsIgnoreCase(
-                                    "BUY"
-                            )
-                    ) {
+                    if (finalSignal.equalsIgnoreCase(
+                            "BUY")) {
 
                         signal.setTextColor(
                                 Color.rgb(
                                         50,
                                         220,
-                                        120
-                                )
-                        );
+                                        120));
 
                     } else if (
                             finalSignal.equalsIgnoreCase(
-                                    "SELL"
-                            )
-                    ) {
+                                    "SELL")) {
 
                         signal.setTextColor(
                                 Color.rgb(
                                         255,
                                         80,
-                                        100
-                                )
-                        );
+                                        100));
 
                     } else {
 
                         signal.setTextColor(
-                                Color.WHITE
-                        );
+                                Color.WHITE);
                     }
                 });
 
@@ -385,22 +340,17 @@ public class MainActivity extends Activity {
 
                 runOnUiThread(() -> {
 
-                    signal.setText(
-                            "WAIT"
-                    );
+                    signal.setText("WAIT");
 
                     confidence.setText(
-                            "Connection Error"
-                    );
+                            "Connection Error");
 
                     info.setText(
                             "Worker connection failed.\n" +
-                            "Please check internet connection."
-                    );
+                            "Please check internet connection.");
 
                     signal.setTextColor(
-                            Color.WHITE
-                    );
+                            Color.WHITE);
                 });
 
             } finally {
@@ -417,17 +367,14 @@ public class MainActivity extends Activity {
 
         if (
                 android.os.Build.VERSION.SDK_INT >= 23 &&
-                !Settings.canDrawOverlays(this)
-        ) {
+                !Settings.canDrawOverlays(this)) {
 
             Intent intent =
                     new Intent(
                             Settings.ACTION_MANAGE_OVERLAY_PERMISSION,
                             Uri.parse(
                                     "package:" +
-                                    getPackageName()
-                            )
-                    );
+                                    getPackageName()));
 
             startActivity(intent);
 
@@ -437,22 +384,18 @@ public class MainActivity extends Activity {
         Intent serviceIntent =
                 new Intent(
                         this,
-                        FloatingService.class
-                );
+                        FloatingService.class);
 
         if (
-                android.os.Build.VERSION.SDK_INT >= 26
-        ) {
+                android.os.Build.VERSION.SDK_INT >= 26) {
 
             startForegroundService(
-                    serviceIntent
-            );
+                    serviceIntent);
 
         } else {
 
             startService(
-                    serviceIntent
-            );
+                    serviceIntent);
         }
     }
 
@@ -462,8 +405,7 @@ public class MainActivity extends Activity {
         destroyed = true;
 
         handler.removeCallbacks(
-                autoUpdate
-        );
+                autoUpdate);
 
         pool.shutdownNow();
 
