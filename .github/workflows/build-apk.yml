@@ -4,7 +4,6 @@ on:
   workflow_dispatch:
   push:
     paths:
-      - "android/**"
       - "app/**"
       - "build.gradle"
       - "settings.gradle"
@@ -33,19 +32,9 @@ jobs:
         with:
           gradle-version: "8.9"
 
-      - name: Prepare Android Source Files
+      - name: Prepare Android Resources
         run: |
-          mkdir -p app/src/main/java/com/traderpink/ai
           mkdir -p app/src/main/res/values
-
-          cp android/MainActivity.java \
-             app/src/main/java/com/traderpink/ai/MainActivity.java
-
-          cp android/FloatingService.java \
-             app/src/main/java/com/traderpink/ai/FloatingService.java
-
-          cp android/AndroidManifest.xml \
-             app/src/main/AndroidManifest.xml
 
           cat > app/src/main/res/values/styles.xml <<'EOF'
           <?xml version="1.0" encoding="utf-8"?>
@@ -72,6 +61,9 @@ jobs:
           test -f app/src/main/AndroidManifest.xml
           test -f app/src/main/java/com/traderpink/ai/MainActivity.java
           test -f app/src/main/java/com/traderpink/ai/FloatingService.java
+          test -f app/build.gradle
+          test -f build.gradle
+          test -f settings.gradle
 
           echo "All Android source files are ready."
 
