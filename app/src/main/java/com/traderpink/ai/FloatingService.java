@@ -24,9 +24,11 @@ public class FloatingService extends Service {
     private TextView signalView;
     private TextView infoView;
 
-    private final Handler handler = new Handler();
+    private final Handler handler =
+            new Handler(Looper.getMainLooper());
 
-    private final Runnable updater = new Runnable() {
+    private final Runnable updater =
+            new Runnable() {
 
         @Override
         public void run() {
@@ -35,8 +37,7 @@ public class FloatingService extends Service {
 
             handler.postDelayed(
                     this,
-                    10000
-            );
+                    10000);
         }
     };
 
@@ -49,27 +50,24 @@ public class FloatingService extends Service {
     public int onStartCommand(
             Intent intent,
             int flags,
-            int startId
-    ) {
+            int startId) {
 
         createNotificationChannel();
+
         startForeground(
                 1001,
-                createNotification()
-        );
+                createNotification());
 
         showFloatingWindow();
 
         updateSignal();
 
         handler.removeCallbacks(
-                updater
-        );
+                updater);
 
         handler.postDelayed(
                 updater,
-                10000
-        );
+                10000);
 
         return START_STICKY;
     }
@@ -84,42 +82,33 @@ public class FloatingService extends Service {
                 new LinearLayout(this);
 
         main.setOrientation(
-                LinearLayout.VERTICAL
-        );
+                LinearLayout.VERTICAL);
 
         main.setPadding(
                 18,
                 14,
                 18,
-                14
-        );
+                14);
 
         main.setBackgroundColor(
                 Color.rgb(
                         20,
                         25,
-                        45
-                )
-        );
+                        45));
 
         TextView title =
                 new TextView(this);
 
         title.setText(
-                "🤖 Trader Pink AI"
-        );
+                "🤖 Trader Pink AI");
 
         title.setTextColor(
-                Color.WHITE
-        );
+                Color.WHITE);
 
-        title.setTextSize(
-                18
-        );
+        title.setTextSize(18);
 
         title.setGravity(
-                Gravity.CENTER
-        );
+                Gravity.CENTER);
 
         main.addView(title);
 
@@ -127,20 +116,15 @@ public class FloatingService extends Service {
                 new TextView(this);
 
         market.setText(
-                "EURUSD • 1 MIN"
-        );
+                "EURUSD • 1 MIN");
 
         market.setTextColor(
-                Color.LTGRAY
-        );
+                Color.LTGRAY);
 
-        market.setTextSize(
-                14
-        );
+        market.setTextSize(14);
 
         market.setGravity(
-                Gravity.CENTER
-        );
+                Gravity.CENTER);
 
         main.addView(market);
 
@@ -148,79 +132,59 @@ public class FloatingService extends Service {
                 new TextView(this);
 
         signalView.setText(
-                "WAIT"
-        );
+                "WAIT");
 
         signalView.setTextColor(
-                Color.WHITE
-        );
+                Color.WHITE);
 
-        signalView.setTextSize(
-                32
-        );
+        signalView.setTextSize(32);
 
         signalView.setGravity(
-                Gravity.CENTER
-        );
+                Gravity.CENTER);
 
         signalView.setPadding(
                 0,
                 10,
                 0,
-                5
-        );
+                5);
 
-        main.addView(
-                signalView
-        );
+        main.addView(signalView);
 
         infoView =
                 new TextView(this);
 
         infoView.setText(
-                "Loading..."
-        );
+                "Loading...");
 
         infoView.setTextColor(
-                Color.WHITE
-        );
+                Color.WHITE);
 
-        infoView.setTextSize(
-                13
-        );
+        infoView.setTextSize(13);
 
-        main.addView(
-                infoView
-        );
+        main.addView(infoView);
 
         Button close =
                 new Button(this);
 
         close.setText(
-                "✕ CLOSE"
-        );
+                "✕ CLOSE");
 
         close.setOnClickListener(
-                v -> stopSelf()
-        );
+                v -> stopSelf());
 
-        main.addView(
-                close
-        );
+        main.addView(close);
 
         floatingView = main;
 
         windowManager =
                 (WindowManager)
                         getSystemService(
-                                WINDOW_SERVICE
-                        );
+                                WINDOW_SERVICE);
 
         int type;
 
         if (
-                Build.VERSION.SDK_INT >= 26
-        ) {
+                Build.VERSION.SDK_INT >= 26) {
 
             type =
                     WindowManager.LayoutParams
@@ -243,8 +207,7 @@ public class FloatingService extends Service {
                                 .FLAG_NOT_FOCUSABLE |
                         WindowManager.LayoutParams
                                 .FLAG_LAYOUT_NO_LIMITS,
-                        PixelFormat.TRANSLUCENT
-                );
+                        PixelFormat.TRANSLUCENT);
 
         params.gravity =
                 Gravity.TOP |
@@ -257,8 +220,7 @@ public class FloatingService extends Service {
 
             windowManager.addView(
                     floatingView,
-                    params
-            );
+                    params);
 
         } catch (Exception e) {
 
@@ -279,36 +241,28 @@ public class FloatingService extends Service {
                         new URL(
                                 API +
                                 "?t=" +
-                                System.currentTimeMillis()
-                        );
+                                System.currentTimeMillis());
 
                 connection =
                         (HttpURLConnection)
                                 url.openConnection();
 
                 connection.setRequestMethod(
-                        "GET"
-                );
+                        "GET");
 
                 connection.setConnectTimeout(
-                        10000
-                );
+                        10000);
 
                 connection.setReadTimeout(
-                        10000
-                );
+                        10000);
 
                 connection.setUseCaches(
-                        false
-                );
+                        false);
 
                 BufferedReader reader =
                         new BufferedReader(
                                 new InputStreamReader(
-                                        connection
-                                                .getInputStream()
-                                )
-                        );
+                                        connection.getInputStream()));
 
                 StringBuilder result =
                         new StringBuilder();
@@ -316,10 +270,8 @@ public class FloatingService extends Service {
                 String line;
 
                 while (
-                        (line =
-                                reader.readLine())
-                                != null
-                ) {
+                        (line = reader.readLine())
+                                != null) {
 
                     result.append(line);
                 }
@@ -328,49 +280,41 @@ public class FloatingService extends Service {
 
                 JSONObject data =
                         new JSONObject(
-                                result.toString()
-                        );
+                                result.toString());
 
-                String signal =
+                String finalSignal =
                         data.optString(
                                 "signal",
-                                "WAIT"
-                        );
+                                "WAIT");
 
                 int confidence =
                         data.optInt(
                                 "confidence",
-                                0
-                        );
+                                0);
 
                 String trend =
                         data.optString(
                                 "trend",
-                                "--"
-                        );
+                                "--");
 
                 String closedTime =
                         data.optString(
                                 "closed_candle_time",
-                                "--"
-                        );
+                                "--");
 
                 String nextTime =
                         data.optString(
                                 "next_candle_time",
-                                "--"
-                        );
+                                "--");
 
                 String reason =
                         data.optString(
                                 "decision_reason",
-                                ""
-                        );
+                                "");
 
                 JSONObject candle =
                         data.optJSONObject(
-                                "candle"
-                        );
+                                "candle");
 
                 String candleDirection =
                         "--";
@@ -380,8 +324,7 @@ public class FloatingService extends Service {
                     candleDirection =
                             candle.optString(
                                     "direction",
-                                    "--"
-                            );
+                                    "--");
                 }
 
                 String text =
@@ -414,75 +357,65 @@ public class FloatingService extends Service {
                 final String finalText =
                         text;
 
-                runOnUiThread(() -> {
+                new Handler(
+                        Looper.getMainLooper())
+                        .post(() -> {
 
                     if (signalView == null) {
                         return;
                     }
 
                     signalView.setText(
-                            signal
-                    );
+                            finalSignal);
 
                     infoView.setText(
-                            finalText
-                    );
+                            finalText);
 
                     if (
-                            signal.equalsIgnoreCase(
-                                    "BUY"
-                            )
-                    ) {
+                            finalSignal.equalsIgnoreCase(
+                                    "BUY")) {
 
                         signalView.setTextColor(
                                 Color.rgb(
                                         50,
                                         220,
-                                        120
-                                )
-                        );
+                                        120));
 
                     } else if (
-                            signal.equalsIgnoreCase(
-                                    "SELL"
-                            )
-                    ) {
+                            finalSignal.equalsIgnoreCase(
+                                    "SELL")) {
 
                         signalView.setTextColor(
                                 Color.rgb(
                                         255,
                                         80,
-                                        100
-                                )
-                        );
+                                        100));
 
                     } else {
 
                         signalView.setTextColor(
-                                Color.WHITE
-                        );
+                                Color.WHITE);
                     }
                 });
 
             } catch (Exception e) {
 
-                runOnUiThread(() -> {
+                new Handler(
+                        Looper.getMainLooper())
+                        .post(() -> {
 
                     if (signalView == null) {
                         return;
                     }
 
                     signalView.setText(
-                            "WAIT"
-                    );
+                            "WAIT");
 
                     signalView.setTextColor(
-                            Color.WHITE
-                    );
+                            Color.WHITE);
 
                     infoView.setText(
-                            "Connection Error"
-                    );
+                            "Connection Error");
                 });
 
             } finally {
@@ -497,29 +430,24 @@ public class FloatingService extends Service {
 
     private void createNotificationChannel() {
 
-        if (
-                Build.VERSION.SDK_INT >= 26
-        ) {
+        if (Build.VERSION.SDK_INT >= 26) {
 
             NotificationChannel channel =
                     new NotificationChannel(
                             "trader_pink_ai",
                             "Trader Pink AI",
                             NotificationManager
-                                    .IMPORTANCE_LOW
-                    );
+                                    .IMPORTANCE_LOW);
 
             NotificationManager manager =
                     (NotificationManager)
                             getSystemService(
-                                    NOTIFICATION_SERVICE
-                            );
+                                    NOTIFICATION_SERVICE);
 
             if (manager != null) {
 
                 manager.createNotificationChannel(
-                        channel
-                );
+                        channel);
             }
         }
     }
@@ -529,8 +457,7 @@ public class FloatingService extends Service {
         Intent intent =
                 new Intent(
                         this,
-                        MainActivity.class
-                );
+                        MainActivity.class);
 
         PendingIntent pendingIntent =
                 PendingIntent.getActivity(
@@ -538,45 +465,35 @@ public class FloatingService extends Service {
                         0,
                         intent,
                         PendingIntent.FLAG_IMMUTABLE |
-                        PendingIntent.FLAG_UPDATE_CURRENT
-                );
+                        PendingIntent.FLAG_UPDATE_CURRENT);
 
         Notification.Builder builder;
 
-        if (
-                Build.VERSION.SDK_INT >= 26
-        ) {
+        if (Build.VERSION.SDK_INT >= 26) {
 
             builder =
                     new Notification.Builder(
                             this,
-                            "trader_pink_ai"
-                    );
+                            "trader_pink_ai");
 
         } else {
 
             builder =
                     new Notification.Builder(
-                            this
-                    );
+                            this);
         }
 
         return builder
                 .setContentTitle(
-                        "Trader Pink AI 🤖📈"
-                )
+                        "Trader Pink AI 🤖📈")
                 .setContentText(
-                        "EURUSD 1M Signal Engine চলছে"
-                )
+                        "EURUSD 1M Signal Engine চলছে")
                 .setSmallIcon(
-                        android.R.drawable.ic_dialog_info
-                )
+                        android.R.drawable
+                                .ic_dialog_info)
                 .setContentIntent(
-                        pendingIntent
-                )
-                .setOngoing(
-                        true
-                )
+                        pendingIntent)
+                .setOngoing(true)
                 .build();
     }
 
@@ -584,19 +501,16 @@ public class FloatingService extends Service {
     public void onDestroy() {
 
         handler.removeCallbacks(
-                updater
-        );
+                updater);
 
         if (
                 floatingView != null &&
-                windowManager != null
-        ) {
+                windowManager != null) {
 
             try {
 
                 windowManager.removeView(
-                        floatingView
-                );
+                        floatingView);
 
             } catch (Exception ignored) {
             }
