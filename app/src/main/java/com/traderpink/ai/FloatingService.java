@@ -1,74 +1,100 @@
 package com.traderpink.ai;
 
-import android.app.*;
-import android.content.*;
-import android.graphics.*;
-import android.graphics.drawable.GradientDrawable;
-import android.os.*;
-import android.view.*;
-import android.widget.*;
+import android.app.Notification;
+import android.app.NotificationChannel;
+import android.app.NotificationManager;
+import android.app.Service;
+import android.content.Context;
+import android.content.Intent;
+import android.graphics.Canvas;
+import android.graphics.Color;
+import android.graphics.Paint;
+import android.graphics.RectF;
+import android.os.Build;
+import android.os.Handler;
+import android.os.IBinder;
+import android.view.Gravity;
+import android.view.MotionEvent;
+import android.view.View;
+import android.view.WindowManager;
+import android.widget.LinearLayout;
+import android.widget.TextView;
 
-import org.json.*;
+import org.json.JSONObject;
 
-import java.io.*;
-import java.net.*;
-import java.util.*;
+import java.io.BufferedReader;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.net.HttpURLConnection;
+import java.net.URL;
+import java.util.Locale;
 
 public class FloatingService extends Service {
 
-    private static final String API =
+    private static final String API_URL =
             "https://crimson-grass-f881.bijondebnath51.workers.dev/";
 
     private WindowManager windowManager;
     private View floatingView;
-
     private TextView signalView;
     private TextView confidenceView;
     private TextView trendView;
-    private TextView timeView;
-    private TextView candleTimerView;
-
+    private TextView candleTimeView;
+    private TextView countdownView;
     private CandleView candleView;
 
-    private WindowManager.LayoutParams windowParams;
+    private final Handler handler = new Handler();
 
-    private float downRawX;
-    private float downRawY;
-    private int startX;
-    private int startY;
+    private double previousOpen = 0;
+    private double previousHigh = 0;
+    private double previousLow = 0;
+    private double previousClose = 0;
 
-    private final Handler handler =
-            new Handler(Looper.getMainLooper());
+    private double liveOpen = 0;
+    private double liveHigh = 0;
+    private double liveLow = 0;
+    private double liveClose = 0;
 
-    private final Runnable updater =
-            new Runnable() {
-                @Override
-                public void run() {
+    private boolean hasRealCandleData = false;
 
-                    updateSignal();
+    private long lastClosedEpoch = 0;
 
-                    handler.postDelayed(
-                            this,
-                            10000);
-                }
-            };
+    // ----------------------------------------------------
+    // SIGNAL UPDATE
+    // ----------------------------------------------------
 
-    private final Runnable candleTimer =
-            new Runnable() {
-                @Override
-                public void run() {
+    private final Runnable updater = new Runnable() {
+        @Override
+        public void run() {
+            updateSignal();
+            handler.postDelayed(this, 10000);
+        }
+    };
 
-                    updateCandleTimer();
+    // ----------------------------------------------------
+    // REAL MARKET CLOCK
+    // ----------------------------------------------------
 
-                    handler.postDelayed(
-                            this,
-                            1000);
-                }
-            };
+    private final Runnable candleTimer = new Runnable() {
+        @Override
+        public void run() {
+
+            updateCandleClock();
+
+            if (candleView != null) {
+                candleView.invalidate();
+            }
+
+            handler.postDelayed(this, 1000);
+        }
+    };
 
     @Override
-    public IBinder onBind(Intent intent) {
-        return null;
+    public void onCreate() {
+        super.onCreate();
+
+        windowManager =
+                (WindowManager) getSystemService(WINDOW_SERVICE);
     }
 
     @Override
@@ -79,37 +105,38 @@ public class FloatingService extends Service {
 
         createNotificationChannel();
 
-        startForeground(
-                1001,
-                createNotification());
+        Notification notification =
+                new Notification.Builder(
+                        this,
+                        "trader_pink_ai")
+                        .setContentTitle("Trader Pink AI")
+                        .setContentText("Floating AI Signal")
+                        .setSmallIcon(android.R.drawable.ic_dialog_info)
+                        .build();
 
-        showFloatingWindow();
+        startForeground(1001, notification);
+
+        if (floatingView == null) {
+            showFloatingWindow();
+        }
 
         updateSignal();
 
         handler.removeCallbacks(updater);
-
-        handler.postDelayed(
-                updater,
-                10000);
-
         handler.removeCallbacks(candleTimer);
 
-        handler.post(
-                candleTimer);
+        handler.post(updater);
+        handler.post(candleTimer);
 
         return START_STICKY;
     }
 
+    // ----------------------------------------------------
+    // FLOATING UI
+    // ----------------------------------------------------
+
     private void showFloatingWindow() {
 
-        if (floatingView != null) {
-            return;
-        }
-
-        /*
-         * MAIN COMPACT PANEL
-         */
         LinearLayout main =
                 new LinearLayout(this);
 
@@ -117,35 +144,22 @@ public class FloatingService extends Service {
                 LinearLayout.VERTICAL);
 
         main.setPadding(
-                10,
-                7,
-                10,
-                8);
+                12, 9, 12, 10);
 
-        GradientDrawable background =
-                new GradientDrawable();
+        main.setBackgroundColor(
+                Color.rgb(20, 25, 45));
 
-        background.setColor(
-                Color.rgb(
-                        18,
-                        23,
-                        40));
+        // -----------------------------
+        // TOP BAR
+        // -----------------------------
 
-        background.setCornerRadius(
-                18);
-
-        main.setBackground(background);
-
-        /*
-         * TOP BAR
-         */
-        LinearLayout topBar =
+        LinearLayout top =
                 new LinearLayout(this);
 
-        topBar.setOrientation(
+        top.setOrientation(
                 LinearLayout.HORIZONTAL);
 
-        topBar.setGravity(
+        top.setGravity(
                 Gravity.CENTER_VERTICAL);
 
         TextView title =
@@ -159,14 +173,15 @@ public class FloatingService extends Service {
 
         title.setTextSize(13);
 
-        title.setSingleLine(true);
-
-        topBar.addView(
-                title,
+        LinearLayout.LayoutParams titleParams =
                 new LinearLayout.LayoutParams(
                         0,
                         LinearLayout.LayoutParams.WRAP_CONTENT,
-                        1));
+                        1);
+
+        top.addView(
+                title,
+                titleParams);
 
         TextView close =
                 new TextView(this);
@@ -174,7 +189,7 @@ public class FloatingService extends Service {
         close.setText("×");
 
         close.setTextColor(
-                Color.LTGRAY);
+                Color.WHITE);
 
         close.setTextSize(20);
 
@@ -182,30 +197,19 @@ public class FloatingService extends Service {
                 Gravity.CENTER);
 
         close.setPadding(
-                6,
-                0,
-                2,
-                0);
+                8, 0, 2, 0);
 
         close.setOnClickListener(
-                v -> {
+                v -> stopSelf());
 
-                    handler.removeCallbacks(
-                            updater);
+        top.addView(close);
 
-                    handler.removeCallbacks(
-                            candleTimer);
+        main.addView(top);
 
-                    stopSelf();
-                });
+        // -----------------------------
+        // MARKET
+        // -----------------------------
 
-        topBar.addView(close);
-
-        main.addView(topBar);
-
-        /*
-         * MARKET
-         */
         TextView market =
                 new TextView(this);
 
@@ -217,20 +221,12 @@ public class FloatingService extends Service {
 
         market.setTextSize(10);
 
-        market.setGravity(
-                Gravity.CENTER);
-
-        market.setPadding(
-                0,
-                1,
-                0,
-                1);
-
         main.addView(market);
 
-        /*
-         * SIGNAL ROW
-         */
+        // -----------------------------
+        // SIGNAL ROW
+        // -----------------------------
+
         LinearLayout signalRow =
                 new LinearLayout(this);
 
@@ -243,158 +239,51 @@ public class FloatingService extends Service {
         signalView =
                 new TextView(this);
 
-        signalView.setText(
-                "🟡 WAIT");
+        signalView.setText("WAIT");
 
         signalView.setTextColor(
                 Color.WHITE);
 
-        signalView.setTextSize(17);
-
-        signalView.setTypeface(
-                Typeface.DEFAULT,
-                Typeface.BOLD);
-
-        signalView.setSingleLine(true);
-
-        signalRow.addView(
-                signalView,
-                new LinearLayout.LayoutParams(
-                        0,
-                        LinearLayout.LayoutParams.WRAP_CONTENT,
-                        1));
+        signalView.setTextSize(21);
 
         confidenceView =
                 new TextView(this);
 
         confidenceView.setText(
-                "--%");
+                "  --%");
 
         confidenceView.setTextColor(
                 Color.WHITE);
 
         confidenceView.setTextSize(13);
 
-        confidenceView.setGravity(
-                Gravity.CENTER);
+        signalRow.addView(signalView);
 
-        signalRow.addView(
-                confidenceView);
-
-        timeView =
-                new TextView(this);
-
-        timeView.setText(
-                "⏱ --");
-
-        timeView.setTextColor(
-                Color.LTGRAY);
-
-        timeView.setTextSize(10);
-
-        timeView.setGravity(
-                Gravity.CENTER);
-
-        timeView.setPadding(
-                7,
-                0,
-                0,
-                0);
-
-        signalRow.addView(timeView);
+        signalRow.addView(confidenceView);
 
         main.addView(signalRow);
 
-        /*
-         * TREND
-         */
+        // -----------------------------
+        // TREND
+        // -----------------------------
+
         trendView =
                 new TextView(this);
 
         trendView.setText(
-                "📈 UPTREND");
+                "📊 WAIT");
 
         trendView.setTextColor(
                 Color.LTGRAY);
 
         trendView.setTextSize(10);
 
-        trendView.setGravity(
-                Gravity.CENTER);
-
-        trendView.setPadding(
-                0,
-                1,
-                0,
-                2);
-
         main.addView(trendView);
 
-        /*
-         * NEXT SIGNAL BUTTON
-         */
-        TextView next =
-                new TextView(this);
+        // -----------------------------
+        // CANDLE AREA
+        // -----------------------------
 
-        next.setText(
-                "◯  NEXT SIGNAL");
-
-        next.setTextColor(
-                Color.WHITE);
-
-        next.setTextSize(10);
-
-        next.setGravity(
-                Gravity.CENTER);
-
-        next.setTypeface(
-                Typeface.DEFAULT,
-                Typeface.BOLD);
-
-        GradientDrawable nextBg =
-                new GradientDrawable();
-
-        nextBg.setColor(
-                Color.rgb(
-                        35,
-                        43,
-                        68));
-
-        nextBg.setCornerRadius(
-                50);
-
-        next.setBackground(nextBg);
-
-        next.setPadding(
-                12,
-                6,
-                12,
-                6);
-
-        next.setOnClickListener(
-                v -> updateSignal());
-
-        LinearLayout.LayoutParams nextParams =
-                new LinearLayout.LayoutParams(
-                        LinearLayout.LayoutParams.WRAP_CONTENT,
-                        LinearLayout.LayoutParams.WRAP_CONTENT);
-
-        nextParams.gravity =
-                Gravity.CENTER;
-
-        nextParams.topMargin = 2;
-        nextParams.bottomMargin = 4;
-
-        main.addView(
-                next,
-                nextParams);
-
-        /*
-         * CANDLE BOX
-         *
-         * একটি মাত্র box
-         * ভিতরে দুইটি candle
-         */
         LinearLayout candleBox =
                 new LinearLayout(this);
 
@@ -404,27 +293,13 @@ public class FloatingService extends Service {
         candleBox.setGravity(
                 Gravity.CENTER_VERTICAL);
 
-        GradientDrawable candleBg =
-                new GradientDrawable();
+        candleBox.setPadding(
+                7, 5, 5, 5);
 
-        candleBg.setColor(
-                Color.rgb(
-                        11,
-                        16,
-                        30));
+        candleBox.setBackgroundColor(
+                Color.rgb(13, 17, 32));
 
-        candleBg.setCornerRadius(
-                12);
-
-        candleBg.setStroke(
-                1,
-                Color.rgb(
-                        45,
-                        55,
-                        80));
-
-        candleBox.setBackground(
-                candleBg);
+        // Candle drawing
 
         candleView =
                 new CandleView(this);
@@ -432,97 +307,141 @@ public class FloatingService extends Service {
         LinearLayout.LayoutParams candleParams =
                 new LinearLayout.LayoutParams(
                         0,
-                        92,
+                        105,
                         1);
 
         candleBox.addView(
                 candleView,
                 candleParams);
 
-        /*
-         * RUNNING CANDLE TIMER
-         */
-        candleTimerView =
-                new TextView(this);
+        // -----------------------------
+        // TIME ON RIGHT SIDE
+        // -----------------------------
 
-        candleTimerView.setText(
-                "00:59");
+        LinearLayout timeBox =
+                new LinearLayout(this);
 
-        candleTimerView.setTextColor(
-                Color.WHITE);
+        timeBox.setOrientation(
+                LinearLayout.VERTICAL);
 
-        candleTimerView.setTextSize(10);
-
-        candleTimerView.setGravity(
+        timeBox.setGravity(
                 Gravity.CENTER);
 
-        candleTimerView.setPadding(
-                2,
-                0,
-                7,
-                0);
+        timeBox.setPadding(
+                5, 0, 2, 0);
+
+        candleTimeView =
+                new TextView(this);
+
+        candleTimeView.setText(
+                "--:--");
+
+        candleTimeView.setTextColor(
+                Color.WHITE);
+
+        candleTimeView.setTextSize(12);
+
+        candleTimeView.setGravity(
+                Gravity.CENTER);
+
+        countdownView =
+                new TextView(this);
+
+        countdownView.setText(
+                "00:59");
+
+        countdownView.setTextColor(
+                Color.LTGRAY);
+
+        countdownView.setTextSize(10);
+
+        countdownView.setGravity(
+                Gravity.CENTER);
+
+        timeBox.addView(candleTimeView);
+
+        timeBox.addView(countdownView);
 
         candleBox.addView(
-                candleTimerView,
+                timeBox,
                 new LinearLayout.LayoutParams(
-                        38,
-                        LinearLayout.LayoutParams.MATCH_PARENT));
+                        55,
+                        LinearLayout.LayoutParams.WRAP_CONTENT));
 
-        main.addView(
-                candleBox);
+        main.addView(candleBox);
+
+        // -----------------------------
+        // NEXT SIGNAL
+        // -----------------------------
+
+        TextView nextSignal =
+                new TextView(this);
+
+        nextSignal.setText(
+                "◯ NEXT SIGNAL");
+
+        nextSignal.setTextColor(
+                Color.WHITE);
+
+        nextSignal.setTextSize(10);
+
+        nextSignal.setGravity(
+                Gravity.CENTER);
+
+        nextSignal.setPadding(
+                0, 5, 0, 0);
+
+        nextSignal.setOnClickListener(
+                v -> updateSignal());
+
+        main.addView(nextSignal);
+
+        // -----------------------------
+        // WINDOW
+        // -----------------------------
 
         floatingView = main;
 
-        /*
-         * WINDOW MANAGER
-         */
-        windowManager =
-                (WindowManager)
-                        getSystemService(
-                                WINDOW_SERVICE);
+        int overlayType;
 
-        int type;
-
-        if (Build.VERSION.SDK_INT >= 26) {
-
-            type =
-                    WindowManager.LayoutParams
-                            .TYPE_APPLICATION_OVERLAY;
-
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            overlayType =
+                    WindowManager.LayoutParams.TYPE_APPLICATION_OVERLAY;
         } else {
-
-            type =
-                    WindowManager.LayoutParams
-                            .TYPE_PHONE;
+            overlayType =
+                    WindowManager.LayoutParams.TYPE_PHONE;
         }
 
-        /*
-         * WIDTH কমানো হয়েছে।
-         * HEIGHT একই ধরনের compact রাখা হয়েছে।
-         */
         windowParams =
                 new WindowManager.LayoutParams(
                         275,
                         WindowManager.LayoutParams.WRAP_CONTENT,
-                        type,
-                        WindowManager.LayoutParams
-                                .FLAG_NOT_FOCUSABLE |
-                        WindowManager.LayoutParams
-                                .FLAG_LAYOUT_NO_LIMITS,
-                        PixelFormat.TRANSLUCENT);
+                        overlayType,
+                        WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE,
+                        android.graphics.PixelFormat.TRANSLUCENT);
 
         windowParams.gravity =
-                Gravity.TOP |
-                Gravity.RIGHT;
+                Gravity.TOP | Gravity.RIGHT;
 
         windowParams.x = 8;
         windowParams.y = 120;
 
-        /*
-         * DRAG
-         */
-        View.OnTouchListener dragListener =
+        windowManager.addView(
+                floatingView,
+                windowParams);
+
+        // -----------------------------
+        // DRAG
+        // -----------------------------
+
+        floatingView.setOnTouchListener(
                 new View.OnTouchListener() {
+
+                    private int initialX;
+                    private int initialY;
+
+                    private float initialTouchX;
+                    private float initialTouchY;
 
                     @Override
                     public boolean onTouch(
@@ -533,97 +452,110 @@ public class FloatingService extends Service {
 
                             case MotionEvent.ACTION_DOWN:
 
-                                downRawX =
-                                        event.getRawX();
-
-                                downRawY =
-                                        event.getRawY();
-
-                                startX =
+                                initialX =
                                         windowParams.x;
 
-                                startY =
+                                initialY =
                                         windowParams.y;
+
+                                initialTouchX =
+                                        event.getRawX();
+
+                                initialTouchY =
+                                        event.getRawY();
 
                                 return true;
 
                             case MotionEvent.ACTION_MOVE:
 
-                                int dx =
-                                        (int)
-                                        (event.getRawX()
-                                        - downRawX);
-
-                                int dy =
-                                        (int)
-                                        (event.getRawY()
-                                        - downRawY);
-
                                 windowParams.x =
-                                        startX - dx;
+                                        initialX +
+                                                (int) (
+                                                        initialTouchX -
+                                                                event.getRawX());
 
                                 windowParams.y =
-                                        startY + dy;
+                                        initialY +
+                                                (int) (
+                                                        event.getRawY() -
+                                                                initialTouchY);
 
-                                if (
-                                        windowManager != null &&
-                                        floatingView != null) {
-
-                                    try {
-
-                                        windowManager.updateViewLayout(
-                                                floatingView,
-                                                windowParams);
-
-                                    } catch (Exception ignored) {
-                                    }
-                                }
-
-                                return true;
-
-                            case MotionEvent.ACTION_UP:
+                                windowManager.updateViewLayout(
+                                        floatingView,
+                                        windowParams);
 
                                 return true;
                         }
 
                         return false;
                     }
-                };
+                });
+    }
 
-        main.setOnTouchListener(
-                dragListener);
+    // ----------------------------------------------------
+    // CLOCK
+    // ----------------------------------------------------
 
-        try {
+    private void updateCandleClock() {
 
-            windowManager.addView(
-                    floatingView,
-                    windowParams);
+        long now =
+                System.currentTimeMillis();
 
-        } catch (Exception e) {
+        long seconds =
+                now / 1000;
 
-            floatingView = null;
+        long secondInMinute =
+                seconds % 60;
+
+        long remaining =
+                60 - secondInMinute;
+
+        if (remaining > 60) {
+            remaining = 60;
+        }
+
+        String time =
+                String.format(
+                        Locale.US,
+                        "%02d:%02d",
+                        (seconds / 3600) % 24,
+                        (seconds / 60) % 60);
+
+        if (candleTimeView != null) {
+            candleTimeView.setText(time);
+        }
+
+        if (countdownView != null) {
+
+            countdownView.setText(
+                    String.format(
+                            Locale.US,
+                            "00:%02d",
+                            remaining == 60
+                                    ? 59
+                                    : remaining));
         }
     }
 
-    /*
-     * =========================================================
-     * SIGNAL UPDATE
-     * =========================================================
-     */
+    // ----------------------------------------------------
+    // API
+    // ----------------------------------------------------
+
     private void updateSignal() {
 
         new Thread(() -> {
 
-            HttpURLConnection connection =
-                    null;
+            HttpURLConnection connection = null;
 
             try {
 
+                String urlString =
+                        API_URL +
+                                "?floating=" +
+                                System.currentTimeMillis();
+
                 URL url =
-                        new URL(
-                                API +
-                                "?t=" +
-                                System.currentTimeMillis());
+                        new URL(urlString);
 
                 connection =
                         (HttpURLConnection)
@@ -633,191 +565,182 @@ public class FloatingService extends Service {
                         "GET");
 
                 connection.setConnectTimeout(
-                        10000);
+                        8000);
 
                 connection.setReadTimeout(
-                        10000);
+                        8000);
 
-                connection.setUseCaches(
-                        false);
+                connection.setUseCaches(false);
+
+                InputStream input =
+                        connection.getInputStream();
 
                 BufferedReader reader =
                         new BufferedReader(
                                 new InputStreamReader(
-                                        connection.getInputStream()));
+                                        input));
 
-                StringBuilder result =
+                StringBuilder response =
                         new StringBuilder();
 
                 String line;
 
-                while (
-                        (line = reader.readLine())
-                                != null) {
-
-                    result.append(line);
+                while ((line = reader.readLine()) != null) {
+                    response.append(line);
                 }
 
                 reader.close();
 
-                JSONObject data =
+                JSONObject json =
                         new JSONObject(
-                                result.toString());
+                                response.toString());
 
-                String finalSignal =
-                        data.optString(
+                String signal =
+                        json.optString(
                                 "signal",
                                 "WAIT");
 
                 int confidence =
-                        data.optInt(
+                        json.optInt(
                                 "confidence",
                                 0);
 
-                String nextTime =
-                        data.optString(
-                                "next_candle_time",
-                                "--");
-
                 String trend =
-                        data.optString(
+                        json.optString(
                                 "trend",
-                                "--");
+                                "SIDEWAYS");
 
-                /*
-                 * Candle data থাকলে ব্যবহার করবে।
-                 * Worker-এ না থাকলে fallback করবে।
-                 */
-                double open =
-                        data.optDouble(
+                String closedTime =
+                        json.optString(
+                                "closed_candle_time",
+                                "");
+
+                // -------------------------
+                // OHLC
+                // -------------------------
+
+                double o =
+                        json.optDouble(
                                 "open",
                                 Double.NaN);
 
-                double high =
-                        data.optDouble(
+                double h =
+                        json.optDouble(
                                 "high",
                                 Double.NaN);
 
-                double low =
-                        data.optDouble(
+                double l =
+                        json.optDouble(
                                 "low",
                                 Double.NaN);
 
-                double close =
-                        data.optDouble(
+                double c =
+                        json.optDouble(
                                 "close",
                                 Double.NaN);
 
                 double price =
-                        data.optDouble(
+                        json.optDouble(
                                 "price",
                                 Double.NaN);
 
-                final double fOpen = open;
-                final double fHigh = high;
-                final double fLow = low;
-                final double fClose = close;
-                final double fPrice = price;
+                if (!Double.isNaN(o)
+                        && !Double.isNaN(h)
+                        && !Double.isNaN(l)
+                        && !Double.isNaN(c)) {
 
-                new Handler(
-                        Looper.getMainLooper())
-                        .post(() -> {
+                    previousOpen = o;
+                    previousHigh = h;
+                    previousLow = l;
+                    previousClose = c;
 
-                            if (signalView == null) {
-                                return;
-                            }
+                    liveOpen = c;
 
-                            String emoji;
+                    if (!Double.isNaN(price)) {
+                        liveClose = price;
+                    } else {
+                        liveClose = c;
+                    }
 
-                            if (
-                                    finalSignal.equalsIgnoreCase(
-                                            "BUY")) {
+                    liveHigh =
+                            Math.max(
+                                    liveOpen,
+                                    liveClose);
 
-                                emoji = "🟢";
+                    liveLow =
+                            Math.min(
+                                    liveOpen,
+                                    liveClose);
 
-                                signalView.setTextColor(
-                                        Color.rgb(
-                                                50,
-                                                220,
-                                                120));
+                    hasRealCandleData = true;
+                }
 
-                            } else if (
-                                    finalSignal.equalsIgnoreCase(
-                                            "SELL")) {
+                lastClosedEpoch =
+                        System.currentTimeMillis();
 
-                                emoji = "🔴";
+                runOnUiThread(() -> {
 
-                                signalView.setTextColor(
-                                        Color.rgb(
-                                                255,
-                                                80,
-                                                100));
+                    // SIGNAL
 
-                            } else {
+                    signalView.setText(
+                            signal.toUpperCase());
 
-                                emoji = "🟡";
-
-                                signalView.setTextColor(
-                                        Color.WHITE);
-                            }
-
-                            signalView.setText(
-                                    emoji +
-                                    " " +
-                                    finalSignal);
-
-                            confidenceView.setText(
+                    confidenceView.setText(
+                            "  " +
                                     confidence +
                                     "%");
 
-                            timeView.setText(
-                                    "⏱ " +
-                                    shortTime(nextTime));
+                    // SIGNAL COLOR
 
-                            trendView.setText(
-                                    "📈 " +
-                                    trend);
+                    if ("BUY".equalsIgnoreCase(signal)) {
 
-                            /*
-                             * CandleView-কে Worker-এর
-                             * data দেওয়া হচ্ছে।
-                             */
-                            if (candleView != null) {
+                        signalView.setTextColor(
+                                Color.rgb(
+                                        45,
+                                        220,
+                                        125));
 
-                                candleView.setMarketData(
-                                        fOpen,
-                                        fHigh,
-                                        fLow,
-                                        fClose,
-                                        fPrice);
-                            }
-                        });
+                    } else if ("SELL".equalsIgnoreCase(signal)) {
+
+                        signalView.setTextColor(
+                                Color.rgb(
+                                        255,
+                                        75,
+                                        90));
+
+                    } else {
+
+                        signalView.setTextColor(
+                                Color.WHITE);
+                    }
+
+                    // TREND
+
+                    trendView.setText(
+                            "📊 " +
+                                    trend.toUpperCase());
+
+                    // Candle redraw
+
+                    if (candleView != null) {
+                        candleView.invalidate();
+                    }
+                });
 
             } catch (Exception e) {
 
-                new Handler(
-                        Looper.getMainLooper())
-                        .post(() -> {
+                runOnUiThread(() -> {
 
-                            if (signalView == null) {
-                                return;
-                            }
+                    signalView.setText(
+                            "WAIT");
 
-                            signalView.setText(
-                                    "🟡 WAIT");
+                    confidenceView.setText(
+                            "  --%");
 
-                            signalView.setTextColor(
-                                    Color.WHITE);
+                    trendView.setText(
+                            "📊 CONNECTION");
 
-                            confidenceView.setText(
-                                    "--%");
-
-                            timeView.setText(
-                                    "⏱ --");
-
-                            trendView.setText(
-                                    "Connection Error");
-                        });
+                });
 
             } finally {
 
@@ -829,215 +752,23 @@ public class FloatingService extends Service {
         }).start();
     }
 
-    /*
-     * Worker-এর সময়কে ছোট করে দেখায়।
-     */
-    private String shortTime(
-            String value) {
+    // ----------------------------------------------------
+    // CANDLE VIEW
+    // ----------------------------------------------------
 
-        if (
-                value == null ||
-                value.equals("--")) {
-
-            return "--";
-        }
-
-        try {
-
-            if (value.contains("T")) {
-
-                String part =
-                        value.substring(
-                                value.indexOf("T") + 1);
-
-                if (part.length() >= 5) {
-
-                    return part.substring(
-                            0,
-                            5);
-                }
-            }
-
-            if (value.length() >= 5) {
-
-                return value.substring(
-                        value.length() - 5);
-            }
-
-        } catch (Exception ignored) {
-        }
-
-        return value;
-    }
-
-    /*
-     * =========================================================
-     * 1 MINUTE COUNTDOWN
-     * =========================================================
-     */
-    private void updateCandleTimer() {
-
-        if (candleTimerView == null) {
-            return;
-        }
-
-        long now =
-                System.currentTimeMillis();
-
-        /*
-         * Bangladesh/local device minute boundary.
-         *
-         * 60 seconds থেকে countdown।
-         */
-        long elapsed =
-                (now / 1000) % 60;
-
-        long remaining =
-                60 - elapsed;
-
-        if (remaining == 60) {
-            remaining = 59;
-        }
-
-        String timer =
-                String.format(
-                        Locale.US,
-                        "00:%02d",
-                        remaining);
-
-        candleTimerView.setText(
-                timer);
-
-        if (candleView != null) {
-
-            candleView.setSecondsLeft(
-                    (int) remaining);
-        }
-
-        handler.postDelayed(
-                () -> updateCandleTimer(),
-                1000);
-    }
-
-    /*
-     * =========================================================
-     * CANDLE VIEW
-     * =========================================================
-     */
     private class CandleView extends View {
 
         private final Paint paint =
-                new Paint(
-                        Paint.ANTI_ALIAS_FLAG);
+                new Paint(Paint.ANTI_ALIAS_FLAG);
 
-        private double previousOpen =
-                Double.NaN;
-
-        private double previousHigh =
-                Double.NaN;
-
-        private double previousLow =
-                Double.NaN;
-
-        private double previousClose =
-                Double.NaN;
-
-        private double currentPrice =
-                Double.NaN;
-
-        private int secondsLeft = 59;
-
-        private final Random random =
-                new Random();
-
-        CandleView(Context context) {
-
+        public CandleView(Context context) {
             super(context);
 
-            paint.setStrokeWidth(2);
-
-            setLayerType(
-                    View.LAYER_TYPE_SOFTWARE,
-                    null);
-        }
-
-        void setMarketData(
-                double open,
-                double high,
-                double low,
-                double close,
-                double price) {
-
-            if (!Double.isNaN(open)) {
-                previousOpen = open;
-            }
-
-            if (!Double.isNaN(high)) {
-                previousHigh = high;
-            }
-
-            if (!Double.isNaN(low)) {
-                previousLow = low;
-            }
-
-            if (!Double.isNaN(close)) {
-                previousClose = close;
-            }
-
-            if (!Double.isNaN(price)) {
-                currentPrice = price;
-            }
-
-            invalidate();
-        }
-
-        void setSecondsLeft(
-                int value) {
-
-            secondsLeft = value;
-
-            /*
-             * Running candle-কে সামান্য
-             * live movement দেওয়া হচ্ছে।
-             */
-            if (!Double.isNaN(currentPrice)) {
-
-                double range =
-                        getBaseRange();
-
-                double movement =
-                        (random.nextDouble()
-                        - 0.5)
-                        * range
-                        * 0.18;
-
-                currentPrice += movement;
-            }
-
-            invalidate();
-        }
-
-        private double getBaseRange() {
-
-            if (
-                    !Double.isNaN(previousHigh) &&
-                    !Double.isNaN(previousLow)) {
-
-                double range =
-                        previousHigh
-                        - previousLow;
-
-                if (range > 0) {
-                    return range;
-                }
-            }
-
-            return 0.00010;
+            paint.setStrokeWidth(3f);
         }
 
         @Override
-        protected void onDraw(
-                Canvas canvas) {
+        protected void onDraw(Canvas canvas) {
 
             super.onDraw(canvas);
 
@@ -1047,163 +778,97 @@ public class FloatingService extends Service {
             float height =
                     getHeight();
 
-            /*
-             * CENTER LINE
-             */
-            paint.setColor(
-                    Color.rgb(
-                            35,
-                            45,
-                            65));
+            float centerY =
+                    height / 2f;
 
-            paint.setStrokeWidth(1);
+            // --------------------------------
+            // FALLBACK DATA
+            // --------------------------------
 
-            canvas.drawLine(
-                    0,
-                    height / 2,
-                    width,
-                    height / 2,
-                    paint);
+            double po;
+            double ph;
+            double pl;
+            double pc;
 
-            /*
-             * DATA না পাওয়া গেলে demo candle
-             */
-            double base;
+            double lo;
+            double lh;
+            double ll;
+            double lc;
 
-            if (!Double.isNaN(previousClose)) {
+            if (hasRealCandleData) {
 
-                base = previousClose;
+                po = previousOpen;
+                ph = previousHigh;
+                pl = previousLow;
+                pc = previousClose;
 
-            } else if (!Double.isNaN(currentPrice)) {
-
-                base = currentPrice;
+                lo = liveOpen;
+                lh = liveHigh;
+                ll = liveLow;
+                lc = liveClose;
 
             } else {
 
-                base = 1.0850;
+                po = 1.16100;
+                ph = 1.16115;
+                pl = 1.16090;
+                pc = 1.16108;
+
+                lo = pc;
+                lc = pc;
+                lh = pc;
+                ll = pc;
             }
 
-            double range =
-                    getBaseRange();
+            // --------------------------------
+            // UPDATE LIVE CANDLE
+            // --------------------------------
 
-            if (range <= 0) {
-                range = 0.00010;
+            if (hasRealCandleData) {
+
+                double movement =
+                        Math.sin(
+                                System.currentTimeMillis()
+                                        / 1800.0)
+                                * Math.abs(
+                                        previousClose
+                                                * 0.00008);
+
+                liveClose =
+                        liveOpen + movement;
+
+                liveHigh =
+                        Math.max(
+                                liveOpen,
+                                liveClose);
+
+                liveLow =
+                        Math.min(
+                                liveOpen,
+                                liveClose);
+
+                lc = liveClose;
+                lh = liveHigh;
+                ll = liveLow;
             }
 
-            /*
-             * PREVIOUS CLOSED CANDLE
-             */
-            double pOpen;
+            // --------------------------------
+            // PRICE RANGE
+            // --------------------------------
 
-            double pClose;
-
-            double pHigh;
-
-            double pLow;
-
-            if (!Double.isNaN(previousOpen) &&
-                !Double.isNaN(previousClose)) {
-
-                pOpen =
-                        previousOpen;
-
-                pClose =
-                        previousClose;
-
-                pHigh =
-                        !Double.isNaN(previousHigh)
-                        ? previousHigh
-                        : Math.max(
-                                pOpen,
-                                pClose)
-                        + range * 0.15;
-
-                pLow =
-                        !Double.isNaN(previousLow)
-                        ? previousLow
-                        : Math.min(
-                                pOpen,
-                                pClose)
-                        - range * 0.15;
-
-            } else {
-
-                /*
-                 * Fallback visual candle
-                 */
-                pOpen =
-                        base + range * 0.25;
-
-                pClose =
-                        base - range * 0.10;
-
-                pHigh =
-                        pOpen + range * 0.25;
-
-                pLow =
-                        pClose - range * 0.20;
-            }
-
-            /*
-             * RUNNING CANDLE
-             */
-            double rOpen =
-                    pClose;
-
-            double rClose;
-
-            if (!Double.isNaN(currentPrice)) {
-
-                rClose =
-                        currentPrice;
-
-            } else {
-
-                /*
-                 * Small live movement
-                 */
-                double progress =
-                        (60 - secondsLeft)
-                        / 60.0;
-
-                rClose =
-                        rOpen
-                        + Math.sin(
-                                progress * 8.0)
-                        * range
-                        * 0.25;
-            }
-
-            double rHigh =
+            double max =
                     Math.max(
-                            rOpen,
-                            rClose)
-                    + range * 0.12;
+                            Math.max(ph, lh),
+                            Math.max(po, lo));
 
-            double rLow =
+            double min =
                     Math.min(
-                            rOpen,
-                            rClose)
-                    - range * 0.12;
+                            Math.min(pl, ll),
+                            Math.min(pc, lc));
 
-            /*
-             * Map prices into common chart range
-             */
-            double chartHigh =
-                    Math.max(
-                            pHigh,
-                            rHigh);
-
-            double chartLow =
-                    Math.min(
-                            pLow,
-                            rLow);
-
-            double chartRange =
-                    chartHigh - chartLow;
-
-            if (chartRange <= 0) {
-                chartRange = range;
+            if (max == min) {
+                max += 0.0001;
+                min -= 0.0001;
             }
 
             float top =
@@ -1212,129 +877,60 @@ public class FloatingService extends Service {
             float bottom =
                     height - 8;
 
-            /*
-             * দুই candle-এর অবস্থান
-             */
-            float previousX =
-                    width * 0.38f;
+            float candleHeight =
+                    bottom - top;
 
-            float runningX =
-                    width * 0.68f;
+            // --------------------------------
+            // PREVIOUS CANDLE
+            // --------------------------------
 
-            float candleWidth =
-                    Math.max(
-                            10,
-                            width * 0.12f);
-
-            /*
-             * Draw previous candle
-             */
             drawCandle(
                     canvas,
-                    previousX,
-                    candleWidth,
-                    pOpen,
-                    pHigh,
-                    pLow,
-                    pClose,
-                    chartHigh,
-                    chartLow,
+                    po,
+                    ph,
+                    pl,
+                    pc,
+                    width * 0.35f,
+                    candleHeight,
                     top,
-                    bottom);
+                    min,
+                    max);
 
-            /*
-             * Draw running candle
-             */
+            // --------------------------------
+            // LIVE CANDLE
+            // --------------------------------
+
             drawCandle(
                     canvas,
-                    runningX,
-                    candleWidth,
-                    rOpen,
-                    rHigh,
-                    rLow,
-                    rClose,
-                    chartHigh,
-                    chartLow,
+                    lo,
+                    lh,
+                    ll,
+                    lc,
+                    width * 0.65f,
+                    candleHeight,
                     top,
-                    bottom);
-
-            /*
-             * LIVE indicator
-             */
-            paint.setTextSize(8);
-
-            paint.setTypeface(
-                    Typeface.DEFAULT_BOLD);
-
-            paint.setColor(
-                    Color.WHITE);
-
-            canvas.drawText(
-                    "LIVE",
-                    runningX - 9,
-                    height - 2,
-                    paint);
-
-            /*
-             * CLOSED indicator
-             */
-            paint.setColor(
-                    Color.LTGRAY);
-
-            canvas.drawText(
-                    "CLOSED",
-                    previousX - 17,
-                    height - 2,
-                    paint);
+                    min,
+                    max);
         }
 
         private void drawCandle(
                 Canvas canvas,
-                float x,
-                float candleWidth,
                 double open,
                 double high,
                 double low,
                 double close,
-                double chartHigh,
-                double chartLow,
+                float x,
+                float candleHeight,
                 float top,
-                float bottom) {
-
-            float yHigh =
-                    priceToY(
-                            high,
-                            chartHigh,
-                            chartLow,
-                            top,
-                            bottom);
-
-            float yLow =
-                    priceToY(
-                            low,
-                            chartHigh,
-                            chartLow,
-                            top,
-                            bottom);
-
-            float yOpen =
-                    priceToY(
-                            open,
-                            chartHigh,
-                            chartLow,
-                            top,
-                            bottom);
-
-            float yClose =
-                    priceToY(
-                            close,
-                            chartHigh,
-                            chartLow,
-                            top,
-                            bottom);
+                double min,
+                double max) {
 
             boolean bullish =
                     close >= open;
+
+            // --------------------------------
+            // MARKET CANDLE COLOR
+            // --------------------------------
 
             if (bullish) {
 
@@ -1353,104 +949,83 @@ public class FloatingService extends Service {
                                 90));
             }
 
-            /*
-             * Wick
-             */
-            paint.setStrokeWidth(2);
+            float highY =
+                    (float)
+                            (top +
+                                    (max - high)
+                                            / (max - min)
+                                            * candleHeight);
+
+            float lowY =
+                    (float)
+                            (top +
+                                    (max - low)
+                                            / (max - min)
+                                            * candleHeight);
+
+            float openY =
+                    (float)
+                            (top +
+                                    (max - open)
+                                            / (max - min)
+                                            * candleHeight);
+
+            float closeY =
+                    (float)
+                            (top +
+                                    (max - close)
+                                            / (max - min)
+                                            * candleHeight);
+
+            // WICK
+
+            paint.setStrokeWidth(2.5f);
 
             canvas.drawLine(
                     x,
-                    yHigh,
+                    highY,
                     x,
-                    yLow,
+                    lowY,
                     paint);
 
-            /*
-             * Body
-             */
+            // BODY
+
             float bodyTop =
                     Math.min(
-                            yOpen,
-                            yClose);
+                            openY,
+                            closeY);
 
             float bodyBottom =
                     Math.max(
-                            yOpen,
-                            yClose);
+                            openY,
+                            closeY);
 
-            if (
-                    Math.abs(
-                            bodyBottom - bodyTop)
-                    < 4) {
-
+            if (bodyBottom - bodyTop < 5) {
                 bodyBottom =
-                        bodyTop + 4;
+                        bodyTop + 5;
             }
 
             RectF body =
                     new RectF(
-                            x - candleWidth / 2,
+                            x - 8,
                             bodyTop,
-                            x + candleWidth / 2,
+                            x + 8,
                             bodyBottom);
 
-            paint.setStyle(
-                    Paint.Style.FILL);
-
-            canvas.drawRoundRect(
+            canvas.drawRect(
                     body,
-                    2,
-                    2,
                     paint);
-
-            /*
-             * Small glow
-             */
-            paint.setShadowLayer(
-                    7,
-                    0,
-                    0,
-                    paint.getColor());
-
-            canvas.drawRoundRect(
-                    body,
-                    2,
-                    2,
-                    paint);
-
-            paint.clearShadowLayer();
-        }
-
-        private float priceToY(
-                double price,
-                double high,
-                double low,
-                float top,
-                float bottom) {
-
-            if (high == low) {
-                return (top + bottom) / 2;
-            }
-
-            double ratio =
-                    (high - price)
-                    / (high - low);
-
-            return (float)
-                    (top +
-                    ratio *
-                    (bottom - top));
         }
     }
 
-    /*
-     * =========================================================
-     * NOTIFICATION
-     * =========================================================
-     */
+    // ----------------------------------------------------
+    // NOTIFICATION
+    // ----------------------------------------------------
+
     private void createNotificationChannel() {
 
-        if (Build.VERSION.SDK_INT >= 26) {
+        if (Build.VERSION.SDK_INT >=
+                Build.VERSION_CODES.O) {
 
             NotificationChannel channel =
                     new NotificationChannel(
@@ -1460,81 +1035,32 @@ public class FloatingService extends Service {
                                     .IMPORTANCE_LOW);
 
             NotificationManager manager =
-                    (NotificationManager)
-                            getSystemService(
-                                    NOTIFICATION_SERVICE);
+                    getSystemService(
+                            NotificationManager.class);
 
             if (manager != null) {
-
                 manager.createNotificationChannel(
                         channel);
             }
         }
     }
 
-    private Notification createNotification() {
-
-        Intent intent =
-                new Intent(
-                        this,
-                        MainActivity.class);
-
-        PendingIntent pendingIntent =
-                PendingIntent.getActivity(
-                        this,
-                        0,
-                        intent,
-                        PendingIntent.FLAG_IMMUTABLE |
-                        PendingIntent.FLAG_UPDATE_CURRENT);
-
-        Notification.Builder builder;
-
-        if (Build.VERSION.SDK_INT >= 26) {
-
-            builder =
-                    new Notification.Builder(
-                            this,
-                            "trader_pink_ai");
-
-        } else {
-
-            builder =
-                    new Notification.Builder(
-                            this);
-        }
-
-        return builder
-                .setContentTitle(
-                        "Trader Pink AI 🤖📈")
-                .setContentText(
-                        "EURUSD 1M Signal Engine চলছে")
-                .setSmallIcon(
-                        android.R.drawable
-                                .ic_dialog_info)
-                .setContentIntent(
-                        pendingIntent)
-                .setOngoing(true)
-                .build();
-    }
+    // ----------------------------------------------------
+    // DESTROY
+    // ----------------------------------------------------
 
     @Override
     public void onDestroy() {
 
-        handler.removeCallbacks(
-                updater);
+        handler.removeCallbacks(updater);
+        handler.removeCallbacks(candleTimer);
 
-        handler.removeCallbacks(
-                candleTimer);
-
-        if (
-                floatingView != null &&
-                windowManager != null) {
+        if (floatingView != null
+                && windowManager != null) {
 
             try {
-
                 windowManager.removeView(
                         floatingView);
-
             } catch (Exception ignored) {
             }
         }
@@ -1542,5 +1068,10 @@ public class FloatingService extends Service {
         floatingView = null;
 
         super.onDestroy();
+    }
+
+    @Override
+    public IBinder onBind(Intent intent) {
+        return null;
     }
 }
