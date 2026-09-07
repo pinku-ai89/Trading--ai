@@ -61,7 +61,7 @@ public class FloatingService extends Service {
     private boolean hasRealCandleData = false;
 
     // ----------------------------------------------------
-    // SIGNAL UPDATE
+    // SIGNAL UPDATE TIMER
     // ----------------------------------------------------
 
     private final Runnable updater = new Runnable() {
@@ -72,12 +72,13 @@ public class FloatingService extends Service {
 
             handler.postDelayed(
                     this,
-                    10000);
+                    10000
+            );
         }
     };
 
     // ----------------------------------------------------
-    // CANDLE CLOCK
+    // CANDLE CLOCK TIMER
     // ----------------------------------------------------
 
     private final Runnable candleTimer = new Runnable() {
@@ -92,12 +93,13 @@ public class FloatingService extends Service {
 
             handler.postDelayed(
                     this,
-                    1000);
+                    1000
+            );
         }
     };
 
     // ----------------------------------------------------
-    // CREATE
+    // SERVICE CREATE
     // ----------------------------------------------------
 
     @Override
@@ -106,12 +108,11 @@ public class FloatingService extends Service {
 
         windowManager =
                 (WindowManager)
-                        getSystemService(
-                                WINDOW_SERVICE);
+                        getSystemService(WINDOW_SERVICE);
     }
 
     // ----------------------------------------------------
-    // START SERVICE
+    // SERVICE START
     // ----------------------------------------------------
 
     @Override
@@ -125,19 +126,24 @@ public class FloatingService extends Service {
         Notification notification =
                 new Notification.Builder(
                         this,
-                        "trader_pink_ai")
+                        "trader_pink_ai"
+                )
                         .setContentTitle(
-                                "Trader Pink AI")
+                                "Trader Pink AI"
+                        )
                         .setContentText(
-                                "Floating AI Signal")
+                                "Floating AI Signal"
+                        )
                         .setSmallIcon(
                                 android.R.drawable
-                                        .ic_dialog_info)
+                                        .ic_dialog_info
+                        )
                         .build();
 
         startForeground(
                 1001,
-                notification);
+                notification
+        );
 
         if (floatingView == null) {
             showFloatingWindow();
@@ -145,14 +151,10 @@ public class FloatingService extends Service {
 
         updateSignal();
 
-        handler.removeCallbacks(
-                updater);
-
-        handler.removeCallbacks(
-                candleTimer);
+        handler.removeCallbacks(updater);
+        handler.removeCallbacks(candleTimer);
 
         handler.post(updater);
-
         handler.post(candleTimer);
 
         return START_STICKY;
@@ -168,19 +170,19 @@ public class FloatingService extends Service {
                 new LinearLayout(this);
 
         main.setOrientation(
-                LinearLayout.VERTICAL);
+                LinearLayout.VERTICAL
+        );
 
         main.setPadding(
                 12,
                 9,
                 12,
-                10);
+                10
+        );
 
         main.setBackgroundColor(
-                Color.rgb(
-                        20,
-                        25,
-                        45));
+                Color.rgb(20, 25, 45)
+        );
 
         // ------------------------------------------------
         // TOP BAR
@@ -190,19 +192,23 @@ public class FloatingService extends Service {
                 new LinearLayout(this);
 
         top.setOrientation(
-                LinearLayout.HORIZONTAL);
+                LinearLayout.HORIZONTAL
+        );
 
         top.setGravity(
-                Gravity.CENTER_VERTICAL);
+                Gravity.CENTER_VERTICAL
+        );
 
         TextView title =
                 new TextView(this);
 
         title.setText(
-                "🤖 Trader Pink AI");
+                "🤖 Trader Pink AI"
+        );
 
         title.setTextColor(
-                Color.WHITE);
+                Color.WHITE
+        );
 
         title.setTextSize(13);
 
@@ -210,11 +216,13 @@ public class FloatingService extends Service {
                 new LinearLayout.LayoutParams(
                         0,
                         LinearLayout.LayoutParams.WRAP_CONTENT,
-                        1);
+                        1
+                );
 
         top.addView(
                 title,
-                titleParams);
+                titleParams
+        );
 
         TextView close =
                 new TextView(this);
@@ -222,21 +230,25 @@ public class FloatingService extends Service {
         close.setText("×");
 
         close.setTextColor(
-                Color.WHITE);
+                Color.WHITE
+        );
 
         close.setTextSize(20);
 
         close.setGravity(
-                Gravity.CENTER);
+                Gravity.CENTER
+        );
 
         close.setPadding(
                 8,
                 0,
                 2,
-                0);
+                0
+        );
 
         close.setOnClickListener(
-                v -> stopSelf());
+                v -> stopSelf()
+        );
 
         top.addView(close);
 
@@ -250,10 +262,12 @@ public class FloatingService extends Service {
                 new TextView(this);
 
         market.setText(
-                "EURUSD • 1M");
+                "EURUSD • 1M"
+        );
 
         market.setTextColor(
-                Color.LTGRAY);
+                Color.LTGRAY
+        );
 
         market.setTextSize(10);
 
@@ -267,19 +281,23 @@ public class FloatingService extends Service {
                 new LinearLayout(this);
 
         signalRow.setOrientation(
-                LinearLayout.HORIZONTAL);
+                LinearLayout.HORIZONTAL
+        );
 
         signalRow.setGravity(
-                Gravity.CENTER_VERTICAL);
+                Gravity.CENTER_VERTICAL
+        );
 
         signalView =
                 new TextView(this);
 
         signalView.setText(
-                "WAIT");
+                "WAIT"
+        );
 
         signalView.setTextColor(
-                Color.WHITE);
+                Color.WHITE
+        );
 
         signalView.setTextSize(21);
 
@@ -287,18 +305,22 @@ public class FloatingService extends Service {
                 new TextView(this);
 
         confidenceView.setText(
-                "  --%");
+                "  --%"
+        );
 
         confidenceView.setTextColor(
-                Color.WHITE);
+                Color.WHITE
+        );
 
         confidenceView.setTextSize(13);
 
         signalRow.addView(
-                signalView);
+                signalView
+        );
 
         signalRow.addView(
-                confidenceView);
+                confidenceView
+        );
 
         main.addView(signalRow);
 
@@ -310,10 +332,12 @@ public class FloatingService extends Service {
                 new TextView(this);
 
         trendView.setText(
-                "📊 WAIT");
+                "📊 WAIT"
+        );
 
         trendView.setTextColor(
-                Color.LTGRAY);
+                Color.LTGRAY
+        );
 
         trendView.setTextSize(10);
 
@@ -327,24 +351,23 @@ public class FloatingService extends Service {
                 new LinearLayout(this);
 
         candleBox.setOrientation(
-                LinearLayout.HORIZONTAL);
+                LinearLayout.HORIZONTAL
+        );
 
         candleBox.setGravity(
-                Gravity.CENTER_VERTICAL);
+                Gravity.CENTER_VERTICAL
+        );
 
         candleBox.setPadding(
                 7,
                 5,
                 5,
-                5);
+                5
+        );
 
         candleBox.setBackgroundColor(
-                Color.rgb(
-                        13,
-                        17,
-                        32));
-
-        // Candle view
+                Color.rgb(13, 17, 32)
+        );
 
         candleView =
                 new CandleView(this);
@@ -353,70 +376,85 @@ public class FloatingService extends Service {
                 new LinearLayout.LayoutParams(
                         0,
                         105,
-                        1);
+                        1
+                );
 
         candleBox.addView(
                 candleView,
-                candleParams);
+                candleParams
+        );
 
         // ------------------------------------------------
-        // TIME ON RIGHT SIDE
+        // TIME ON RIGHT
         // ------------------------------------------------
 
         LinearLayout timeBox =
                 new LinearLayout(this);
 
         timeBox.setOrientation(
-                LinearLayout.VERTICAL);
+                LinearLayout.VERTICAL
+        );
 
         timeBox.setGravity(
-                Gravity.CENTER);
+                Gravity.CENTER
+        );
 
         timeBox.setPadding(
                 5,
                 0,
                 2,
-                0);
+                0
+        );
 
         candleTimeView =
                 new TextView(this);
 
         candleTimeView.setText(
-                "--:--");
+                "--:--"
+        );
 
         candleTimeView.setTextColor(
-                Color.WHITE);
+                Color.WHITE
+        );
 
         candleTimeView.setTextSize(12);
 
         candleTimeView.setGravity(
-                Gravity.CENTER);
+                Gravity.CENTER
+        );
 
         countdownView =
                 new TextView(this);
 
         countdownView.setText(
-                "00:59");
+                "00:59"
+        );
 
         countdownView.setTextColor(
-                Color.LTGRAY);
+                Color.LTGRAY
+        );
 
         countdownView.setTextSize(10);
 
         countdownView.setGravity(
-                Gravity.CENTER);
+                Gravity.CENTER
+        );
 
         timeBox.addView(
-                candleTimeView);
+                candleTimeView
+        );
 
         timeBox.addView(
-                countdownView);
+                countdownView
+        );
 
         candleBox.addView(
                 timeBox,
                 new LinearLayout.LayoutParams(
                         55,
-                        LinearLayout.LayoutParams.WRAP_CONTENT));
+                        LinearLayout.LayoutParams.WRAP_CONTENT
+                )
+        );
 
         main.addView(candleBox);
 
@@ -428,29 +466,34 @@ public class FloatingService extends Service {
                 new TextView(this);
 
         nextSignal.setText(
-                "◯ NEXT SIGNAL");
+                "◯ NEXT SIGNAL"
+        );
 
         nextSignal.setTextColor(
-                Color.WHITE);
+                Color.WHITE
+        );
 
         nextSignal.setTextSize(10);
 
         nextSignal.setGravity(
-                Gravity.CENTER);
+                Gravity.CENTER
+        );
 
         nextSignal.setPadding(
                 0,
                 5,
                 0,
-                0);
+                0
+        );
 
         nextSignal.setOnClickListener(
-                v -> updateSignal());
+                v -> updateSignal()
+        );
 
         main.addView(nextSignal);
 
         // ------------------------------------------------
-        // WINDOW PARAMS
+        // WINDOW
         // ------------------------------------------------
 
         floatingView = main;
@@ -474,13 +517,11 @@ public class FloatingService extends Service {
         windowParams =
                 new WindowManager.LayoutParams(
                         275,
-                        WindowManager.LayoutParams
-                                .WRAP_CONTENT,
+                        WindowManager.LayoutParams.WRAP_CONTENT,
                         overlayType,
-                        WindowManager.LayoutParams
-                                .FLAG_NOT_FOCUSABLE,
-                        android.graphics.PixelFormat
-                                .TRANSLUCENT);
+                        WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE,
+                        android.graphics.PixelFormat.TRANSLUCENT
+                );
 
         windowParams.gravity =
                 Gravity.TOP |
@@ -491,7 +532,8 @@ public class FloatingService extends Service {
 
         windowManager.addView(
                 floatingView,
-                windowParams);
+                windowParams
+        );
 
         // ------------------------------------------------
         // DRAG
@@ -512,7 +554,8 @@ public class FloatingService extends Service {
                             MotionEvent event) {
 
                         switch (
-                                event.getAction()) {
+                                event.getAction()
+                        ) {
 
                             case MotionEvent.ACTION_DOWN:
 
@@ -537,26 +580,29 @@ public class FloatingService extends Service {
                                                 (int)
                                                         (
                                                                 initialTouchX -
-                                                                        event.getRawX());
+                                                                        event.getRawX()
+                                                        );
 
                                 windowParams.y =
                                         initialY +
                                                 (int)
                                                         (
                                                                 event.getRawY() -
-                                                                        initialTouchY);
+                                                                        initialTouchY
+                                                        );
 
-                                windowManager
-                                        .updateViewLayout(
-                                                floatingView,
-                                                windowParams);
+                                windowManager.updateViewLayout(
+                                        floatingView,
+                                        windowParams
+                                );
 
                                 return true;
                         }
 
                         return false;
                     }
-                });
+                }
+        );
     }
 
     // ----------------------------------------------------
@@ -571,9 +617,6 @@ public class FloatingService extends Service {
         long seconds =
                 now / 1000;
 
-        long minute =
-                seconds / 60;
-
         long secondInMinute =
                 seconds % 60;
 
@@ -584,42 +627,47 @@ public class FloatingService extends Service {
             remaining = 60;
         }
 
-        // Bangladesh local time (UTC + 6)
+        // Bangladesh UTC +6
 
         long bdSeconds =
-                seconds + (6 * 60 * 60);
-
-        long bdMinute =
-                bdSeconds / 60;
+                seconds +
+                        (6 * 60 * 60);
 
         long hour =
                 (bdSeconds / 3600) % 24;
 
-        long minuteOfHour =
-                bdMinute % 60;
+        long minute =
+                (bdSeconds / 60) % 60;
 
         String time =
                 String.format(
                         Locale.US,
                         "%02d:%02d",
                         hour,
-                        minuteOfHour);
+                        minute
+                );
 
         if (candleTimeView != null) {
 
             candleTimeView.setText(
-                    time);
+                    time
+            );
         }
 
         if (countdownView != null) {
+
+            int displaySeconds =
+                    remaining == 60
+                            ? 59
+                            : (int) remaining;
 
             countdownView.setText(
                     String.format(
                             Locale.US,
                             "00:%02d",
-                            remaining == 60
-                                    ? 59
-                                    : remaining));
+                            displaySeconds
+                    )
+            );
         }
     }
 
@@ -629,212 +677,282 @@ public class FloatingService extends Service {
 
     private void updateSignal() {
 
-        new Thread(() -> {
+        new Thread(
+                () -> {
 
-            HttpURLConnection connection =
-                    null;
+                    HttpURLConnection connection =
+                            null;
 
-            try {
+                    try {
 
-                String urlString =
-                        API_URL +
-                                "?floating=" +
-                                System.currentTimeMillis();
+                        String urlString =
+                                API_URL +
+                                        "?floating=" +
+                                        System.currentTimeMillis();
 
-                URL url =
-                        new URL(urlString);
+                        URL url =
+                                new URL(urlString);
 
-                connection =
-                        (HttpURLConnection)
-                                url.openConnection();
+                        connection =
+                                (HttpURLConnection)
+                                        url.openConnection();
 
-                connection.setRequestMethod(
-                        "GET");
+                        connection.setRequestMethod(
+                                "GET"
+                        );
 
-                connection.setConnectTimeout(
-                        8000);
+                        connection.setConnectTimeout(
+                                8000
+                        );
 
-                connection.setReadTimeout(
-                        8000);
+                        connection.setReadTimeout(
+                                8000
+                        );
 
-                connection.setUseCaches(
-                        false);
+                        connection.setUseCaches(
+                                false
+                        );
 
-                InputStream input =
-                        connection.getInputStream();
+                        InputStream input =
+                                connection.getInputStream();
 
-                BufferedReader reader =
-                        new BufferedReader(
-                                new InputStreamReader(
-                                        input));
+                        BufferedReader reader =
+                                new BufferedReader(
+                                        new InputStreamReader(
+                                                input
+                                        )
+                                );
 
-                StringBuilder response =
-                        new StringBuilder();
+                        StringBuilder response =
+                                new StringBuilder();
 
-                String line;
+                        String line;
 
-                while (
-                        (line =
-                                reader.readLine())
-                                != null) {
+                        while (
+                                (line =
+                                        reader.readLine())
+                                        != null
+                        ) {
 
-                    response.append(line);
-                }
+                            response.append(line);
+                        }
 
-                reader.close();
+                        reader.close();
 
-                JSONObject json =
-                        new JSONObject(
-                                response.toString());
+                        JSONObject json =
+                                new JSONObject(
+                                        response.toString()
+                                );
 
-                String signal =
-                        json.optString(
-                                "signal",
-                                "WAIT");
+                        String signal =
+                                json.optString(
+                                        "signal",
+                                        "WAIT"
+                                );
 
-                int confidence =
-                        json.optInt(
-                                "confidence",
-                                0);
+                        int confidence =
+                                json.optInt(
+                                        "confidence",
+                                        0
+                                );
 
-                String trend =
-                        json.optString(
-                                "trend",
-                                "SIDEWAYS");
+                        String trend =
+                                json.optString(
+                                        "trend",
+                                        "SIDEWAYS"
+                                );
 
-                // ------------------------------------------------
-                // OHLC DATA
-                // ------------------------------------------------
+                        // ------------------------------------------------
+                        // OHLC
+                        // ------------------------------------------------
 
-                double o =
-                        json.optDouble(
-                                "open",
-                                Double.NaN);
+                        double o =
+                                json.optDouble(
+                                        "open",
+                                        Double.NaN
+                                );
 
-                double h =
-                        json.optDouble(
-                                "high",
-                                Double.NaN);
+                        double h =
+                                json.optDouble(
+                                        "high",
+                                        Double.NaN
+                                );
 
-                double l =
-                        json.optDouble(
-                                "low",
-                                Double.NaN);
+                        double l =
+                                json.optDouble(
+                                        "low",
+                                        Double.NaN
+                                );
 
-                double c =
-                        json.optDouble(
-                                "close",
-                                Double.NaN);
+                        double c =
+                                json.optDouble(
+                                        "close",
+                                        Double.NaN
+                                );
 
-                double price =
-                        json.optDouble(
-                                "price",
-                                Double.NaN);
+                        double price =
+                                json.optDouble(
+                                        "price",
+                                        Double.NaN
+                                );
 
-                if (!Double.isNaN(o)
-                        && !Double.isNaN(h)
-                        && !Double.isNaN(l)
-                        && !Double.isNaN(c)) {
+                        if (!Double.isNaN(o)
+                                && !Double.isNaN(h)
+                                && !Double.isNaN(l)
+                                && !Double.isNaN(c)) {
 
-                    previousOpen = o;
-                    previousHigh = h;
-                    previousLow = l;
-                    previousClose = c;
+                            previousOpen = o;
+                            previousHigh = h;
+                            previousLow = l;
+                            previousClose = c;
 
-                    liveOpen = c;
+                            liveOpen = c;
 
-                    if (!Double.isNaN(price)) {
+                            if (!Double.isNaN(price)) {
 
-                        liveClose =
-                                price;
+                                liveClose =
+                                        price;
 
-                    } else {
+                            } else {
 
-                        liveClose =
-                                c;
+                                liveClose =
+                                        c;
+                            }
+
+                            liveHigh =
+                                    Math.max(
+                                            liveOpen,
+                                            liveClose
+                                    );
+
+                            liveLow =
+                                    Math.min(
+                                            liveOpen,
+                                            liveClose
+                                    );
+
+                            hasRealCandleData =
+                                    true;
+                        }
+
+                        final String finalSignal =
+                                signal;
+
+                        final int finalConfidence =
+                                confidence;
+
+                        final String finalTrend =
+                                trend;
+
+                        // ------------------------------------------------
+                        // UI UPDATE
+                        // ------------------------------------------------
+
+                        handler.post(
+                                () -> {
+
+                                    if (signalView != null) {
+
+                                        signalView.setText(
+                                                finalSignal.toUpperCase(
+                                                        Locale.US
+                                                )
+                                        );
+
+                                        if ("BUY".equalsIgnoreCase(
+                                                finalSignal
+                                        )) {
+
+                                            signalView.setTextColor(
+                                                    Color.rgb(
+                                                            45,
+                                                            220,
+                                                            125
+                                                    )
+                                            );
+
+                                        } else if (
+                                                "SELL".equalsIgnoreCase(
+                                                        finalSignal
+                                                )
+                                        ) {
+
+                                            signalView.setTextColor(
+                                                    Color.rgb(
+                                                            255,
+                                                            75,
+                                                            90
+                                                    )
+                                            );
+
+                                        } else {
+
+                                            signalView.setTextColor(
+                                                    Color.WHITE
+                                            );
+                                        }
+                                    }
+
+                                    if (confidenceView != null) {
+
+                                        confidenceView.setText(
+                                                "  " +
+                                                        finalConfidence +
+                                                        "%"
+                                        );
+                                    }
+
+                                    if (trendView != null) {
+
+                                        trendView.setText(
+                                                "📊 " +
+                                                        finalTrend.toUpperCase(
+                                                                Locale.US
+                                                        )
+                                        );
+                                    }
+
+                                    if (candleView != null) {
+                                        candleView.invalidate();
+                                    }
+                                }
+                        );
+
+                    } catch (Exception e) {
+
+                        handler.post(
+                                () -> {
+
+                                    if (signalView != null) {
+                                        signalView.setText("WAIT");
+                                        signalView.setTextColor(
+                                                Color.WHITE
+                                        );
+                                    }
+
+                                    if (confidenceView != null) {
+                                        confidenceView.setText(
+                                                "  --%"
+                                        );
+                                    }
+
+                                    if (trendView != null) {
+                                        trendView.setText(
+                                                "📊 CONNECTION"
+                                        );
+                                    }
+                                }
+                        );
+
+                    } finally {
+
+                        if (connection != null) {
+                            connection.disconnect();
+                        }
                     }
 
-                    liveHigh =
-                            Math.max(
-                                    liveOpen,
-                                    liveClose);
-
-                    liveLow =
-                            Math.min(
-                                    liveOpen,
-                                    liveClose);
-
-                    hasRealCandleData =
-                            true;
                 }
-
-                runOnUiThread(() -> {
-
-                    signalView.setText(
-                            signal.toUpperCase());
-
-                    confidenceView.setText(
-                            "  " +
-                                    confidence +
-                                    "%");
-
-                    if ("BUY".equalsIgnoreCase(
-                            signal)) {
-
-                        signalView.setTextColor(
-                                Color.rgb(
-                                        45,
-                                        220,
-                                        125));
-
-                    } else if (
-                            "SELL".equalsIgnoreCase(
-                                    signal)) {
-
-                        signalView.setTextColor(
-                                Color.rgb(
-                                        255,
-                                        75,
-                                        90));
-
-                    } else {
-
-                        signalView.setTextColor(
-                                Color.WHITE);
-                    }
-
-                    trendView.setText(
-                            "📊 " +
-                                    trend.toUpperCase());
-
-                    if (candleView != null) {
-
-                        candleView.invalidate();
-                    }
-                });
-
-            } catch (Exception e) {
-
-                runOnUiThread(() -> {
-
-                    signalView.setText(
-                            "WAIT");
-
-                    confidenceView.setText(
-                            "  --%");
-
-                    trendView.setText(
-                            "📊 CONNECTION");
-                });
-
-            } finally {
-
-                if (connection != null) {
-                    connection.disconnect();
-                }
-            }
-
-        }).start();
+        ).start();
     }
 
     // ----------------------------------------------------
@@ -845,7 +963,8 @@ public class FloatingService extends Service {
 
         private final Paint paint =
                 new Paint(
-                        Paint.ANTI_ALIAS_FLAG);
+                        Paint.ANTI_ALIAS_FLAG
+                );
 
         CandleView(Context context) {
 
@@ -856,7 +975,8 @@ public class FloatingService extends Service {
 
         @Override
         protected void onDraw(
-                Canvas canvas) {
+                Canvas canvas
+        ) {
 
             super.onDraw(canvas);
 
@@ -894,40 +1014,44 @@ public class FloatingService extends Service {
 
             } else {
 
-                // Temporary fallback
-
                 po = 1.16100;
                 ph = 1.16115;
                 pl = 1.16090;
                 pc = 1.16108;
 
                 lo = pc;
-                lc = pc;
                 lh = pc;
                 ll = pc;
+                lc = pc;
             }
 
             // ------------------------------------------------
-            // PRICE RANGE
+            // RANGE
             // ------------------------------------------------
 
             double max =
                     Math.max(
                             Math.max(
                                     ph,
-                                    lh),
+                                    lh
+                            ),
                             Math.max(
                                     po,
-                                    lo));
+                                    lo
+                            )
+                    );
 
             double min =
                     Math.min(
                             Math.min(
                                     pl,
-                                    ll),
+                                    ll
+                            ),
                             Math.min(
                                     pc,
-                                    lc));
+                                    lc
+                            )
+                    );
 
             if (max == min) {
 
@@ -944,7 +1068,7 @@ public class FloatingService extends Service {
                     bottom - top;
 
             // ------------------------------------------------
-            // PREVIOUS CLOSED CANDLE
+            // PREVIOUS CLOSED
             // ------------------------------------------------
 
             drawCandle(
@@ -957,10 +1081,11 @@ public class FloatingService extends Service {
                     candleHeight,
                     top,
                     min,
-                    max);
+                    max
+            );
 
             // ------------------------------------------------
-            // LIVE CANDLE
+            // LIVE
             // ------------------------------------------------
 
             drawCandle(
@@ -973,11 +1098,12 @@ public class FloatingService extends Service {
                     candleHeight,
                     top,
                     min,
-                    max);
+                    max
+            );
         }
 
         // ----------------------------------------------------
-        // DRAW ONE CANDLE
+        // DRAW CANDLE
         // ----------------------------------------------------
 
         private void drawCandle(
@@ -990,15 +1116,11 @@ public class FloatingService extends Service {
                 float candleHeight,
                 float top,
                 double min,
-                double max) {
+                double max
+        ) {
 
             boolean bullish =
                     close >= open;
-
-            // ------------------------------------------------
-            // BULLISH = GREEN
-            // BEARISH = RED
-            // ------------------------------------------------
 
             if (bullish) {
 
@@ -1006,7 +1128,9 @@ public class FloatingService extends Service {
                         Color.rgb(
                                 45,
                                 220,
-                                125));
+                                125
+                        )
+                );
 
             } else {
 
@@ -1014,7 +1138,9 @@ public class FloatingService extends Service {
                         Color.rgb(
                                 255,
                                 75,
-                                90));
+                                90
+                        )
+                );
             }
 
             float highY =
@@ -1065,15 +1191,15 @@ public class FloatingService extends Service {
             // WICK
             // ------------------------------------------------
 
-            paint.setStrokeWidth(
-                    2.5f);
+            paint.setStrokeWidth(2.5f);
 
             canvas.drawLine(
                     x,
                     highY,
                     x,
                     lowY,
-                    paint);
+                    paint
+            );
 
             // ------------------------------------------------
             // BODY
@@ -1082,12 +1208,14 @@ public class FloatingService extends Service {
             float bodyTop =
                     Math.min(
                             openY,
-                            closeY);
+                            closeY
+                    );
 
             float bodyBottom =
                     Math.max(
                             openY,
-                            closeY);
+                            closeY
+                    );
 
             if (bodyBottom - bodyTop < 5) {
 
@@ -1100,11 +1228,13 @@ public class FloatingService extends Service {
                             x - 8,
                             bodyTop,
                             x + 8,
-                            bodyBottom);
+                            bodyBottom
+                    );
 
             canvas.drawRect(
                     body,
-                    paint);
+                    paint
+            );
         }
     }
 
@@ -1122,16 +1252,19 @@ public class FloatingService extends Service {
                             "trader_pink_ai",
                             "Trader Pink AI",
                             NotificationManager
-                                    .IMPORTANCE_LOW);
+                                    .IMPORTANCE_LOW
+                    );
 
             NotificationManager manager =
                     getSystemService(
-                            NotificationManager.class);
+                            NotificationManager.class
+                    );
 
             if (manager != null) {
 
                 manager.createNotificationChannel(
-                        channel);
+                        channel
+                );
             }
         }
     }
@@ -1144,10 +1277,12 @@ public class FloatingService extends Service {
     public void onDestroy() {
 
         handler.removeCallbacks(
-                updater);
+                updater
+        );
 
         handler.removeCallbacks(
-                candleTimer);
+                candleTimer
+        );
 
         if (floatingView != null
                 && windowManager != null) {
@@ -1155,7 +1290,8 @@ public class FloatingService extends Service {
             try {
 
                 windowManager.removeView(
-                        floatingView);
+                        floatingView
+                );
 
             } catch (Exception ignored) {
             }
@@ -1172,7 +1308,8 @@ public class FloatingService extends Service {
 
     @Override
     public IBinder onBind(
-            Intent intent) {
+            Intent intent
+    ) {
 
         return null;
     }
